@@ -53,7 +53,7 @@ class PayInvoice extends Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
      * @Groups({"invoice_read"})
      */
     private $order;
