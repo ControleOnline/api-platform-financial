@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace ControleOnline\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;

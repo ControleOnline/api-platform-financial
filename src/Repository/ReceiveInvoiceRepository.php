@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Repository;
+namespace ControleOnline\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\DBALException;

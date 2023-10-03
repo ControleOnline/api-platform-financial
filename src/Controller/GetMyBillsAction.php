@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Controller;
+namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\PayInvoice;
 use App\Entity\PurchasingOrder AS Order;

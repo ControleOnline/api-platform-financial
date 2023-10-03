@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace ControleOnline\Controller;
 
 use App\Entity\Status;
 use App\Entity\Order;

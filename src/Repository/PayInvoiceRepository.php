@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Repository;
+namespace ControleOnline\Repository;
 
 use ControleOnline\Entity\PayInvoice;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

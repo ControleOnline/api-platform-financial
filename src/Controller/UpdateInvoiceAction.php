@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace ControleOnline\Controller;
 
 use App\Controller\AbstractCustomResourceAction;
 use App\Entity\Status;
