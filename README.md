@@ -25,7 +25,7 @@ doctrine:
                 type: annotation
                 dir: "%kernel.project_dir%/vendor/controleonline/financial/src/Entity"
                 prefix: 'ControleOnline\Entity'
-                alias: App                             
+                alias: ControleOnline                             
 ```          
 
 
