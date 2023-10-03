@@ -8,7 +8,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\ResultSetMapping;
 
-use App\Entity\ReceiveInvoice;
+use ControleOnline\Entity\ReceiveInvoice;
 
 /**
  * @method ReceiveInvoice|null find($id, $lockMode = null, $lockVersion = null)
