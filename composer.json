@@ -1,0 +1,16 @@
+{
+    "name": "controleonline/financial",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ControleOnline\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Controle Online",
+            "email": "luiz.kim@controleonline.com"
+        }
+    ],
+    "require": {}
+}
