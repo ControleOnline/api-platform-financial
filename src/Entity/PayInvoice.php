@@ -53,7 +53,7 @@ class PayInvoice extends Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
      * @Groups({"invoice_read"})
      */
     private $order;
@@ -225,10 +225,10 @@ class PayInvoice extends Invoice
     /**
      * Add PurchasingOrderInvoice
      *
-     * @param \App\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
      * @return People
      */
-    public function addOrder(\App\Entity\PurchasingOrderInvoice $order)
+    public function addOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
     {
         $this->order[] = $order;
         return $this;
@@ -236,9 +236,9 @@ class PayInvoice extends Invoice
     /**
      * Remove PurchasingOrderInvoice
      *
-     * @param \App\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
      */
-    public function removeOrder(\App\Entity\PurchasingOrderInvoice $order)
+    public function removeOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
     {
         $this->order->removeElement($order);
     }
