@@ -2,7 +2,7 @@
 
 namespace ControleOnline\Controller;
 
-use App\Entity\Config;
+use ControleOnline\Entity\Config;
 use ControleOnline\Entity\ReceiveInvoice;
 use ctodobom\APInterPHP\BancoInterException;
 use Exception;
@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Entity\Invoice;
-use App\Library\Inter\InterClient;
+use ControleOnline\Entity\Invoice;
+use ControleOnline\Library\Inter\InterClient;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 

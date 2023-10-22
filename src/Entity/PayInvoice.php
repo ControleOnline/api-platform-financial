@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * PayInvoice
  *
- * @ORM\EntityListeners ({App\Listener\LogListener::class})
+ * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="invoice", indexes={@ORM\Index (name="invoice_subtype", columns={"invoice_subtype"})})
  * @ORM\Entity (repositoryClass="ControleOnline\Repository\PayInvoiceRepository")
  */
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/pay/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
-            controller: \App\Controller\GetBankItauDataAction::class
+            controller: \ControleOnline\Controller\GetBankItauDataAction::class
         )
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
@@ -58,9 +58,9 @@ class PayInvoice extends Invoice
      */
     private $order;
     /**
-     * @var \App\Entity\Status
+     * @var \ControleOnline\Entity\Status
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Status")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
@@ -137,13 +137,13 @@ class PayInvoice extends Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\ServiceInvoiceTax", mappedBy="invoice")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ServiceInvoiceTax", mappedBy="invoice")
      */
     private $service_invoice_tax;
     /**
-     * @var \App\Entity\Category
+     * @var \ControleOnline\Entity\Category
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Category")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Category")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
      * })
@@ -352,10 +352,10 @@ class PayInvoice extends Invoice
     /**
      * Set status
      *
-     * @param \App\Entity\Status $status
+     * @param \ControleOnline\Entity\Status $status
      * @return Order
      */
-    public function setStatus(\App\Entity\Status $status = null)
+    public function setStatus(\ControleOnline\Entity\Status $status = null)
     {
         $this->status = $status;
         return $this;
@@ -363,7 +363,7 @@ class PayInvoice extends Invoice
     /**
      * Get status
      *
-     * @return \App\Entity\Status
+     * @return \ControleOnline\Entity\Status
      */
     public function getStatus()
     {
@@ -372,10 +372,10 @@ class PayInvoice extends Invoice
     /**
      * Add service_invoice_tax
      *
-     * @param \App\Entity\ServiceInvoiceTax $service_invoice_tax
+     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
      * @return Order
      */
-    public function addAServiceInvoiceTax(\App\Entity\ServiceInvoiceTax $service_invoice_tax)
+    public function addAServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
     {
         $this->service_invoice_tax[] = $service_invoice_tax;
         return $this;
@@ -383,9 +383,9 @@ class PayInvoice extends Invoice
     /**
      * Remove service_invoice_tax
      *
-     * @param \App\Entity\ServiceInvoiceTax $service_invoice_tax
+     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
      */
-    public function removeServiceInvoiceTax(\App\Entity\ServiceInvoiceTax $service_invoice_tax)
+    public function removeServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
     {
         $this->service_invoice_tax->removeElement($service_invoice_tax);
     }

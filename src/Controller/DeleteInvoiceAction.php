@@ -2,10 +2,10 @@
 
 namespace ControleOnline\Controller;
 
-use App\Controller\AbstractCustomResourceAction;
-use App\Entity\Status;
+use ControleOnline\Controller\AbstractCustomResourceAction;
+use ControleOnline\Entity\Status;
 use ControleOnline\Entity\ReceiveInvoice;
-use App\Entity\SalesOrder;
+use ControleOnline\Entity\SalesOrder;
 
 class DeleteInvoiceAction extends AbstractCustomResourceAction
 {

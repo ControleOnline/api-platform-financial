@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Payment
- * @ORM\EntityListeners({App\Listener\LogListener::class})
+ * @ORM\EntityListeners({ControleOnline\Listener\LogListener::class})
  * @ORM\Table(name="payment")
  * @ORM\Entity
  */

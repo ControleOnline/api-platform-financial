@@ -2,13 +2,13 @@
 
 namespace ControleOnline\Controller;
 
-use App\Controller\AbstractCustomResourceAction;
-use App\Entity\Status;
-use App\Entity\People;
-use App\Entity\PeopleProvider;
+use ControleOnline\Controller\AbstractCustomResourceAction;
+use ControleOnline\Entity\Status;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\PeopleProvider;
 use ControleOnline\Entity\ReceiveInvoice;
-use App\Entity\Category;
-use App\Entity\SalesOrder;
+use ControleOnline\Entity\Category;
+use ControleOnline\Entity\SalesOrder;
 use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;

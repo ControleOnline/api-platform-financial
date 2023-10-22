@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ControleOnline\Entity\ReceiveInvoice;
-use App\Entity\Status;
+use ControleOnline\Entity\Status;
 
 class RenewInvoiceAction
 {

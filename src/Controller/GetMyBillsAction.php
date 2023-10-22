@@ -4,9 +4,9 @@
 namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\PayInvoice;
-use App\Entity\PurchasingOrder AS Order;
-use App\Entity\People;
-use App\Entity\SchoolClass;
+use ControleOnline\Entity\PurchasingOrder AS Order;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\SchoolClass;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class GetMyBillsAction
- * @package App\Controller
+ * @package ControleOnline\Controller
  * @Route("/invoice")
  */
 class GetMyBillsAction extends AbstractController

@@ -14,11 +14,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * ReceiveInvoice
  *
- * @ORM\EntityListeners ({App\Listener\LogListener::class})
+ * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="invoice", indexes={@ORM\Index (name="invoice_subtype", columns={"invoice_subtype"})})
  * @ORM\Entity (repositoryClass="ControleOnline\Repository\ReceiveInvoiceRepository")
  */
-#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}'), new Get(security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')', uriTemplate: '/finance/{id}/download', requirements: ['id' => '[\\w-]+'], controller: \App\Controller\GetBankInterDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank', controller: \App\Controller\GetProviderDataPerInvoiceId::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/renew', controller: \App\Controller\RenewInvoiceAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/itau/{operation}', requirements: ['operation' => '^(itauhash|payment)+$'], controller: \App\Controller\GetBankItauDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/inter/{operation}', requirements: ['operation' => '^(download|payment)+$'], controller: \App\Controller\GetBankInterDataAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}', validationContext: ['groups' => ['invoice_receive_put_validation']], denormalizationContext: ['groups' => ['invoice_receive_put_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-notified', validationContext: ['groups' => ['invoice_receive_notified_validation']], denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/remove-order', controller: \ControleOnline\Controller\DeleteReceiveInvoiceOrderAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-status', controller: \App\Controller\UpdateInvoiceStatusAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/order-classes', controller: \App\Controller\GetSchoolOrderClassesAction::class), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive', controller: \ControleOnline\Controller\GetReceiveInvoiceCollectionAction::class)], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['invoice_read']], denormalizationContext: ['groups' => ['invoice_write']])]
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}'), new Get(security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')', uriTemplate: '/finance/{id}/download', requirements: ['id' => '[\\w-]+'], controller: \ControleOnline\Controller\GetBankInterDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank', controller: \ControleOnline\Controller\GetProviderDataPerInvoiceId::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/renew', controller: \ControleOnline\Controller\RenewInvoiceAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/itau/{operation}', requirements: ['operation' => '^(itauhash|payment)+$'], controller: \ControleOnline\Controller\GetBankItauDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/inter/{operation}', requirements: ['operation' => '^(download|payment)+$'], controller: \ControleOnline\Controller\GetBankInterDataAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}', validationContext: ['groups' => ['invoice_receive_put_validation']], denormalizationContext: ['groups' => ['invoice_receive_put_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-notified', validationContext: ['groups' => ['invoice_receive_notified_validation']], denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/remove-order', controller: \ControleOnline\Controller\DeleteReceiveInvoiceOrderAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-status', controller: \ControleOnline\Controller\UpdateInvoiceStatusAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/order-classes', controller: \ControleOnline\Controller\GetSchoolOrderClassesAction::class), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive', controller: \ControleOnline\Controller\GetReceiveInvoiceCollectionAction::class)], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['invoice_read']], denormalizationContext: ['groups' => ['invoice_write']])]
 class ReceiveInvoice extends Invoice
 {
     /**
@@ -33,14 +33,14 @@ class ReceiveInvoice extends Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\SalesOrderInvoice", mappedBy="invoice", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\SalesOrderInvoice", mappedBy="invoice", cascade={"persist"})
      * @Groups({"invoice_read"})
      */
     private $order;
     /**
-     * @var \App\Entity\Status
+     * @var \ControleOnline\Entity\Status
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Status")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
@@ -117,13 +117,13 @@ class ReceiveInvoice extends Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\ServiceInvoiceTax", mappedBy="invoice")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ServiceInvoiceTax", mappedBy="invoice")
      */
     private $service_invoice_tax;
     /**
-     * @var \App\Entity\Category
+     * @var \ControleOnline\Entity\Category
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Category")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Category")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
      * })
@@ -211,10 +211,10 @@ class ReceiveInvoice extends Invoice
     /**
      * Add SalesOrderInvoice
      *
-     * @param \App\Entity\SalesOrderInvoice $order
+     * @param \ControleOnline\Entity\SalesOrderInvoice $order
      * @return People
      */
-    public function addOrder(\App\Entity\SalesOrderInvoice $order)
+    public function addOrder(\ControleOnline\Entity\SalesOrderInvoice $order)
     {
         $this->order[] = $order;
         return $this;
@@ -222,9 +222,9 @@ class ReceiveInvoice extends Invoice
     /**
      * Remove SalesOrderInvoice
      *
-     * @param \App\Entity\SalesOrderInvoice $order
+     * @param \ControleOnline\Entity\SalesOrderInvoice $order
      */
-    public function removeOrder(\App\Entity\SalesOrderInvoice $order)
+    public function removeOrder(\ControleOnline\Entity\SalesOrderInvoice $order)
     {
         $this->order->removeElement($order);
     }
@@ -358,10 +358,10 @@ class ReceiveInvoice extends Invoice
     /**
      * Set status
      *
-     * @param \App\Entity\Status $status
+     * @param \ControleOnline\Entity\Status $status
      * @return Order
      */
-    public function setStatus(\App\Entity\Status $status = null)
+    public function setStatus(\ControleOnline\Entity\Status $status = null)
     {
         $this->status = $status;
         return $this;
@@ -369,7 +369,7 @@ class ReceiveInvoice extends Invoice
     /**
      * Get status
      *
-     * @return \App\Entity\Status
+     * @return \ControleOnline\Entity\Status
      */
     public function getStatus()
     {
@@ -378,10 +378,10 @@ class ReceiveInvoice extends Invoice
     /**
      * Add service_invoice_tax
      *
-     * @param \App\Entity\ServiceInvoiceTax $service_invoice_tax
+     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
      * @return Order
      */
-    public function addAServiceInvoiceTax(\App\Entity\ServiceInvoiceTax $service_invoice_tax)
+    public function addAServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
     {
         $this->service_invoice_tax[] = $service_invoice_tax;
         return $this;
@@ -389,9 +389,9 @@ class ReceiveInvoice extends Invoice
     /**
      * Remove service_invoice_tax
      *
-     * @param \App\Entity\ServiceInvoiceTax $service_invoice_tax
+     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
      */
-    public function removeServiceInvoiceTax(\App\Entity\ServiceInvoiceTax $service_invoice_tax)
+    public function removeServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
     {
         $this->address->removeElement($service_invoice_tax);
     }

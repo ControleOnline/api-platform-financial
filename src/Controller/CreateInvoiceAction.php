@@ -2,16 +2,16 @@
 
 namespace ControleOnline\Controller;
 
-use App\Controller\AbstractCustomResourceAction;
-use App\Entity\Status;
-use App\Entity\People;
-use App\Entity\SalesOrder;
-use App\Entity\PurchasingOrder;
+use ControleOnline\Controller\AbstractCustomResourceAction;
+use ControleOnline\Entity\Status;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\SalesOrder;
+use ControleOnline\Entity\PurchasingOrder;
 use ControleOnline\Entity\ReceiveInvoice;
 use ControleOnline\Entity\PayInvoice;
-use App\Entity\SalesOrderInvoice;
-use App\Entity\PurchasingOrderInvoice;
-use App\Entity\Category;
+use ControleOnline\Entity\SalesOrderInvoice;
+use ControleOnline\Entity\PurchasingOrderInvoice;
+use ControleOnline\Entity\Category;
 
 class CreateInvoiceAction extends AbstractCustomResourceAction
 {
@@ -43,9 +43,9 @@ class CreateInvoiceAction extends AbstractCustomResourceAction
         throw new \Exception('Provider was not found');
       }
 
-      $orderClass        = $this->payload()->orderType == 'purchase' ? '\\App\\Entity\\PurchasingOrder'        : '\\App\\Entity\\SalesOrder';
-      $invoiceClass      = $this->payload()->orderType == 'purchase' ? '\\ControleOnline\\Entity\\PayInvoice'             : '\\App\\Entity\\ReceiveInvoice';
-      $orderInvoiceClass = $this->payload()->orderType == 'purchase' ? '\\App\\Entity\\PurchasingOrderInvoice' : '\\App\\Entity\\SalesOrderInvoice';
+      $orderClass        = $this->payload()->orderType == 'purchase' ? '\\ControleOnline\\Entity\\PurchasingOrder'        : '\\ControleOnline\\Entity\\SalesOrder';
+      $invoiceClass      = $this->payload()->orderType == 'purchase' ? '\\ControleOnline\\Entity\\PayInvoice'             : '\\ControleOnline\\Entity\\ReceiveInvoice';
+      $orderInvoiceClass = $this->payload()->orderType == 'purchase' ? '\\ControleOnline\\Entity\\PurchasingOrderInvoice' : '\\ControleOnline\\Entity\\SalesOrderInvoice';
 
       // create order
 

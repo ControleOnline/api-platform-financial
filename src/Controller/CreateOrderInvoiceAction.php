@@ -2,13 +2,13 @@
 
 namespace ControleOnline\Controller;
 
-use App\Entity\Status;
-use App\Entity\Order;
+use ControleOnline\Entity\Status;
+use ControleOnline\Entity\Order;
 use ControleOnline\Entity\PayInvoice;
-use App\Entity\PurchasingOrderInvoice;
+use ControleOnline\Entity\PurchasingOrderInvoice;
 use ControleOnline\Entity\ReceiveInvoice;
-use App\Entity\SalesOrder;
-use App\Entity\SalesOrderInvoice;
+use ControleOnline\Entity\SalesOrder;
+use ControleOnline\Entity\SalesOrderInvoice;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 

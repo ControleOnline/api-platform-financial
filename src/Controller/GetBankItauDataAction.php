@@ -6,12 +6,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
-use App\Entity\Config;
-use App\Entity\Invoice;
-use App\Entity\Status;
-use App\Entity\People;
-use App\Entity\SalesOrder;
-use App\Library\Itau\ItauClient;
+use ControleOnline\Entity\Config;
+use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Status;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\SalesOrder;
+use ControleOnline\Library\Itau\ItauClient;
 
 class GetBankItauDataAction
 {
@@ -95,7 +95,7 @@ class GetBankItauDataAction
         $obsAd2          = '';
         $obsAd3          = '';
 
-        $itaucripto      = new \App\Library\Itau\Itaucripto();
+        $itaucripto      = new \ControleOnline\Library\Itau\Itaucripto();
 
         return $itaucripto->geraDados(
             $codEmp,
@@ -179,7 +179,7 @@ class GetBankItauDataAction
     private function getItauConfig(People $people): array
     {
         /**
-         * @var \App\Repository\ConfigRepository
+         * @var \ControleOnline\Repository\ConfigRepository
          */
         $crepo   = $this->manager->getRepository(Config::class);
         $configs = $crepo->getItauConfigByPeople($people);

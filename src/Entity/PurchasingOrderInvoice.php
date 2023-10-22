@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * PurchasingOrderInvoice
  *
- * @ORM\EntityListeners ({App\Listener\LogListener::class})
+ * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="order_invoice", uniqueConstraints={@ORM\UniqueConstraint (name="order_id", columns={"order_id", "invoice_id"})}, indexes={@ORM\Index (name="invoice_id", columns={"invoice_id"})})
  * @ORM\Entity
  */
@@ -37,9 +37,9 @@ class PurchasingOrderInvoice
      */
     private $invoice;
     /**
-     * @var \App\Entity\PurchasingOrder
+     * @var \ControleOnline\Entity\PurchasingOrder
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\PurchasingOrder", inversedBy="invoice")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PurchasingOrder", inversedBy="invoice")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
@@ -90,10 +90,10 @@ class PurchasingOrderInvoice
     /**
      * Set order
      *
-     * @param \App\Entity\PurchasingOrder $order
+     * @param \ControleOnline\Entity\PurchasingOrder $order
      * @return PurchasingOrderInvoice
      */
-    public function setOrder(\App\Entity\PurchasingOrder $order = null)
+    public function setOrder(\ControleOnline\Entity\PurchasingOrder $order = null)
     {
         $this->order = $order;
         return $this;
@@ -101,7 +101,7 @@ class PurchasingOrderInvoice
     /**
      * Get order
      *
-     * @return \App\Entity\PurchasingOrder
+     * @return \ControleOnline\Entity\PurchasingOrder
      */
     public function getOrder()
     {

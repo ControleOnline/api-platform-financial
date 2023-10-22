@@ -2,15 +2,15 @@
 
 namespace ControleOnline\Controller;
 
-use App\Entity\Config;
-use App\Entity\People;
+use ControleOnline\Entity\Config;
+use ControleOnline\Entity\People;
 use ControleOnline\Entity\ReceiveInvoice;
-use App\Entity\SalesOrder;
-use App\Entity\SalesOrderInvoice;
+use ControleOnline\Entity\SalesOrder;
+use ControleOnline\Entity\SalesOrderInvoice;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Library\Itau\ItauClient;
+use ControleOnline\Library\Itau\ItauClient;
 
 class DeleteReceiveInvoiceOrderAction
 {
@@ -111,7 +111,7 @@ class DeleteReceiveInvoiceOrderAction
     private function getItauConfig(People $people): array
     {
         /**
-         * @var \App\Repository\ConfigRepository
+         * @var \ControleOnline\Repository\ConfigRepository
          */
         $crepo   = $this->manager->getRepository(Config::class);
         $configs = $crepo->getItauConfigByPeople($people);
@@ -127,7 +127,7 @@ class DeleteReceiveInvoiceOrderAction
         $price = 0;
 
         /**
-         * @var \App\Entity\SalesOrderInvoice $salesOrderInvoice
+         * @var \ControleOnline\Entity\SalesOrderInvoice $salesOrderInvoice
          */
         foreach ($invoice->getOrder() as $salesOrderInvoice) {
             if (!in_array($salesOrderInvoice->getOrder()->getStatus()->getStatus(), ['canceled', 'expired'])) {
