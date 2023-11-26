@@ -172,7 +172,7 @@ class PurchasingOrder extends Order
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\PurchasingOrderInvoiceTax", mappedBy="order")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoiceTax", mappedBy="order")
      * @Groups({"order_read"})
      */
     private $invoiceTax;
@@ -675,10 +675,10 @@ class PurchasingOrder extends Order
     /**
      * Add invoiceTax
      *
-     * @param \App\Entity\PurchasingOrderInvoiceTax $invoice_tax
+     * @param \ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax
      * @return Order
      */
-    public function addAInvoiceTax(\App\Entity\PurchasingOrderInvoiceTax $invoice_tax)
+    public function addAInvoiceTax(\ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax)
     {
         $this->invoiceTax[] = $invoice_tax;
         return $this;
@@ -686,9 +686,9 @@ class PurchasingOrder extends Order
     /**
      * Remove invoiceTax
      *
-     * @param \App\Entity\PurchasingOrderInvoiceTax $invoice_tax
+     * @param \ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax
      */
-    public function removeInvoiceTax(\App\Entity\PurchasingOrderInvoiceTax $invoice_tax)
+    public function removeInvoiceTax(\ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax)
     {
         $this->address->removeElement($invoice_tax);
     }
