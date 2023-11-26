@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
+Use ControleOnline\Entity\SalesOrderInvoice;
 use App\Entity\Category;
 use App\Entity\Order;
 /**
@@ -217,7 +217,7 @@ class ReceiveInvoice extends Invoice
      * @param \ControleOnline\Entity\SalesOrderInvoice $order
      * @return People
      */
-    public function addOrder(\ControleOnline\Entity\SalesOrderInvoice $order)
+    public function addOrder(SalesOrderInvoice $order)
     {
         $this->order[] = $order;
         return $this;
@@ -227,7 +227,7 @@ class ReceiveInvoice extends Invoice
      *
      * @param \ControleOnline\Entity\SalesOrderInvoice $order
      */
-    public function removeOrder(\ControleOnline\Entity\SalesOrderInvoice $order)
+    public function removeOrder(SalesOrderInvoice $order)
     {
         $this->order->removeElement($order);
     }
