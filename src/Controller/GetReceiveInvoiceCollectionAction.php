@@ -2,7 +2,7 @@
 
 namespace ControleOnline\Controller;
 
-use ControleOnline\Entity\People;
+use App\Entity\People;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;

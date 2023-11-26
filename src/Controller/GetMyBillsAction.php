@@ -5,7 +5,7 @@ namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\PayInvoice;
 use ControleOnline\Entity\PurchasingOrder AS Order;
-use ControleOnline\Entity\People;
+use App\Entity\People;
 use ControleOnline\Entity\SchoolClass;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;

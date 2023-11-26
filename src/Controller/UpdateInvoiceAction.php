@@ -4,8 +4,8 @@ namespace ControleOnline\Controller;
 
 use ControleOnline\Controller\AbstractCustomResourceAction;
 use ControleOnline\Entity\Status;
-use ControleOnline\Entity\People;
-use ControleOnline\Entity\PeopleProvider;
+use App\Entity\People;
+use App\Entity\PeopleProvider;
 use ControleOnline\Entity\ReceiveInvoice;
 use ControleOnline\Entity\Category;
 use ControleOnline\Entity\SalesOrder;

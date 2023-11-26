@@ -4,7 +4,7 @@ namespace ControleOnline\Controller;
 
 use ControleOnline\Controller\AbstractCustomResourceAction;
 use ControleOnline\Entity\Status;
-use ControleOnline\Entity\People;
+use App\Entity\People;
 use ControleOnline\Entity\SalesOrder;
 use ControleOnline\Entity\PurchasingOrder;
 use ControleOnline\Entity\ReceiveInvoice;
