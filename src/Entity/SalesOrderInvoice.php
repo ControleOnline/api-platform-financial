@@ -42,9 +42,9 @@ class SalesOrderInvoice
      */
     private $invoice;
     /**
-     * @var \App\Entity\SalesOrder
+     * @var \ControleOnline\Entity\SalesOrder
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\SalesOrder", inversedBy="invoice")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\SalesOrder", inversedBy="invoice")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
@@ -91,10 +91,10 @@ class SalesOrderInvoice
     /**
      * Set order
      *
-     * @param \App\Entity\SalesOrder $order
+     * @param \ControleOnline\Entity\SalesOrder $order
      * @return SalesOrderInvoice
      */
-    public function setOrder(\App\Entity\SalesOrder $order = null)
+    public function setOrder(\ControleOnline\Entity\SalesOrder $order = null)
     {
         $this->order = $order;
         return $this;
@@ -102,7 +102,7 @@ class SalesOrderInvoice
     /**
      * Get order
      *
-     * @return \App\Entity\SalesOrder
+     * @return \ControleOnline\Entity\SalesOrder
      */
     public function getOrder()
     {

@@ -9,7 +9,7 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\Status;
-use App\Entity\People;
+use ControleOnline\Entity\People;
 use ControleOnline\Entity\SalesOrder;
 use ControleOnline\Library\Itau\ItauClient;
 

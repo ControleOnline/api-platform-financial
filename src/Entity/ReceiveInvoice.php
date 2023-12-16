@@ -12,8 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 Use ControleOnline\Entity\SalesOrderInvoice;
-use App\Entity\Category;
-use App\Entity\Order;
+use ControleOnline\Entity\Category;
+use ControleOnline\Entity\Order;
 /**
  * ReceiveInvoice
  *

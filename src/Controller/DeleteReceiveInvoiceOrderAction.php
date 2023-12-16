@@ -3,7 +3,7 @@
 namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\Config;
-use App\Entity\People;
+use ControleOnline\Entity\People;
 use ControleOnline\Entity\ReceiveInvoice;
 use ControleOnline\Entity\SalesOrder;
 use ControleOnline\Entity\SalesOrderInvoice;

@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Filter\PurchasingOrderEntityFilter;
-use App\Entity\Order;
+use ControleOnline\Entity\Order;
 use stdClass;
 
 /**
@@ -110,9 +110,9 @@ class PurchasingOrder extends Order
      */
     private $id;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="client_id", referencedColumnName="id")
      * })
@@ -138,9 +138,9 @@ class PurchasingOrder extends Order
      */
     private $orderType;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\SalesOrder")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\SalesOrder")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="main_order_id", referencedColumnName="id")
      * })
@@ -155,9 +155,9 @@ class PurchasingOrder extends Order
      */
     private $mainOrderId;
     /**
-     * @var \App\Entity\Contract
+     * @var \ControleOnline\Entity\Contract
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Contract")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Contract")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="contract_id", referencedColumnName="id")
      * })
@@ -192,9 +192,9 @@ class PurchasingOrder extends Order
      */
     private $status;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="delivery_people_id", referencedColumnName="id")
      * })
@@ -202,9 +202,9 @@ class PurchasingOrder extends Order
      */
     private $deliveryPeople;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="retrieve_people_id", referencedColumnName="id")
      * })
@@ -212,18 +212,18 @@ class PurchasingOrder extends Order
      */
     private $retrievePeople;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="payer_people_id", referencedColumnName="id")
      * })
      */
     private $payer;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="provider_id", referencedColumnName="id")
      * })
@@ -231,9 +231,9 @@ class PurchasingOrder extends Order
      */
     private $provider;
     /**
-     * @var \App\Entity\Quotation
+     * @var \ControleOnline\Entity\Quotation
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Quotation")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Quotation")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="quote_id", referencedColumnName="id")
      * })
@@ -243,40 +243,40 @@ class PurchasingOrder extends Order
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\Quotation", mappedBy="order")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\Quotation", mappedBy="order")
      */
     private $quotes;
     /**
-     * @var \App\Entity\Address
+     * @var \ControleOnline\Entity\Address
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Address")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Address")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="address_origin_id", referencedColumnName="id")
      * })
      */
     private $addressOrigin;
     /**
-     * @var \App\Entity\Address
+     * @var \ControleOnline\Entity\Address
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Address")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Address")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="address_destination_id", referencedColumnName="id")
      * })
      */
     private $addressDestination;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="retrieve_contact_id", referencedColumnName="id")
      * })
      */
     private $retrieveContact;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="delivery_contact_id", referencedColumnName="id")
      * })
@@ -285,7 +285,7 @@ class PurchasingOrder extends Order
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="App\Entity\OrderPackage", mappedBy="order")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\OrderPackage", mappedBy="order")
      */
     private $orderPackage;
     /**
@@ -379,10 +379,10 @@ class PurchasingOrder extends Order
     /**
      * Set client
      *
-     * @param \App\Entity\People $client
+     * @param \ControleOnline\Entity\People $client
      * @return Order
      */
-    public function setClient(\App\Entity\People $client = null)
+    public function setClient(\ControleOnline\Entity\People $client = null)
     {
         $this->client = $client;
         return $this;
@@ -390,7 +390,7 @@ class PurchasingOrder extends Order
     /**
      * Get client
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getClient()
     {
@@ -399,10 +399,10 @@ class PurchasingOrder extends Order
     /**
      * Set provider
      *
-     * @param \App\Entity\People $provider
+     * @param \ControleOnline\Entity\People $provider
      * @return Order
      */
-    public function setProvider(\App\Entity\People $provider = null)
+    public function setProvider(\ControleOnline\Entity\People $provider = null)
     {
         $this->provider = $provider;
         return $this;
@@ -410,7 +410,7 @@ class PurchasingOrder extends Order
     /**
      * Get provider
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getProvider()
     {
@@ -439,10 +439,10 @@ class PurchasingOrder extends Order
     /**
      * Set quote
      *
-     * @param \App\Entity\Quotation $quote
+     * @param \ControleOnline\Entity\Quotation $quote
      * @return Order
      */
-    public function setQuote(\App\Entity\Quotation $quote = null)
+    public function setQuote(\ControleOnline\Entity\Quotation $quote = null)
     {
         $this->quote = $quote;
         return $this;
@@ -450,7 +450,7 @@ class PurchasingOrder extends Order
     /**
      * Get quote
      *
-     * @return \App\Entity\Quotation
+     * @return \ControleOnline\Entity\Quotation
      */
     public function getQuote()
     {
@@ -459,10 +459,10 @@ class PurchasingOrder extends Order
     /**
      * Set addressOrigin
      *
-     * @param \App\Entity\Address $address_origin
+     * @param \ControleOnline\Entity\Address $address_origin
      * @return Order
      */
-    public function setAddressOrigin(\App\Entity\Address $address_origin = null)
+    public function setAddressOrigin(\ControleOnline\Entity\Address $address_origin = null)
     {
         $this->addressOrigin = $address_origin;
         return $this;
@@ -470,7 +470,7 @@ class PurchasingOrder extends Order
     /**
      * Get addressOrigin
      *
-     * @return \App\Entity\Address
+     * @return \ControleOnline\Entity\Address
      */
     public function getAddressOrigin()
     {
@@ -479,10 +479,10 @@ class PurchasingOrder extends Order
     /**
      * Set addressDestination
      *
-     * @param \App\Entity\Address $address_destination
+     * @param \ControleOnline\Entity\Address $address_destination
      * @return Order
      */
-    public function setAddressDestination(\App\Entity\Address $address_destination = null)
+    public function setAddressDestination(\ControleOnline\Entity\Address $address_destination = null)
     {
         $this->addressDestination = $address_destination;
         return $this;
@@ -490,7 +490,7 @@ class PurchasingOrder extends Order
     /**
      * Get quote
      *
-     * @return \App\Entity\Address
+     * @return \ControleOnline\Entity\Address
      */
     public function getAddressDestination()
     {
@@ -499,7 +499,7 @@ class PurchasingOrder extends Order
     /**
      * Get retrieveContact
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getRetrieveContact()
     {
@@ -508,10 +508,10 @@ class PurchasingOrder extends Order
     /**
      * Set retrieveContact
      *
-     * @param \App\Entity\People $retrieve_contact
+     * @param \ControleOnline\Entity\People $retrieve_contact
      * @return Order
      */
-    public function setRetrieveContact(\App\Entity\People $retrieve_contact = null)
+    public function setRetrieveContact(\ControleOnline\Entity\People $retrieve_contact = null)
     {
         $this->retrieveContact = $retrieve_contact;
         return $this;
@@ -519,7 +519,7 @@ class PurchasingOrder extends Order
     /**
      * Get deliveryContact
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getDeliveryContact()
     {
@@ -528,10 +528,10 @@ class PurchasingOrder extends Order
     /**
      * Set deliveryContact
      *
-     * @param \App\Entity\People $delivery_contact
+     * @param \ControleOnline\Entity\People $delivery_contact
      * @return Order
      */
-    public function setDeliveryContact(\App\Entity\People $delivery_contact = null)
+    public function setDeliveryContact(\ControleOnline\Entity\People $delivery_contact = null)
     {
         $this->deliveryContact = $delivery_contact;
         return $this;
@@ -539,10 +539,10 @@ class PurchasingOrder extends Order
     /**
      * Set payer
      *
-     * @param \App\Entity\People $payer
+     * @param \ControleOnline\Entity\People $payer
      * @return Order
      */
-    public function setPayer(\App\Entity\People $payer = null)
+    public function setPayer(\ControleOnline\Entity\People $payer = null)
     {
         $this->payer = $payer;
         return $this;
@@ -550,7 +550,7 @@ class PurchasingOrder extends Order
     /**
      * Get payer
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getPayer()
     {
@@ -559,10 +559,10 @@ class PurchasingOrder extends Order
     /**
      * Set deliveryPeople
      *
-     * @param \App\Entity\People $delivery_people
+     * @param \ControleOnline\Entity\People $delivery_people
      * @return Order
      */
-    public function setDeliveryPeople(\App\Entity\People $delivery_people = null)
+    public function setDeliveryPeople(\ControleOnline\Entity\People $delivery_people = null)
     {
         $this->deliveryPeople = $delivery_people;
         return $this;
@@ -570,7 +570,7 @@ class PurchasingOrder extends Order
     /**
      * Get deliveryPeople
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getDeliveryPeople()
     {
@@ -579,10 +579,10 @@ class PurchasingOrder extends Order
     /**
      * Set retrievePeople
      *
-     * @param \App\Entity\People $retrieve_people
+     * @param \ControleOnline\Entity\People $retrieve_people
      * @return Order
      */
-    public function setRetrievePeople(\App\Entity\People $retrieve_people = null): self
+    public function setRetrievePeople(\ControleOnline\Entity\People $retrieve_people = null): self
     {
         $this->retrievePeople = $retrieve_people;
         return $this;
@@ -590,7 +590,7 @@ class PurchasingOrder extends Order
     /**
      * Get retrievePeople
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getRetrievePeople(): ?People
     {
@@ -646,10 +646,10 @@ class PurchasingOrder extends Order
     /**
      * Add orderPackage
      *
-     * @param \App\Entity\OrderPackage $order_package
+     * @param \ControleOnline\Entity\OrderPackage $order_package
      * @return Order
      */
-    public function addOrderPackage(\App\Entity\OrderPackage $order_package)
+    public function addOrderPackage(\ControleOnline\Entity\OrderPackage $order_package)
     {
         $this->orderPackage[] = $order_package;
         return $this;
@@ -657,9 +657,9 @@ class PurchasingOrder extends Order
     /**
      * Remove orderPackage
      *
-     * @param \App\Entity\OrderPackage $order_package
+     * @param \ControleOnline\Entity\OrderPackage $order_package
      */
-    public function removeOrderPackage(\App\Entity\OrderPackage $order_package)
+    public function removeOrderPackage(\ControleOnline\Entity\OrderPackage $order_package)
     {
         $this->orderPackage->removeElement($order_package);
     }
@@ -793,10 +793,10 @@ class PurchasingOrder extends Order
     /**
      * Add quotes
      *
-     * @param \App\Entity\Quotation $quotes
+     * @param \ControleOnline\Entity\Quotation $quotes
      * @return Order
      */
-    public function addAQuotes(\App\Entity\Quotation $quotes)
+    public function addAQuotes(\ControleOnline\Entity\Quotation $quotes)
     {
         $this->quotes[] = $quotes;
         return $this;
@@ -804,9 +804,9 @@ class PurchasingOrder extends Order
     /**
      * Remove quotes
      *
-     * @param \App\Entity\Quotation $quotes
+     * @param \ControleOnline\Entity\Quotation $quotes
      */
-    public function removeQuotes(\App\Entity\Quotation $quotes)
+    public function removeQuotes(\ControleOnline\Entity\Quotation $quotes)
     {
         $this->quotes->removeElement($quotes);
     }
@@ -862,10 +862,10 @@ class PurchasingOrder extends Order
     /**
      * Set mainOrder
      *
-     * @param \App\Entity\SalesOrder $mainOrder
+     * @param \ControleOnline\Entity\SalesOrder $mainOrder
      * @return Order
      */
-    public function setMainOrder(\App\Entity\SalesOrder $main_order = null)
+    public function setMainOrder(\ControleOnline\Entity\SalesOrder $main_order = null)
     {
         $this->mainOrder = $main_order;
         return $this;
@@ -873,7 +873,7 @@ class PurchasingOrder extends Order
     /**
      * Get mainOrder
      *
-     * @return \App\Entity\SalesOrder
+     * @return \ControleOnline\Entity\SalesOrder
      */
     public function getMainOrder()
     {
@@ -902,7 +902,7 @@ class PurchasingOrder extends Order
     /**
      * Set contract
      *
-     * @param \App\Entity\Contract $contract
+     * @param \ControleOnline\Entity\Contract $contract
      * @return Order
      */
     public function setContract($contract)
@@ -913,7 +913,7 @@ class PurchasingOrder extends Order
     /**
      * Get contract
      *
-     * @return \App\Entity\Contract
+     * @return \ControleOnline\Entity\Contract
      */
     public function getContract()
     {

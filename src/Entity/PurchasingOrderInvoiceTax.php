@@ -27,9 +27,9 @@ class PurchasingOrderInvoiceTax
      */
     private $id;
     /**
-     * @var \App\Entity\PurchasingInvoiceTax
+     * @var \ControleOnline\Entity\PurchasingInvoiceTax
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\PurchasingInvoiceTax", inversedBy="order")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PurchasingInvoiceTax", inversedBy="order")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="invoice_tax_id", referencedColumnName="id")
      * })
@@ -46,9 +46,9 @@ class PurchasingOrderInvoiceTax
      */
     private $order;
     /**
-     * @var \App\Entity\People
+     * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\People")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="issuer_id", referencedColumnName="id")
      * })
@@ -77,10 +77,10 @@ class PurchasingOrderInvoiceTax
     /**
      * Set invoiceTax
      *
-     * @param \App\Entity\PurchasingInvoiceTax $invoice_tax
+     * @param \ControleOnline\Entity\PurchasingInvoiceTax $invoice_tax
      * @return PurchasingOrderInvoiceTax
      */
-    public function setInvoiceTax(\App\Entity\PurchasingInvoiceTax $invoice_tax = null)
+    public function setInvoiceTax(\ControleOnline\Entity\PurchasingInvoiceTax $invoice_tax = null)
     {
         $this->invoiceTax = $invoice_tax;
         return $this;
@@ -88,7 +88,7 @@ class PurchasingOrderInvoiceTax
     /**
      * Get invoiceTax
      *
-     * @return \App\Entity\PurchasingInvoiceTax
+     * @return \ControleOnline\Entity\PurchasingInvoiceTax
      */
     public function getInvoiceTax()
     {
@@ -108,7 +108,7 @@ class PurchasingOrderInvoiceTax
     /**
      * Get order
      *
-     * @return \App\Entity\Order
+     * @return \ControleOnline\Entity\Order
      */
     public function getOrder()
     {
@@ -137,10 +137,10 @@ class PurchasingOrderInvoiceTax
     /**
      * Set issuer
      *
-     * @param \App\Entity\People $issuer
+     * @param \ControleOnline\Entity\People $issuer
      * @return People
      */
-    public function setIssuer(\App\Entity\People $issuer = null)
+    public function setIssuer(\ControleOnline\Entity\People $issuer = null)
     {
         $this->issuer = $issuer;
         return $this;
@@ -148,7 +148,7 @@ class PurchasingOrderInvoiceTax
     /**
      * Get issuer
      *
-     * @return \App\Entity\People
+     * @return \ControleOnline\Entity\People
      */
     public function getIssuer()
     {

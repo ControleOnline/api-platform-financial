@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="service_invoice_tax", uniqueConstraints={@ORM\UniqueConstraint(name="invoice_id", columns={"invoice_id", "invoice_tax_id"}),@ORM\UniqueConstraint(name="invoice_type", columns={"issuer_id", "invoice_type", "invoice_id"})}, indexes={@ORM\Index(name="invoice_tax_id", columns={"invoice_tax_id"})})
  * @ORM\Entity
- *  @ORM\EntityListeners({ControleOnline\Listener\LogListener::class})
+ *  @ORM\EntityListeners({App\Listener\LogListener::class})
  */
 class ServiceInvoiceTax
 {
