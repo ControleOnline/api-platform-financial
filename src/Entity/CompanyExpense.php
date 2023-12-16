@@ -19,7 +19,7 @@ use App\Resource\ResourceEntity;
 /**
  * @ORM\EntityListeners ({App\Listener\LogListener::class})
  * @ORM\Table (name="company_expense")
- * @ORM\Entity (repositoryClass="App\Repository\CompanyExpenseRepository")
+ * @ORM\Entity (repositoryClass="ControleOnline\Repository\CompanyExpenseRepository")
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'read\', object)'), new Put(uriTemplate: '/company_expenses/{id}', requirements: ['id' => '^\\d+$'], security: 'is_granted(\'edit\', object)', controller: \App\Controller\UpdateCompanyExpenseAction::class, denormalizationContext: ['groups' => ['company_expense_edit']]), new Delete(security: 'is_granted(\'delete\', object)'), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'), new Post(securityPostDenormalize: 'is_granted(\'create\', object)')], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['company_expense_read']], denormalizationContext: ['groups' => ['company_expense_write']])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['company' => 'exact'])]
