@@ -11,9 +11,10 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-Use ControleOnline\Entity\SalesOrderInvoice;
+use ControleOnline\Entity\SalesOrderInvoice;
 use ControleOnline\Entity\Category;
 use ControleOnline\Entity\Order;
+
 /**
  * ReceiveInvoice
  *
@@ -21,7 +22,47 @@ use ControleOnline\Entity\Order;
  * @ORM\Table (name="invoice", indexes={@ORM\Index (name="invoice_subtype", columns={"invoice_subtype"})})
  * @ORM\Entity (repositoryClass="ControleOnline\Repository\ReceiveInvoiceRepository")
  */
-#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}'), new Get(security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')', uriTemplate: '/finance/{id}/download', requirements: ['id' => '[\\w-]+'], controller: \ControleOnline\Controller\GetBankInterDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank', controller: \ControleOnline\Controller\GetProviderDataPerInvoiceId::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/renew', controller: \ControleOnline\Controller\RenewInvoiceAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/itau/{operation}', requirements: ['operation' => '^(itauhash|payment)+$'], controller: \ControleOnline\Controller\GetBankItauDataAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/bank/inter/{operation}', requirements: ['operation' => '^(download|payment)+$'], controller: \ControleOnline\Controller\GetBankInterDataAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}', validationContext: ['groups' => ['invoice_receive_put_validation']], denormalizationContext: ['groups' => ['invoice_receive_put_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-notified', validationContext: ['groups' => ['invoice_receive_notified_validation']], denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/remove-order', controller: \ControleOnline\Controller\DeleteReceiveInvoiceOrderAction::class), new Put(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/update-status', controller: \ControleOnline\Controller\UpdateInvoiceStatusAction::class), new Get(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive/{id}/order-classes', controller: \ControleOnline\Controller\GetSchoolOrderClassesAction::class), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')', uriTemplate: '/finance/receive', controller: \ControleOnline\Controller\GetReceiveInvoiceCollectionAction::class)], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['invoice_read']], denormalizationContext: ['groups' => ['invoice_write']])]
+#[ApiResource(
+    operations: [
+        new Get(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/receive/{id}'
+        ),
+        new Get(
+            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            uriTemplate: '/finance/{id}/download',
+            requirements: ['id' => '[\\w-]+'],
+            controller: \ControleOnline\Controller\GetBankInterDataAction::class
+        ),
+        new Get(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/receive/{id}/bank/itau/{operation}',
+            requirements: ['operation' => '^(itauhash|payment)+$'],
+            controller: \ControleOnline\Controller\GetBankItauDataAction::class
+        ),
+        new Get(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/receive/{id}/bank/inter/{operation}',
+            requirements: ['operation' => '^(download|payment)+$'],
+            controller: \ControleOnline\Controller\GetBankInterDataAction::class
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/receive/{id}',
+            validationContext: ['groups' => ['invoice_receive_put_validation']],
+            denormalizationContext: ['groups' => ['invoice_receive_put_edit']]
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/receive/{id}/update-notified',
+            validationContext: ['groups' => ['invoice_receive_notified_validation']],
+            denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]
+        )
+    ],
+    formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
+    normalizationContext: ['groups' => ['invoice_read']],
+    denormalizationContext: ['groups' => ['invoice_write']]
+)]
 class ReceiveInvoice extends Invoice
 {
     /**
@@ -396,7 +437,7 @@ class ReceiveInvoice extends Invoice
      */
     public function removeServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
     {
-        $this->address->removeElement($service_invoice_tax);
+        $this->service_invoice_tax->removeElement($service_invoice_tax);
     }
     /**
      * Get service_invoice_tax
@@ -412,7 +453,7 @@ class ReceiveInvoice extends Invoice
         $this->category = $category;
         return $this;
     }
-    public function getCategory() : ?Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -421,7 +462,7 @@ class ReceiveInvoice extends Invoice
         $this->description = $description;
         return $this;
     }
-    public function getDescription() : ?string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -430,32 +471,32 @@ class ReceiveInvoice extends Invoice
         $this->paymentMode = $mode;
         return $this;
     }
-    public function getPaymentMode() : ?int
+    public function getPaymentMode(): ?int
     {
         return $this->paymentMode;
     }
-    public function getOneOrder() : ?Order
+    public function getOneOrder(): ?Order
     {
         if (($orderInvoice = $this->getOrder()->first()) === false) {
             return null;
         }
         return $orderInvoice->getOrder();
     }
-    public function isPaid() : bool
+    public function isPaid(): bool
     {
         return $this->getStatus()->getStatus() === 'paid';
     }
     /**
      * @return string
      */
-    public function getInvoiceBankId() : ?string
+    public function getInvoiceBankId(): ?string
     {
         return $this->invoice_bank_id;
     }
     /**
      * @param string|null $invoice_bank_id
      */
-    public function setInvoiceBankId(?string $invoice_bank_id = null) : void
+    public function setInvoiceBankId(?string $invoice_bank_id = null): void
     {
         $this->invoice_bank_id = $invoice_bank_id;
     }
