@@ -57,7 +57,6 @@ class PayInvoice extends Invoice
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
-     * @Groups({"invoice_read"})
      */
     private $order;
     /**
@@ -73,12 +72,14 @@ class PayInvoice extends Invoice
     /**
      * @var \DateTime
      * @ORM\Column(name="invoice_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
+     * @Groups({"invoice_read"})
      */
     private $invoice_date;
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
+     * @Groups({"invoice_read"})
      */
     private $alter_date;
     /**
@@ -99,6 +100,7 @@ class PayInvoice extends Invoice
      * @var \DateTime
      *
      * @ORM\Column(name="payment_date", type="datetime",  nullable=true, columnDefinition="DATETIME")
+     * @Groups({"invoice_read"})
      */
     private $payment_date;
     /**
@@ -108,7 +110,7 @@ class PayInvoice extends Invoice
      * @Groups({"invoice_pay_notified_edit"})
      * @Assert\Type(
      *  type  ="bool",
-     *  groups={"invoice_pay_notified_validation"}
+     *  groups={"invoice_read"}
      * )
      */
     private $notified;
@@ -123,18 +125,22 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="invoice_type", type="string",  nullable=true)
+     * @Groups({"invoice_read"})
      */
     private $invoiceType;
     /**
      * @var string
      *
      * @ORM\Column(name="invoice_subtype", type="string",  nullable=true)
+     * @Groups({"invoice_read"})
      */
     private $invoice_subtype;
     /**
      * @var string
      *
      * @ORM\Column(name="payment_response", type="string",  nullable=true)
+     * @Groups({"invoice_read"})
+
      */
     private $payment_response;
     /**
