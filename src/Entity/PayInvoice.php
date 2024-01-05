@@ -31,6 +31,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/finance/pay/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: \ControleOnline\Controller\GetBankItauDataAction::class
+        ), new GetCollection(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/finance/pay'
         )
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
