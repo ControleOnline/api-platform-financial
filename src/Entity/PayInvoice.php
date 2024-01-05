@@ -50,7 +50,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"logistic_read"})  
+     * @Groups({"invoice_read","logistic_read"})
      */
     private $id;
     /**
