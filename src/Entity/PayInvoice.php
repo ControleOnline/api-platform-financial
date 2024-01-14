@@ -43,7 +43,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact', 'order.order' => 'exact'])]
-#[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate' ])]
+#[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
 
 class PayInvoice extends Invoice
 {
@@ -55,12 +55,14 @@ class PayInvoice extends Invoice
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Groups({"invoice_read","logistic_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['order' => 'exact'])]
     private $order;
     /**
      * @var \ControleOnline\Entity\Status
@@ -71,12 +73,14 @@ class PayInvoice extends Invoice
      * })
      * @Groups({"invoice_read","logistic_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'partial'])]
     private $status;
     /**
      * @var \DateTime
      * @ORM\Column(name="invoice_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
     private $invoice_date;
     /**
      * @var \DateTime
@@ -84,6 +88,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
     private $alter_date;
     /**
      * @var \DateTime
@@ -98,6 +103,7 @@ class PayInvoice extends Invoice
      *     groups ={"invoice_pay_put_validation"}
      * )
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['dueDate' => 'exact'])]
     private $dueDate;
     /**
      * @var \DateTime
@@ -105,6 +111,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="payment_date", type="datetime",  nullable=true, columnDefinition="DATETIME")
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_date' => 'exact'])]
     private $payment_date;
     /**
      * @var boolean
@@ -116,6 +123,7 @@ class PayInvoice extends Invoice
      *  groups={"invoice_read"}
      * )
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
     private $notified;
     /**
      * @var float
@@ -123,6 +131,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="price", type="float",  nullable=true)
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
     private $price;
     /**
      * @var string
@@ -130,6 +139,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="invoice_type", type="string",  nullable=true)
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoiceType' => 'exact'])]
     private $invoiceType;
     /**
      * @var string
@@ -137,6 +147,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="invoice_subtype", type="string",  nullable=true)
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_subtype' => 'exact'])]
     private $invoice_subtype;
     /**
      * @var string
@@ -145,12 +156,15 @@ class PayInvoice extends Invoice
      * @Groups({"invoice_read"})
 
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_response' => 'exact'])]
     private $payment_response;
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ServiceInvoiceTax", mappedBy="invoice")
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['service_invoice_tax' => 'exact'])]
+
     private $service_invoice_tax;
     /**
      * @var \ControleOnline\Entity\Category
@@ -161,6 +175,7 @@ class PayInvoice extends Invoice
      * })
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     private $category = null;
     /**
      * @var string
@@ -168,6 +183,7 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="description", type="string", nullable=true)
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['description' => 'exact'])]
     private $description = null;
     /**
      * @var string
@@ -175,7 +191,9 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="payment_mode", type="integer", nullable=true)
      * @Groups({"invoice_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentMode' => 'exact'])]
     private $paymentMode = null;
+
     public function __construct()
     {
         $this->invoice_date = new \DateTime('now');
