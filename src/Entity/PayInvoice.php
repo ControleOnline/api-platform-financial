@@ -2,6 +2,7 @@
 
 namespace ControleOnline\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
@@ -42,6 +43,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact', 'order.order' => 'exact'])]
+#[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate' ])]
+
 class PayInvoice extends Invoice
 {
     /**
