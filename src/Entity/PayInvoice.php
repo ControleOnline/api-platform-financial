@@ -100,8 +100,8 @@ class PayInvoice extends Invoice
      * })
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer_id' => 'exact'])]
-    private $payer_id;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer' => 'exact'])]
+    private $payer;
 
     /**
      * @var \ControleOnline\Entity\People
@@ -112,8 +112,8 @@ class PayInvoice extends Invoice
      * })
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver_id' => 'exact'])]
-    private $receiver_id;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver' => 'exact'])]
+    private $receiver;
 
     /**
      * @var \DateTime
@@ -514,38 +514,40 @@ class PayInvoice extends Invoice
         return $this->paymentMode;
     }
 
+
+
     /**
-     * Get the value of payer_id
+     * Get the value of payer
      */
-    public function getPayerId()
+    public function getPayer()
     {
-        return $this->payer_id;
+        return $this->payer;
     }
 
     /**
-     * Set the value of payer_id
+     * Set the value of payer
      */
-    public function setPayerId($payer_id): self
+    public function setPayer($payer): self
     {
-        $this->payer_id = $payer_id;
+        $this->payer = $payer;
 
         return $this;
     }
 
     /**
-     * Get the value of receiver_id
+     * Get the value of receiver
      */
-    public function getReceiverId()
+    public function getReceiver()
     {
-        return $this->receiver_id;
+        return $this->receiver;
     }
 
     /**
-     * Set the value of receiver_id
+     * Set the value of receiver
      */
-    public function setReceiverId($receiver_id): self
+    public function setReceiver($receiver): self
     {
-        $this->receiver_id = $receiver_id;
+        $this->receiver = $receiver;
 
         return $this;
     }
