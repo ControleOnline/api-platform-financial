@@ -14,7 +14,8 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use ApiPlatform\Core\Annotation\Post;
+use ApiPlatform\Core\Annotation\Delete;
 /**
  * PayInvoice
  *
@@ -27,14 +28,28 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/pay/{id}'
-        ), new Get(
+        ),
+        new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/pay/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: \ControleOnline\Controller\GetBankItauDataAction::class
-        ), new GetCollection(
+        ),
+        new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/pay'
+        ),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\')',
+            uriTemplate: '/finance/pay'
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\') and object.user == user)',
+            uriTemplate: '/finance/pay/{id}'
+        ),
+        new Delete(
+            security: 'is_granted(\'ROLE_ADMIN\')',
+            uriTemplate: '/finance/pay/{id}'
         )
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
