@@ -134,13 +134,8 @@ class PayInvoice extends Invoice
      * @var \DateTime
      *
      * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
-     * @Groups({"invoice_read", "invoice_pay_put_edit"})
-     * @Assert\NotBlank(groups={"invoice_pay_put_validation"})
-     * @Assert\DateTime(groups={"invoice_pay_put_validation"})
-     * @Assert\Expression(
-     *     "this.getDateAsString(this.getDueDate()) > this.getDateAsString()",
-     *     message="Duedate must be greater than today",
-     * )
+     * @Assert\NotBlank(groups={"invoice_write"})
+     * @Assert\DateTime(groups={"invoice_write"})
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
