@@ -45,7 +45,7 @@ use ApiPlatform\Metadata\Delete;
             uriTemplate: '/finance/pay'
         ),
         new Put(
-            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\') and object.user == user)',
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             uriTemplate: '/finance/pay/{id}'
         ),
         new Delete(
