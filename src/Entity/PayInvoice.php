@@ -41,9 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['invoice_read']],
     denormalizationContext: ['groups' => ['invoice_write']]
 )]
-#[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
-#[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact', 'order.order' => 'exact'])]
-#[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
+
 
 class PayInvoice extends Invoice
 {
@@ -61,8 +59,9 @@ class PayInvoice extends Invoice
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['order' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
     private $order;
     /**
      * @var \ControleOnline\Entity\Status
@@ -71,14 +70,39 @@ class PayInvoice extends Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'partial'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact'])]
     private $status;
+
+    /**
+     * @var \ControleOnline\Entity\People
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="payer_id", referencedColumnName="id")
+     * })
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer_id' => 'exact'])]
+    private $payer_id;
+
+        /**
+     * @var \ControleOnline\Entity\People
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="receiver_id", referencedColumnName="id")
+     * })
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver_id' => 'exact'])]
+    private $receiver_id;
+
     /**
      * @var \DateTime
      * @ORM\Column(name="invoice_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
     private $invoice_date;
@@ -86,7 +110,7 @@ class PayInvoice extends Invoice
      * @var \DateTime
      *
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
     private $alter_date;
@@ -100,16 +124,17 @@ class PayInvoice extends Invoice
      * @Assert\Expression(
      *     "this.getDateAsString(this.getDueDate()) > this.getDateAsString()",
      *     message="Duedate must be greater than today",
-     *     groups ={"invoice_pay_put_validation"}
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      * )
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['dueDate' => 'exact'])]
+    #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
+    #[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
     private $dueDate;
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="payment_date", type="datetime",  nullable=true, columnDefinition="DATETIME")
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_date' => 'exact'])]
     private $payment_date;
@@ -119,9 +144,9 @@ class PayInvoice extends Invoice
      * @ORM\Column(name="notified", type="boolean",  nullable=false)
      * @Groups({"invoice_pay_notified_edit"})
      * @Assert\Type(
-     *  type  ="bool",
-     *  groups={"invoice_read"}
+     *  type  ="bool"
      * )
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
     private $notified;
@@ -129,7 +154,7 @@ class PayInvoice extends Invoice
      * @var float
      *
      * @ORM\Column(name="price", type="float",  nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
     private $price;
@@ -137,7 +162,7 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="invoice_type", type="string",  nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoiceType' => 'exact'])]
     private $invoiceType;
@@ -145,7 +170,7 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="invoice_subtype", type="string",  nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_subtype' => 'exact'])]
     private $invoice_subtype;
@@ -153,7 +178,7 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="payment_response", type="string",  nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
 
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_response' => 'exact'])]
@@ -162,6 +187,8 @@ class PayInvoice extends Invoice
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ServiceInvoiceTax", mappedBy="invoice")
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['service_invoice_tax' => 'exact'])]
 
@@ -173,7 +200,7 @@ class PayInvoice extends Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
      * })
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     private $category = null;
@@ -181,7 +208,7 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="description", type="string", nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['description' => 'exact'])]
     private $description = null;
@@ -189,7 +216,7 @@ class PayInvoice extends Invoice
      * @var string
      *
      * @ORM\Column(name="payment_mode", type="integer", nullable=true)
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentMode' => 'exact'])]
     private $paymentMode = null;
@@ -474,5 +501,41 @@ class PayInvoice extends Invoice
     public function getPaymentMode(): ?int
     {
         return $this->paymentMode;
+    }
+
+    /**
+     * Get the value of payer_id
+     */
+    public function getPayerId()
+    {
+        return $this->payer_id;
+    }
+
+    /**
+     * Set the value of payer_id
+     */
+    public function setPayerId($payer_id): self
+    {
+        $this->payer_id = $payer_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of receiver_id
+     */
+    public function getReceiverId()
+    {
+        return $this->receiver_id;
+    }
+
+    /**
+     * Set the value of receiver_id
+     */
+    public function setReceiverId($receiver_id): self
+    {
+        $this->receiver_id = $receiver_id;
+
+        return $this;
     }
 }
