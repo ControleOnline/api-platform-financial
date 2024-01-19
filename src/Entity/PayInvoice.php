@@ -87,7 +87,7 @@ class PayInvoice extends Invoice
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer_id' => 'exact'])]
     private $payer_id;
 
-        /**
+    /**
      * @var \ControleOnline\Entity\People
      *
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
@@ -124,8 +124,8 @@ class PayInvoice extends Invoice
      * @Assert\Expression(
      *     "this.getDateAsString(this.getDueDate()) > this.getDateAsString()",
      *     message="Duedate must be greater than today",
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
      * )
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
     #[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
