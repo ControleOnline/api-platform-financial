@@ -14,8 +14,9 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Core\Annotation\Post;
-use ApiPlatform\Core\Annotation\Delete;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+
 /**
  * PayInvoice
  *
