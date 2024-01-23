@@ -141,14 +141,7 @@ class PayInvoice extends Invoice
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
     #[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
     private $dueDate;
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="payment_date", type="datetime",  nullable=true, columnDefinition="DATETIME")
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_date' => 'exact'])]
-    private $payment_date;
+
     /**
      * @var boolean
      *
@@ -161,6 +154,7 @@ class PayInvoice extends Invoice
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
     private $notified;
+    
     /**
      * @var float
      *
@@ -169,41 +163,7 @@ class PayInvoice extends Invoice
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
     private $price;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="invoice_type", type="string",  nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoiceType' => 'exact'])]
-    private $invoiceType;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="invoice_subtype", type="string",  nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_subtype' => 'exact'])]
-    private $invoice_subtype;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="payment_response", type="string",  nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
 
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['payment_response' => 'exact'])]
-    private $payment_response;
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\ServiceInvoiceTax", mappedBy="invoice")
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['service_invoice_tax' => 'exact'])]
-
-    private $service_invoice_tax;
     /**
      * @var \ControleOnline\Entity\Category
      *
@@ -215,31 +175,13 @@ class PayInvoice extends Invoice
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     private $category = null;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="string", nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['description' => 'exact'])]
-    private $description = null;
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="payment_mode", type="integer", nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentMode' => 'exact'])]
-    private $paymentMode = null;
 
     public function __construct()
     {
         $this->invoice_date = new \DateTime('now');
         $this->alter_date = new \DateTime('now');
         $this->dueDate = new \DateTime('now');
-        $this->payment_date = new \DateTime('now');
         $this->order = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->service_invoice_tax = new \Doctrine\Common\Collections\ArrayCollection();
     }
     /**
      * Get id
@@ -249,46 +191,6 @@ class PayInvoice extends Invoice
     public function getId()
     {
         return $this->id;
-    }
-    /**
-     * Set invoice_type
-     *
-     * @param string $invoice_type
-     * @return Order
-     */
-    public function setInvoiceType($invoice_type)
-    {
-        $this->invoiceType = $invoice_type;
-        return $this;
-    }
-    /**
-     * Get invoice_type
-     *
-     * @return string
-     */
-    public function getInvoiceType()
-    {
-        return $this->invoiceType;
-    }
-    /**
-     * Set payment_response
-     *
-     * @param string $payment_response
-     * @return Invoice
-     */
-    public function setPaymentResponse($payment_response)
-    {
-        $this->payment_response = $payment_response;
-        return $this;
-    }
-    /**
-     * Get payment_response
-     *
-     * @return string
-     */
-    public function getPaymentResponse()
-    {
-        return $this->payment_response;
     }
     /**
      * Add PurchasingOrderInvoice
@@ -319,26 +221,8 @@ class PayInvoice extends Invoice
     {
         return $this->order;
     }
-    /**
-     * Set invoice_subtype
-     *
-     * @param string $invoice_subtype
-     * @return Invoice
-     */
-    public function setInvoiceSubtype($invoice_subtype)
-    {
-        $this->invoice_subtype = $invoice_subtype;
-        return $this;
-    }
-    /**
-     * Get invoice_subtype
-     *
-     * @return string
-     */
-    public function getInvoiceSubtype()
-    {
-        return $this->invoice_subtype;
-    }
+
+
     /**
      * Set price
      *
@@ -386,15 +270,7 @@ class PayInvoice extends Invoice
     {
         return $this->dueDate;
     }
-    /**
-     * Get payment_date
-     *
-     * @return \DateTimeInterface
-     */
-    public function getPaymentDate()
-    {
-        return $this->payment_date;
-    }
+
     /**
      * Set dueDate
      *
@@ -406,17 +282,7 @@ class PayInvoice extends Invoice
         $this->dueDate = $due_date;
         return $this;
     }
-    /**
-     * Set price
-     *
-     * @param \DateTime $payment_date
-     * @return Invoice
-     */
-    public function setPaymentDate($payment_date)
-    {
-        $this->payment_date = $payment_date;
-        return $this;
-    }
+
     /**
      * Set status
      *
@@ -437,35 +303,9 @@ class PayInvoice extends Invoice
     {
         return $this->status;
     }
-    /**
-     * Add service_invoice_tax
-     *
-     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
-     * @return Order
-     */
-    public function addAServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
-    {
-        $this->service_invoice_tax[] = $service_invoice_tax;
-        return $this;
-    }
-    /**
-     * Remove service_invoice_tax
-     *
-     * @param \ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax
-     */
-    public function removeServiceInvoiceTax(\ControleOnline\Entity\ServiceInvoiceTax $service_invoice_tax)
-    {
-        $this->service_invoice_tax->removeElement($service_invoice_tax);
-    }
-    /**
-     * Get service_invoice_tax
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getServiceInvoiceTax()
-    {
-        return $this->service_invoice_tax;
-    }
+
+
+
     /**
      * Set notified
      *
@@ -495,24 +335,7 @@ class PayInvoice extends Invoice
     {
         return $this->category;
     }
-    public function setDescription(?string $description = null)
-    {
-        $this->description = $description;
-        return $this;
-    }
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-    public function setPaymentMode(?int $mode = null)
-    {
-        $this->paymentMode = $mode;
-        return $this;
-    }
-    public function getPaymentMode(): ?int
-    {
-        return $this->paymentMode;
-    }
+
 
 
 
