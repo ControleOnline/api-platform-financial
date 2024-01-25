@@ -41,7 +41,7 @@ use ApiPlatform\Metadata\Delete;
             uriTemplate: '/finance/pay'
         ),
         new Post(
-            security: 'is_granted(\'ROLE_ADMIN\')',
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/pay'
         ),
         new Put(
@@ -49,7 +49,7 @@ use ApiPlatform\Metadata\Delete;
             uriTemplate: '/finance/pay/{id}'
         ),
         new Delete(
-            security: 'is_granted(\'ROLE_ADMIN\')',
+            security: 'is_granted(\'ROLE_ADMIN\' or (is_granted(\'ROLE_CLIENT\'))',
             uriTemplate: '/finance/pay/{id}'
         )
     ],
