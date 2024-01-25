@@ -336,9 +336,6 @@ class PayInvoice extends Invoice
         return $this->category;
     }
 
-
-
-
     /**
      * Get the value of payer
      */
