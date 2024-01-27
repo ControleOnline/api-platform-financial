@@ -19,11 +19,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
- * PayInvoice
+ * Invoice
  *
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="invoice", indexes={@ORM\Index (name="invoice_subtype", columns={"invoice_subtype"})})
- * @ORM\Entity (repositoryClass="ControleOnline\Repository\PayInvoiceRepository")
+ * @ORM\Entity (repositoryClass="ControleOnline\Repository\InvoiceRepository")
  */
 #[ApiResource(
     operations: [
