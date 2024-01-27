@@ -20,7 +20,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')'), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['order_invoice_read']], denormalizationContext: ['groups' => ['order_invoice_write']])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.id' => 'exact'])]
-class Invoice
+class OrderInvoice
 {
     /**
      * @var integer
@@ -42,9 +42,9 @@ class Invoice
      */
     private $invoice;
     /**
-     * @var \ControleOnline\Entity\SalesOrder
+     * @var \ControleOnline\Entity\Order
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\SalesOrder", inversedBy="invoice")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Order", inversedBy="invoice")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
@@ -91,10 +91,10 @@ class Invoice
     /**
      * Set order
      *
-     * @param \ControleOnline\Entity\SalesOrder $order
+     * @param \ControleOnline\Entity\Order $order
      * @return SalesInvoice
      */
-    public function setOrder(\ControleOnline\Entity\SalesOrder $order = null)
+    public function setOrder(\ControleOnline\Entity\Order $order = null)
     {
         $this->order = $order;
         return $this;
@@ -102,7 +102,7 @@ class Invoice
     /**
      * Get order
      *
-     * @return \ControleOnline\Entity\SalesOrder
+     * @return \ControleOnline\Entity\Order
      */
     public function getOrder()
     {

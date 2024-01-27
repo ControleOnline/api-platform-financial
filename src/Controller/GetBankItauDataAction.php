@@ -10,7 +10,7 @@ use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\People;
-use ControleOnline\Entity\SalesOrder;
+use ControleOnline\Entity\Order;
 use ControleOnline\Library\Itau\ItauClient;
 
 class GetBankItauDataAction
