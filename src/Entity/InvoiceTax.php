@@ -10,14 +10,14 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 /**
- * PurchasingInvoiceTax
+ * InvoiceTax
  *
  * @ORM\EntityListeners ({App\Listener\LogListener::class})
  * @ORM\Table (name="invoice_tax")
  * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')'), new Get(security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')', uriTemplate: '/invoice_taxes/{id}/download-nf', requirements: ['id' => '[\\w-]+'], controller: \App\Controller\DownloadOrderNFAction::class), new Post(uriTemplate: '/invoice_taxes/upload-nf', controller: \App\Controller\UploadOrderNFAction::class, deserialize: false, security: 'is_granted(\'ROLE_CLIENT\')', validationContext: ['groups' => ['Default', 'order_upload_nf']], openapiContext: ['consumes' => ['multipart/form-data']]), new Post(uriTemplate: '/invoice_taxes/upload-dacte', controller: \App\Controller\UploadOrderDACTEAction::class, deserialize: false, security: 'is_granted(\'ROLE_CLIENT\')', openapiContext: ['consumes' => ['multipart/form-data']])], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['invoice_tax_read']], denormalizationContext: ['groups' => ['invoice_tax_write']])]
-class PurchasingInvoiceTax
+class InvoiceTax
 {
     /**
      * @var integer
@@ -30,7 +30,7 @@ class PurchasingInvoiceTax
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoiceTax", mappedBy="invoiceTax")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\InvoiceTax", mappedBy="invoiceTax")
      */
     private $order;
     /**
@@ -74,27 +74,27 @@ class PurchasingInvoiceTax
         return $this->id;
     }
     /**
-     * Add PurchasingOrderInvoice
+     * Add Invoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\Invoice $order
      * @return People
      */
-    public function addOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
+    public function addOrder(\ControleOnline\Entity\Invoice $order)
     {
         $this->order[] = $order;
         return $this;
     }
     /**
-     * Remove PurchasingOrderInvoice
+     * Remove Invoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\Invoice $order
      */
-    public function removeOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
+    public function removeOrder(\ControleOnline\Entity\Invoice $order)
     {
         $this->order->removeElement($order);
     }
     /**
-     * Get PurchasingOrderInvoice
+     * Get Invoice
      *
      * @return \Doctrine\Common\Collections\Collection
      */

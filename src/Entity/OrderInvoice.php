@@ -2,21 +2,25 @@
 
 namespace ControleOnline\Entity;
 
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Common\Collections\ArrayCollection;
 /**
- * PurchasingOrderInvoice
+ * SalesInvoice
  *
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="order_invoice", uniqueConstraints={@ORM\UniqueConstraint (name="order_id", columns={"order_id", "invoice_id"})}, indexes={@ORM\Index (name="invoice_id", columns={"invoice_id"})})
  * @ORM\Entity
  */
-#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')')], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['order_invoice_read']], denormalizationContext: ['groups' => ['order_invoice_write']])]
-class PurchasingOrderInvoice
+#[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')'), new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')')], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['order_invoice_read']], denormalizationContext: ['groups' => ['order_invoice_write']])]
+#[ApiFilter(filterClass: SearchFilter::class, properties: ['order.id' => 'exact'])]
+class Invoice
 {
     /**
      * @var integer
@@ -24,40 +28,37 @@ class PurchasingOrderInvoice
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Groups({"order_invoice_read","order_read"})
      */
     private $id;
     /**
-     * @var \ControleOnline\Entity\PayInvoice
+     * @var \ControleOnline\Entity\Invoice
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PayInvoice", inversedBy="order")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Invoice", inversedBy="order")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="invoice_id", referencedColumnName="id")
      * })
-     * @Groups({"logistic_read"})  
+     * @Groups({"order_invoice_read","order_read"}) 
      */
     private $invoice;
     /**
-     * @var \ControleOnline\Entity\PurchasingOrder
+     * @var \ControleOnline\Entity\SalesOrder
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PurchasingOrder", inversedBy="invoice")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\SalesOrder", inversedBy="invoice")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
-     * @Groups({"invoice_read"})
+     * @Groups({"invoice_read","order_invoice_read"})
      */
     private $order;
     /**
      * @var float
      *
      * @ORM\Column(name="real_price", type="float",  nullable=false)
-     * @Groups({"invoice_read"})
+     * @Groups({"order_invoice_read","order_read"})
+     * 
      */
-    private $real_price = 0;
-    public function __construct()
-    {
-        $this->order = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->invoice = new \Doctrine\Common\Collections\ArrayCollection();
-    }
+    private $realPrice = 0;
     /**
      * Get id
      *
@@ -70,10 +71,10 @@ class PurchasingOrderInvoice
     /**
      * Set invoice
      *
-     * @param \ControleOnline\Entity\PayInvoice $invoice
-     * @return PurchasingOrderInvoice
+     * @param \ControleOnline\Entity\Invoice $invoice
+     * @return SalesInvoice
      */
-    public function setInvoice(\ControleOnline\Entity\PayInvoice $invoice = null)
+    public function setInvoice(\ControleOnline\Entity\Invoice $invoice = null)
     {
         $this->invoice = $invoice;
         return $this;
@@ -81,7 +82,7 @@ class PurchasingOrderInvoice
     /**
      * Get invoice
      *
-     * @return \ControleOnline\Entity\PayInvoice
+     * @return \ControleOnline\Entity\Invoice
      */
     public function getInvoice()
     {
@@ -90,10 +91,10 @@ class PurchasingOrderInvoice
     /**
      * Set order
      *
-     * @param \ControleOnline\Entity\PurchasingOrder $order
-     * @return PurchasingOrderInvoice
+     * @param \ControleOnline\Entity\SalesOrder $order
+     * @return SalesInvoice
      */
-    public function setOrder(\ControleOnline\Entity\PurchasingOrder $order = null)
+    public function setOrder(\ControleOnline\Entity\SalesOrder $order = null)
     {
         $this->order = $order;
         return $this;
@@ -101,30 +102,30 @@ class PurchasingOrderInvoice
     /**
      * Get order
      *
-     * @return \ControleOnline\Entity\PurchasingOrder
+     * @return \ControleOnline\Entity\SalesOrder
      */
     public function getOrder()
     {
         return $this->order;
     }
     /**
-     * Set real_price
+     * Set realPrice
      *
-     * @param float $real_price
-     * @return Order
+     * @param float $realPrice
+     * @return SalesInvoice
      */
-    public function setRealPrice($real_price)
+    public function setRealPrice($realPrice)
     {
-        $this->real_price = $real_price;
+        $this->realPrice = $realPrice;
         return $this;
     }
     /**
-     * Get real_price
+     * Get realPrice
      *
      * @return float
      */
     public function getRealPrice()
     {
-        return $this->real_price;
+        return $this->realPrice;
     }
 }

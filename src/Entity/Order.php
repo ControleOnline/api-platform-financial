@@ -14,16 +14,16 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-use App\Filter\PurchasingOrderEntityFilter;
+use App\Filter\OrderEntityFilter;
 use ControleOnline\Entity\Order;
 use stdClass;
 
 /**
- * PurchasingOrder
+ * Order
  *
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="orders")
- * @ORM\Entity (repositoryClass="ControleOnline\Repository\PurchasingOrderRepository")
+ * @ORM\Entity (repositoryClass="ControleOnline\Repository\OrderRepository")
  */
 #[ApiResource(
     operations: [
@@ -71,35 +71,35 @@ use stdClass;
         new Get(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\') and previous_object.canAccess(user))',
             uriTemplate: '/purchasing/orders/{id}/detail/summary',
-            controller: \App\Controller\GetPurchasingOrderSummaryAction::class
+            controller: \App\Controller\GetOrderSummaryAction::class
         ),
         new Get(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\') and previous_object.canAccess(user))',
             uriTemplate: '/purchasing/orders/{id}/detail/quotation',
-            controller: \App\Controller\GetPurchasingOrderQuotationAction::class
+            controller: \App\Controller\GetOrderQuotationAction::class
         ),
         new Get(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\') and previous_object.canAccess(user))',
             uriTemplate: '/purchasing/orders/{id}/detail/invoice',
-            controller: \App\Controller\GetPurchasingOrderInvoiceAction::class
+            controller: \App\Controller\GetInvoiceAction::class
         ), new Put(
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/purchasing/orders/{id}/update-status',
             controller: \App\Controller\UpdatePurchasingStatusAction::class
         ), new GetCollection(
-            extraProperties: ['filters' => [PurchasingOrderEntityFilter::class]],
+            extraProperties: ['filters' => [OrderEntityFilter::class]],
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/purchasing/orders'
         )
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-    filters: [\App\Filter\PurchasingOrderEntityFilter::class],
+    filters: [\App\Filter\OrderEntityFilter::class],
     normalizationContext: ['groups' => ['order_read']],
     denormalizationContext: ['groups' => ['order_write']]
 )]
 #[ApiFilter(filterClass: OrderFilter::class, properties: ['alterDate' => 'DESC'])]
 #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact', 'invoice.invoice' => 'exact', 'client' => 'exact', 'provider' => 'exact'])]
-class PurchasingOrder extends Order
+class Order extends Order
 {
     /**
      * @var integer
@@ -165,14 +165,14 @@ class PurchasingOrder extends Order
     private $contract;
     /**
      * @var \Doctrine\Common\Collections\Collection   
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="order")   
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\Invoice", mappedBy="order")   
      * @Groups({"logistic_read"})    
      */
     private $invoice;
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\PurchasingOrderInvoiceTax", mappedBy="order")
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\InvoiceTax", mappedBy="order")
      * @Groups({"order_read"})
      */
     private $invoiceTax;
@@ -675,10 +675,10 @@ class PurchasingOrder extends Order
     /**
      * Add invoiceTax
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax
+     * @param \ControleOnline\Entity\InvoiceTax $invoice_tax
      * @return Order
      */
-    public function addAInvoiceTax(\ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax)
+    public function addAInvoiceTax(\ControleOnline\Entity\InvoiceTax $invoice_tax)
     {
         $this->invoiceTax[] = $invoice_tax;
         return $this;
@@ -686,9 +686,9 @@ class PurchasingOrder extends Order
     /**
      * Remove invoiceTax
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax
+     * @param \ControleOnline\Entity\InvoiceTax $invoice_tax
      */
-    public function removeInvoiceTax(\ControleOnline\Entity\PurchasingOrderInvoiceTax $invoice_tax)
+    public function removeInvoiceTax(\ControleOnline\Entity\InvoiceTax $invoice_tax)
     {
         $this->address->removeElement($invoice_tax);
     }
@@ -702,27 +702,27 @@ class PurchasingOrder extends Order
         return $this->invoiceTax;
     }
     /**
-     * Add PurchasingOrderInvoice
+     * Add Invoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $invoice
+     * @param \ControleOnline\Entity\Invoice $invoice
      * @return People
      */
-    public function addInvoice(\ControleOnline\Entity\PurchasingOrderInvoice $invoice)
+    public function addInvoice(\ControleOnline\Entity\Invoice $invoice)
     {
         $this->invoice[] = $invoice;
         return $this;
     }
     /**
-     * Remove PurchasingOrderInvoice
+     * Remove Invoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $invoice
+     * @param \ControleOnline\Entity\Invoice $invoice
      */
-    public function removeInvoice(\ControleOnline\Entity\PurchasingOrderInvoice $invoice)
+    public function removeInvoice(\ControleOnline\Entity\Invoice $invoice)
     {
         $this->invoice->removeElement($invoice);
     }
     /**
-     * Get PurchasingOrderInvoice
+     * Get Invoice
      *
      * @return \Doctrine\Common\Collections\Collection
      */
@@ -934,8 +934,8 @@ class PurchasingOrder extends Order
     }
     public function getInvoiceByStatus(array $status)
     {
-        foreach ($this->getInvoice() as $purchasingOrderInvoice) {
-            $invoice = $purchasingOrderInvoice->getInvoice();
+        foreach ($this->getInvoice() as $Invoice) {
+            $invoice = $Invoice->getInvoice();
             if (in_array($invoice->getStatus()->getStatus(), $status)) {
                 return $invoice;
             }

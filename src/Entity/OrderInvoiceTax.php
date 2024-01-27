@@ -9,14 +9,14 @@ use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 /**
- * PurchasingOrderInvoiceTax
+ * InvoiceTax
  *
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="order_invoice_tax", uniqueConstraints={@ORM\UniqueConstraint (name="order_id", columns={"order_id", "invoice_tax_id"}),@ORM\UniqueConstraint(name="invoice_type", columns={"issuer_id", "invoice_type", "order_id"})}, indexes={@ORM\Index (name="invoice_tax_id", columns={"invoice_tax_id"})})
  * @ORM\Entity
  */
 #[ApiResource(operations: [new Get(security: 'is_granted(\'ROLE_CLIENT\')')], formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']], normalizationContext: ['groups' => ['order_invoice_tax_read']], denormalizationContext: ['groups' => ['order_invoice_tax_write']])]
-class PurchasingOrderInvoiceTax
+class InvoiceTax
 {
     /**
      * @var integer
@@ -27,9 +27,9 @@ class PurchasingOrderInvoiceTax
      */
     private $id;
     /**
-     * @var \ControleOnline\Entity\PurchasingInvoiceTax
+     * @var \ControleOnline\Entity\InvoiceTax
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PurchasingInvoiceTax", inversedBy="order")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\InvoiceTax", inversedBy="order")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="invoice_tax_id", referencedColumnName="id")
      * })
@@ -37,9 +37,9 @@ class PurchasingOrderInvoiceTax
      */
     private $invoiceTax;
     /**
-     * @var \ControleOnline\Entity\PurchasingOrder
+     * @var \ControleOnline\Entity\Order
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PurchasingOrder", inversedBy="invoiceTax")
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Order", inversedBy="invoiceTax")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="order_id", referencedColumnName="id")
      * })
@@ -77,10 +77,10 @@ class PurchasingOrderInvoiceTax
     /**
      * Set invoiceTax
      *
-     * @param \ControleOnline\Entity\PurchasingInvoiceTax $invoice_tax
-     * @return PurchasingOrderInvoiceTax
+     * @param \ControleOnline\Entity\InvoiceTax $invoice_tax
+     * @return InvoiceTax
      */
-    public function setInvoiceTax(\ControleOnline\Entity\PurchasingInvoiceTax $invoice_tax = null)
+    public function setInvoiceTax(\ControleOnline\Entity\InvoiceTax $invoice_tax = null)
     {
         $this->invoiceTax = $invoice_tax;
         return $this;
@@ -88,7 +88,7 @@ class PurchasingOrderInvoiceTax
     /**
      * Get invoiceTax
      *
-     * @return \ControleOnline\Entity\PurchasingInvoiceTax
+     * @return \ControleOnline\Entity\InvoiceTax
      */
     public function getInvoiceTax()
     {
@@ -97,10 +97,10 @@ class PurchasingOrderInvoiceTax
     /**
      * Set order
      *
-     * @param \ControleOnline\Entity\PurchasingOrder $order
-     * @return PurchasingOrderInvoiceTax
+     * @param \ControleOnline\Entity\Order $order
+     * @return InvoiceTax
      */
-    public function setOrder(\ControleOnline\Entity\PurchasingOrder $order = null)
+    public function setOrder(\ControleOnline\Entity\Order $order = null)
     {
         $this->order = $order;
         return $this;
