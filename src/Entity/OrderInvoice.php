@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
- * SalesInvoice
+ * Invoice
  *
  * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
  * @ORM\Table (name="order_invoice", uniqueConstraints={@ORM\UniqueConstraint (name="order_id", columns={"order_id", "invoice_id"})}, indexes={@ORM\Index (name="invoice_id", columns={"invoice_id"})})
@@ -72,7 +72,7 @@ class OrderInvoice
      * Set invoice
      *
      * @param \ControleOnline\Entity\Invoice $invoice
-     * @return SalesInvoice
+     * @return Invoice
      */
     public function setInvoice(\ControleOnline\Entity\Invoice $invoice = null)
     {
@@ -92,7 +92,7 @@ class OrderInvoice
      * Set order
      *
      * @param \ControleOnline\Entity\Order $order
-     * @return SalesInvoice
+     * @return Invoice
      */
     public function setOrder(\ControleOnline\Entity\Order $order = null)
     {
@@ -112,7 +112,7 @@ class OrderInvoice
      * Set realPrice
      *
      * @param float $realPrice
-     * @return SalesInvoice
+     * @return Invoice
      */
     public function setRealPrice($realPrice)
     {

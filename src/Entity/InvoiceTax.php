@@ -184,7 +184,7 @@ class InvoiceTax
      * Set invoiceKey
      *
      * @param integer $invoice_number
-     * @return SalesInvoiceTax
+     * @return InvoiceTax
      */
     public function setInvoiceKey($invoice_key)
     {

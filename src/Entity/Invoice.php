@@ -29,41 +29,41 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance/{id}'
+            uriTemplate: '/invoice/{id}'
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance'
+            uriTemplate: '/invoice'
         ),
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance'
+            uriTemplate: '/invoice'
         ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
-            uriTemplate: '/finance/{id}'
+            uriTemplate: '/invoice/{id}'
         ),
         new Delete(
             security: 'is_granted(\'ROLE_ADMIN\' or (is_granted(\'ROLE_CLIENT\'))',
-            uriTemplate: '/finance/{id}'
+            uriTemplate: '/invoice/{id}'
         ),
 
 
         new Get(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
-            uriTemplate: '/finance/{id}/download',
+            uriTemplate: '/invoice/{id}/download',
             requirements: ['id' => '[\\w-]+'],
             controller: \ControleOnline\Controller\GetBankInterDataAction::class
         ),
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance/{id}/bank/itau/{operation}',
+            uriTemplate: '/invoice/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: \ControleOnline\Controller\GetBankItauDataAction::class
         ),
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance/{id}/bank/inter/{operation}',
+            uriTemplate: '/invoice/{id}/bank/inter/{operation}',
             requirements: ['operation' => '^(download|payment)+$'],
             controller: \ControleOnline\Controller\GetBankInterDataAction::class
         ),
