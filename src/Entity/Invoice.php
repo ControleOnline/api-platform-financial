@@ -169,7 +169,7 @@ class Invoice
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
-    private $notified;
+    private $notified = 0;
     
     /**
      * @var float
