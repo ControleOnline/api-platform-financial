@@ -214,7 +214,7 @@ class Invoice
      * @param \ControleOnline\Entity\Invoice $order
      * @return People
      */
-    public function addOrder(\ControleOnline\Entity\Invoice $order)
+    public function addOrder(\ControleOnline\Entity\OrderInvoice $order)
     {
         $this->order[] = $order;
         return $this;
@@ -224,7 +224,7 @@ class Invoice
      *
      * @param \ControleOnline\Entity\Invoice $order
      */
-    public function removeOrder(\ControleOnline\Entity\Invoice $order)
+    public function removeOrder(\ControleOnline\Entity\OrderInvoice $order)
     {
         $this->order->removeElement($order);
     }
