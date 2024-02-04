@@ -9,5 +9,5 @@ config\services.yaml
 
 ```yaml
 imports:
-    - { resource: "../vendor/controleonline/dashboard/financial/services/financial.yaml" }    
+    - { resource: "../modules/controleonline/dashboard/financial/services/financial.yaml" }    
 ```
