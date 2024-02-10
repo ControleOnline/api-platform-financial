@@ -40,12 +40,18 @@ use ApiPlatform\Metadata\Delete;
         ),
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            validationContext: ['groups' => ['invoice_write']],
+            denormalizationContext: ['groups' => ['invoice_write']]
         ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            validationContext: ['groups' => ['invoice_write']],
+            denormalizationContext: ['groups' => ['invoice_write']]
         ),
         new Delete(
             security: 'is_granted(\'ROLE_ADMIN\' or (is_granted(\'ROLE_CLIENT\'))',
+            validationContext: ['groups' => ['invoice_write']],
+            denormalizationContext: ['groups' => ['invoice_write']]
         ),
         new Get(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
@@ -65,12 +71,7 @@ use ApiPlatform\Metadata\Delete;
             requirements: ['operation' => '^(download|payment)+$'],
             controller: \ControleOnline\Controller\GetBankInterDataAction::class
         ),
-        new Put(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/finance/receive/{id}',
-            validationContext: ['groups' => ['invoice_receive_put_validation']],
-            denormalizationContext: ['groups' => ['invoice_receive_put_edit']]
-        ),
+
         new Put(
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/finance/receive/{id}/update-notified',
