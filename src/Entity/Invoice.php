@@ -93,7 +93,7 @@ class Invoice
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
@@ -161,7 +161,6 @@ class Invoice
      *
      * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
      * @Assert\NotBlank(groups={"invoice_write"})
-     * @Assert\DateTime(groups={"invoice_write"})
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
