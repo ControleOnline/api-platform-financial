@@ -3,15 +3,15 @@
 namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\Config;
-use ControleOnline\Entity\ReceiveInvoice;
+use ControleOnline\Entity\Invoice;
 use ctodobom\APInterPHP\BancoInterException;
 use Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use ControleOnline\Entity\Invoice;
-use ControleOnline\Library\Inter\InterClient;
+
+use App\Library\Inter\InterClient;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -86,7 +86,7 @@ class GetBankInterDataAction
      */
     private function echoBilletPdfContent($idInvoice): BinaryFileResponse
     {
-        $invEtt = $this->manager->getRepository(ReceiveInvoice::class)->find($idInvoice);
+        $invEtt = $this->manager->getRepository(Invoice::class)->find($idInvoice);
         if (empty($invEtt)) {
             throw new Exception("Não foi possível localizar a fatura com o ID: " . $idInvoice);
         }
@@ -102,7 +102,7 @@ class GetBankInterDataAction
     /**
      * Retrieve INTER billing information
      *
-     * @param ReceiveInvoice $invoice
+     * @param Invoice $invoice
      * @return void
      * @throws Exception
      */

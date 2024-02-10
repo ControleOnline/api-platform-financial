@@ -11,7 +11,7 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\SalesOrder;
-use ControleOnline\Library\Itau\ItauClient;
+use App\Library\Itau\ItauClient;
 
 class GetBankItauDataAction
 {
@@ -44,7 +44,7 @@ class GetBankItauDataAction
     /**
      * Retrieve ITAU hash
      *
-     * @param  \ControleOnline\Entity\ReceiveInvoice $invoice
+     * @param  \ControleOnline\Entity\Invoice $invoice
      * @return string
      */
     private function getItauhash(Invoice $invoice): string
@@ -95,7 +95,7 @@ class GetBankItauDataAction
         $obsAd2          = '';
         $obsAd3          = '';
 
-        $itaucripto      = new \ControleOnline\Library\Itau\Itaucripto();
+        $itaucripto      = new \App\Library\Itau\Itaucripto();
 
         return $itaucripto->geraDados(
             $codEmp,
@@ -122,7 +122,7 @@ class GetBankItauDataAction
     /**
      * Retrieve ITAU billing information
      *
-     * @param  \ControleOnline\Entity\ReceiveInvoice $invoice
+     * @param  \ControleOnline\Entity\Invoice $invoice
      * @return array
      */
     private function getPayment(Invoice $invoice): array
