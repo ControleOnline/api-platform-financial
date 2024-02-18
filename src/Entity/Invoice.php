@@ -1,8 +1,7 @@
 <?php
 
 namespace ControleOnline\Entity;
-
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
@@ -164,7 +163,7 @@ class Invoice
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
-    #[ApiFilter(filterClass: RangeFilter::class, properties: ['dueDate'])]
+    #[ApiFilter(filterClass: DateFilter::class, properties: ['dueDate'])]
     private $dueDate;
 
     /**
