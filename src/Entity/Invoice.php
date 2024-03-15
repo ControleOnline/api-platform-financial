@@ -37,11 +37,7 @@ use ApiPlatform\Metadata\Delete;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-        new Post(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']]
-        ),
+        new Post(securityPostDenormalize: 'is_granted(\'ROLE_CLIENT\')'),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             validationContext: ['groups' => ['invoice_write']],
@@ -158,8 +154,7 @@ class Invoice
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
-     * @Assert\NotBlank(groups={"invoice_write"})
+     * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATE")
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
