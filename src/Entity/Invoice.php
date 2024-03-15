@@ -37,7 +37,11 @@ use ApiPlatform\Metadata\Delete;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-        new Post(securityPostDenormalize: 'is_granted(\'ROLE_CLIENT\')'),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            validationContext: ['groups' => ['invoice_write']],
+            denormalizationContext: ['groups' => ['invoice_write']]
+        ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             validationContext: ['groups' => ['invoice_write']],
