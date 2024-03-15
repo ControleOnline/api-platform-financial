@@ -100,7 +100,7 @@ class Invoice
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice")
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     * @Groups({"invoice_read","logistic_read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
     private $order;
