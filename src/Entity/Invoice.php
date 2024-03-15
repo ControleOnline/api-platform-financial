@@ -99,7 +99,7 @@ class Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice")
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
