@@ -1,6 +1,7 @@
 <?php
 
 namespace ControleOnline\Entity;
+
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Put;
@@ -40,7 +41,9 @@ use ApiPlatform\Metadata\Delete;
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']]
+            denormalizationContext: ['groups' => ['invoice_write']],
+            uriTemplate: '/invoices',
+
         ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
@@ -176,7 +179,7 @@ class Invoice
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
-    private $notified;
+    private $notified  = false;
 
     /**
      * @var float
