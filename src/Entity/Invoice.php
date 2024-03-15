@@ -92,7 +92,7 @@ class Invoice
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     * @Groups({"invoice_read","logistic_read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
