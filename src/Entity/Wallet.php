@@ -51,6 +51,8 @@ class Wallet
      * @Groups({"invoice_read", "wallet_read", "wallet_write"})
 
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
+
     private $id;
 
     /**
@@ -58,12 +60,15 @@ class Wallet
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
+
     private $people;
 
     /**
      * @ORM\Column(type="string", length=50)
      * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
 
     private $wallet;
 
