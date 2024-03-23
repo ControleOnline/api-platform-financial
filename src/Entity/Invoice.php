@@ -205,14 +205,14 @@ class Invoice
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     private $otherInformations;
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'exact'])]
 
@@ -220,7 +220,7 @@ class Invoice
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     private $paymentType;
