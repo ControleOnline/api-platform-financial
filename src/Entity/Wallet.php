@@ -48,7 +48,7 @@ class Wallet
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_read", "wallet_read", "wallet_write})
+     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
 
      */
     private $id;
@@ -56,20 +56,20 @@ class Wallet
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read", "wallet_read", "wallet_write})
+     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
     private $people;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice_read", "wallet_read", "wallet_write})
+     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
 
     private $wallet;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_read", "wallet_read", "wallet_write})
+     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
     private $balance;
 
