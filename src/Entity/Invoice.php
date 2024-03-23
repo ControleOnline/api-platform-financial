@@ -214,13 +214,15 @@ class Invoice
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice_read","logistic_read"})
      */
-    private $wallet;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'exact'])]
 
+    private $wallet;
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice_read","logistic_read"})
      */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     private $paymentType;
 
     public function __construct()
