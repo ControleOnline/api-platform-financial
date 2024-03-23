@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
+use stdClass;
 
 /**
  * Invoice
@@ -247,6 +248,7 @@ class Invoice
         $this->alter_date = new \DateTime('now');
         $this->dueDate = new \DateTime('now');
         $this->order = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->otherInformations = json_encode(new stdClass());
     }
     /**
      * Get id
@@ -443,20 +445,38 @@ class Invoice
     }
 
     /**
-     * Get the value of otherInformations
+     * Get otherInformations
+     *
+     * @return stdClass
      */
-    public function getOtherInformations()
+    public function getOtherInformations($decode = false)
     {
-        return $this->otherInformations;
+        return $decode ? (object) json_decode((is_array($this->otherInformations) ? json_encode($this->otherInformations) : $this->otherInformations)) : $this->otherInformations;
     }
 
     /**
-     * Set the value of otherInformations
+     * Set comments
+     *
+     * @param string $otherInformations
+     * @return Order
      */
-    public function setOtherInformations($otherInformations): self
+    public function addOtherInformations($key, $value)
     {
-        $this->otherInformations = $otherInformations;
+        $otherInformations = $this->getOtherInformations(true);
+        $otherInformations->$key = $value;
+        $this->otherInformations = json_encode($otherInformations);
+        return $this;
+    }
 
+    /**
+     * Set comments
+     *
+     * @param string $otherInformations
+     * @return Order
+     */
+    public function setOtherInformations($otherInformations)
+    {
+        $this->otherInformations = json_encode($otherInformations);
         return $this;
     }
 
