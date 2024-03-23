@@ -242,6 +242,15 @@ class Invoice
      */
     private $installments;
 
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="installment_id", type="integer",  nullable=true)
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     */
+    private $installment_id;
+
     public function __construct()
     {
         $this->invoice_date = new \DateTime('now');
@@ -550,6 +559,24 @@ class Invoice
     public function setInstallments($installments): self
     {
         $this->installments = $installments;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of installment_id
+     */
+    public function getInstallmentId()
+    {
+        return $this->installment_id;
+    }
+
+    /**
+     * Set the value of installment_id
+     */
+    public function setInstallmentId($installment_id): self
+    {
+        $this->installment_id = $installment_id;
 
         return $this;
     }

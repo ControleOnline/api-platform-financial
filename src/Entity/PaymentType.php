@@ -78,7 +78,7 @@ class PaymentType
     private $frequency;
 
     /**
-     * @ORM\Column(type="string", columnDefinition="ENUM('single', 'split', 'recurrent')")
+     * @ORM\Column(type="string", columnDefinition="ENUM('single', 'split')")
      * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['installments' => 'exact'])]
