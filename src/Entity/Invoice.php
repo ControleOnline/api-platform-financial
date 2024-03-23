@@ -249,6 +249,8 @@ class Invoice
         $this->dueDate = new \DateTime('now');
         $this->order = new \Doctrine\Common\Collections\ArrayCollection();
         $this->otherInformations = json_encode(new stdClass());
+        $this->portion = 0;
+        $this->installments = 0;
     }
     /**
      * Get id
