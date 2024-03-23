@@ -71,7 +71,7 @@ class PaymentType
     private $frequency;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", columnDefinition="ENUM('single', 'split', 'recurrent')")
      * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $installments;

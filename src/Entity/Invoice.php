@@ -225,6 +225,22 @@ class Invoice
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     private $paymentType;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="portion", type="integer",  nullable=false)
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     */
+    private $portion;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="installments", type="integer",  nullable=false)
+     * @Groups({"invoice_read","logistic_read","invoice_write"})
+     */
+    private $installments;
+
     public function __construct()
     {
         $this->invoice_date = new \DateTime('now');
@@ -476,6 +492,42 @@ class Invoice
     public function setPaymentType($paymentType): self
     {
         $this->paymentType = $paymentType;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of portion
+     */
+    public function getPortion()
+    {
+        return $this->portion;
+    }
+
+    /**
+     * Set the value of portion
+     */
+    public function setPortion($portion): self
+    {
+        $this->portion = $portion;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of installments
+     */
+    public function getInstallments()
+    {
+        return $this->installments;
+    }
+
+    /**
+     * Set the value of installments
+     */
+    public function setInstallments($installments): self
+    {
+        $this->installments = $installments;
 
         return $this;
     }
