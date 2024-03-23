@@ -202,6 +202,26 @@ class Invoice
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     private $category = null;
 
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $otherInformations;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $wallet;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $paymentType;
+
+
+
     public function __construct()
     {
         $this->invoice_date = new \DateTime('now');
@@ -401,5 +421,59 @@ class Invoice
     public function getDateAsString(\DateTime $date = null): string
     {
         return ($date !== null ? $date : (new \DateTime))->format('Y-m-d');
+    }
+
+    /**
+     * Get the value of otherInformations
+     */
+    public function getOtherInformations()
+    {
+        return $this->otherInformations;
+    }
+
+    /**
+     * Set the value of otherInformations
+     */
+    public function setOtherInformations($otherInformations): self
+    {
+        $this->otherInformations = $otherInformations;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of wallet
+     */
+    public function getWallet()
+    {
+        return $this->wallet;
+    }
+
+    /**
+     * Set the value of wallet
+     */
+    public function setWallet($wallet): self
+    {
+        $this->wallet = $wallet;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of paymentType
+     */
+    public function getPaymentType()
+    {
+        return $this->paymentType;
+    }
+
+    /**
+     * Set the value of paymentType
+     */
+    public function setPaymentType($paymentType): self
+    {
+        $this->paymentType = $paymentType;
+
+        return $this;
     }
 }
