@@ -47,31 +47,34 @@ class PaymentType
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
+     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $people;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $paymentType;
 
     /**
      * @ORM\Column(type="string", columnDefinition="ENUM('monthly', 'daily', 'weekly', 'single')")
+     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $frequency;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
      */
     private $installments;
-
-
 
     /**
      * Get the value of id

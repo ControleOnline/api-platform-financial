@@ -205,22 +205,23 @@ class Invoice
 
     /**
      * @ORM\Column(type="json")
+     * @Groups({"invoice_read","logistic_read"})
      */
     private $otherInformations;
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoice_read","logistic_read"})
      */
     private $wallet;
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoice_read","logistic_read"})
      */
     private $paymentType;
-
-
 
     public function __construct()
     {
