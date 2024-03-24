@@ -235,7 +235,7 @@ class Invoice
     /**
      * @var integer
      *
-     * @ORM\Column(name="portion", type="integer",  nullable=false)
+     * @ORM\Column(name="portion_number", type="integer",  nullable=false)
      * @Groups({"invoice_read","logistic_read","invoice_write"})
      */
     private $portion;
