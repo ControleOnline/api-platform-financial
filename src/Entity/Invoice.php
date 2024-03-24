@@ -16,7 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
-use ControleOnline\Controller\DREAction;
+use ControleOnline\Controller\IncomeStatementAction;
 use stdClass;
 
 /**
@@ -39,8 +39,8 @@ use stdClass;
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/dre',
-            controller: DREAction::class
+            uriTemplate: '/income_statements',
+            controller: IncomeStatementAction::class
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',

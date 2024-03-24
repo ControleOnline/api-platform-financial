@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class DREAction
+class IncomeStatementAction
 {
     public function __construct(
         private EntityManagerInterface $manager,
