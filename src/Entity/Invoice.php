@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
+use ControleOnline\Controller\DREAction;
 use stdClass;
 
 /**
@@ -35,6 +36,11 @@ use stdClass;
             uriTemplate: '/invoice/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: \ControleOnline\Controller\GetBankItauDataAction::class
+        ),
+        new GetCollection(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/dre',
+            controller: DREAction::class
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
