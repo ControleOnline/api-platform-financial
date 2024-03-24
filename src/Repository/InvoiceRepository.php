@@ -35,7 +35,7 @@ class InvoiceRepository extends ServiceEntityRepository
                 category_name,
                 report.payer_id,
                 report.receiver_id,
-                COALESCE(SUM(total_price), 0) AS total_price
+               SUM(COALESCE(total_price, 0)) AS total_price
             FROM
                 (
                     SELECT 1 AS month
@@ -57,8 +57,8 @@ class InvoiceRepository extends ServiceEntityRepository
                 category_name,
                 report.payer_id,
                 report.receiver_id,
-                parent_id
-            ORDER BY
+                parent_id";
+        $sql .= "     ORDER BY
                 months.month
         ";
 
