@@ -109,7 +109,7 @@ class Invoice
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\PurchasingOrderInvoice", mappedBy="invoice")
+     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\OrderInvoice", mappedBy="invoice")
      * @Groups({"invoice_read","logistic_read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
@@ -277,27 +277,27 @@ class Invoice
         return $this->id;
     }
     /**
-     * Add PurchasingOrderInvoice
+     * Add OrderInvoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\OrderInvoice $order
      * @return People
      */
-    public function addOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
+    public function addOrder(\ControleOnline\Entity\OrderInvoice $order)
     {
         $this->order[] = $order;
         return $this;
     }
     /**
-     * Remove PurchasingOrderInvoice
+     * Remove OrderInvoice
      *
-     * @param \ControleOnline\Entity\PurchasingOrderInvoice $order
+     * @param \ControleOnline\Entity\OrderInvoice $order
      */
-    public function removeOrder(\ControleOnline\Entity\PurchasingOrderInvoice $order)
+    public function removeOrder(\ControleOnline\Entity\OrderInvoice $order)
     {
         $this->order->removeElement($order);
     }
     /**
-     * Get PurchasingOrderInvoice
+     * Get OrderInvoice
      *
      * @return \Doctrine\Common\Collections\Collection
      */
