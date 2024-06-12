@@ -8,7 +8,7 @@ use ControleOnline\Entity\Status;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 
-class OrderInvoiceService
+class InvoiceService
 {
     public function __construct(
         private EntityManagerInterface $manager,
