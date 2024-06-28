@@ -10,6 +10,7 @@ use Braspag\Split\Request\Sale as RequestSale;
 use Braspag\Split\Domains\Environment;
 use Braspag\Split\Domains\Authentication;
 use ControleOnline\Entity\Config;
+use ControleOnline\Entity\People;
 
 class BraspagService
 {
@@ -36,10 +37,9 @@ class BraspagService
         /* Executa o split */
         $result = $this->getInstance()->split($paymentId, [$splitOne]);
 
-        /**
-         * Captura o JSON encodado retornado pela API
-         */
-        var_dump($result->getResponseRaw());
+        $invoice->addOtherInformations('braspag', $result->getResponseRaw());
+        $this->manager->persist($invoice);
+        $this->manager->flush();
     }
 
     /* PaymentId da transação já capturada */
@@ -51,18 +51,22 @@ class BraspagService
 
     private function getSubordinateMerchantId(Invoice $invoice)
     {
+        return $this->getConfig($invoice->getReceiver(), 'subordinate-merchant-id');
+    }
+
+    private function getConfig(People $people, $key)
+    {
         return $this->manager->getRepository(Config::class)->findOneBy([
-            'people' => $invoice->getReceiver(),
-            'config_key' => 'subordinate-merchant-id'
+            'people' => $people,
+            'config_key' => 'braspag-' . $key
         ]);
     }
 
     private function  getInstance()
     {
         $people = $this->peopleRoleService->getMainCompany();
-
-        $merchantKey = 'merchant-key';
-        $env = Environment::production('client-id', 'client-sercret');
+        $merchantKey = $this->getConfig($people, 'merchant-key');
+        $env = Environment::production($this->getConfig($people, 'client-id'), $this->getConfig($people, 'client-sercret'));
         $auth = new Authentication($env);
         return  new RequestSale($env, $merchantKey, $auth);
     }
