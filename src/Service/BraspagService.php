@@ -24,34 +24,38 @@ class BraspagService
     public function split(Invoice $invoice)
     {
         $subordinateMerchantId = $this->getSubordinateMerchantId($invoice);
-        $paymentId = $this->getPaymentId($invoice);
+        $payments = $this->getPayments($invoice);
+        $mainCompany = $this->peopleRoleService->getMainCompany();
 
-        if (!$subordinateMerchantId || !$paymentId)
-            return;
+        if (!$subordinateMerchantId || !$payments || $mainCompany->getId() == $invoice->getReceiver()->getId()) return;
+        $percentage = 5;
+        foreach ($payments as $payment) {
 
-        $splitOne = new SplitPayments;
-        $splitOne->setSubordinateMerchantId($subordinateMerchantId);
-        $splitOne->setAmount(3000); /* Valor em centavos */
-        $splitOne->setFares(5, 0);
+            $splitOne = new SplitPayments;
+            $splitOne->setSubordinateMerchantId($subordinateMerchantId);
+            $splitOne->setAmount($payment->amount / 100 * $percentage); /* Valor em centavos */
+            $splitOne->setFares($percentage, $percentage);
 
-        /* Executa o split */
-        $result = $this->getInstance()->split($paymentId, [$splitOne]);
+            /* Executa o split */
+            $result = $this->getInstance($mainCompany)->split($payment->id, [$splitOne]);
+            $response[] = $result->getResponseRaw();
+        }
 
-        $invoice->addOtherInformations('braspag', $result->getResponseRaw());
+        $invoice->addOtherInformations('braspag', $response);
         $this->manager->persist($invoice);
         $this->manager->flush();
     }
 
     /* PaymentId da transação já capturada */
-    private function getPaymentId(Invoice $invoice)
+    private function getPayments(Invoice $invoice)
     {
         $OtherInformations = $invoice->getOtherInformations(true);
-        return isset($OtherInformations->lio) ? $OtherInformations->lio->seinao : null;
+        return isset($OtherInformations->lio) ? $OtherInformations->lio->result->payments : null;
     }
 
     private function getSubordinateMerchantId(Invoice $invoice)
     {
-        return $this->getConfig($invoice->getReceiver(), 'subordinate-merchant-id');
+        return $this->getConfig($invoice->getReceiver(), 'merchant-id');
     }
 
     private function getConfig(People $people, $key)
@@ -62,11 +66,10 @@ class BraspagService
         ]);
     }
 
-    private function  getInstance()
+    private function  getInstance($mainCompany)
     {
-        $people = $this->peopleRoleService->getMainCompany();
-        $merchantKey = $this->getConfig($people, 'merchant-key');
-        $env = Environment::production($this->getConfig($people, 'client-id'), $this->getConfig($people, 'client-sercret'));
+        $merchantKey = $this->getConfig($mainCompany, 'merchant-id');
+        $env = Environment::production($merchantKey, $this->getConfig($mainCompany, 'client-sercret'));
         $auth = new Authentication($env);
         return  new RequestSale($env, $merchantKey, $auth);
     }
