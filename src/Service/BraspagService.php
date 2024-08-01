@@ -29,19 +29,19 @@ class BraspagService
 
         if (!$subordinateMerchantId || !$payments || $mainCompany->getId() == $invoice->getReceiver()->getId()) return;
         $percentage = 5;
+        $key = 0;
+        $split = [];
         foreach ($payments as $payment) {
-
-            $splitOne = new SplitPayments;
-            $splitOne->setSubordinateMerchantId($subordinateMerchantId);
-            $splitOne->setAmount($payment->amount / 100 * $percentage); /* Valor em centavos */
-            $splitOne->setFares($percentage, $percentage);
-
-            /* Executa o split */
-            $result = $this->getInstance($mainCompany)->split($payment->id, [$splitOne]);
-            $response[] = $result->getResponseRaw();
+            $split[$key] = new SplitPayments;
+            $split[$key]->setSubordinateMerchantId($subordinateMerchantId);
+            $split[$key]->setAmount($payment->amount / 100 * $percentage); /* Valor em centavos */
+            $split[$key]->setFares($percentage, $percentage);
+            $key++;
         }
 
-        $invoice->addOtherInformations('braspag', $response);
+        /* Executa o split */
+        $result = $this->getInstance($mainCompany)->split($payment->id, $split);
+        $invoice->addOtherInformations('braspag', $result->getResponseRaw());
         $this->manager->persist($invoice);
         $this->manager->flush();
     }
