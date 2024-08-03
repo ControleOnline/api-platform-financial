@@ -60,10 +60,12 @@ class BraspagService
 
     private function getConfig(People $people, $key)
     {
-        return $this->manager->getRepository(Config::class)->findOneBy([
+        $config = $this->manager->getRepository(Config::class)->findOneBy([
             'people' => $people,
             'config_key' => 'braspag-' . $key
         ]);
+
+        return $config ? $config->getConfigValue() : null;
     }
 
     private function  getInstance($mainCompany)
