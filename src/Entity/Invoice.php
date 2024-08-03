@@ -91,7 +91,7 @@ use stdClass;
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
             validationContext: ['groups' => ['invoice_write']],
             denormalizationContext: ['groups' => ['invoice_write']],
-            uriTemplate: '/finance/{id}/split',
+            uriTemplate: '/invoice/{id}/split',
             controller: \ControleOnline\Controller\SplitInvoiceAction::class
         ),
     ],
