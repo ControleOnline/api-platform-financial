@@ -32,10 +32,11 @@ class BraspagService
         $key = 0;
         $split = [];
         foreach ($payments as $payment) {
+            $value = floor($payment->amount / 100 * $percentage) * 100; /* Valor em centavos */
             $split[$key] = new SplitPayments;
             $split[$key]->setSubordinateMerchantId($subordinateMerchantId);
-            $split[$key]->setAmount($payment->amount / 100 * $percentage); /* Valor em centavos */
-            $split[$key]->setFares($percentage, $percentage);
+            $split[$key]->setAmount($value); 
+            $split[$key]->setFares($percentage, $value);
             $key++;
         }
 

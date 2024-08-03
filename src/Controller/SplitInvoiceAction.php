@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ControleOnline\Service\BraspagService;
+use Braspag\Split\Exception\BraspagSplitException;
 use Psr\Log\LoggerInterface;
 
 
@@ -42,6 +43,16 @@ class SplitInvoiceAction
                     'success' => false,
                 ],
             ], 500);
+        } catch (BraspagSplitException $e) {
+            $this->logger->error('Failed', ['exception' => $e]);
+            return new JsonResponse([
+                'response' => [
+                    'data'    => [],
+                    'count'   => 0,
+                    'error'   => $e->getResponse(),
+                    'success' => false,
+                ],
+            ], $e->getStatusCode());
         }
     }
 }
