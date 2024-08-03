@@ -44,6 +44,7 @@ class BraspagService
         $invoice->addOtherInformations('braspag', $result->getResponseRaw());
         $this->manager->persist($invoice);
         $this->manager->flush();
+        return $result->getResponseRaw();
     }
 
     /* PaymentId da transação já capturada */
