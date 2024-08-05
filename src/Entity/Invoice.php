@@ -86,7 +86,14 @@ use stdClass;
             uriTemplate: '/finance/receive/{id}/update-notified',
             validationContext: ['groups' => ['invoice_receive_notified_validation']],
             denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]
-        )
+        ),
+        new Put(
+            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            validationContext: ['groups' => ['invoice_write']],
+            denormalizationContext: ['groups' => ['invoice_write']],
+            uriTemplate: '/invoice/{id}/split',
+            controller: \ControleOnline\Controller\SplitInvoiceAction::class
+        ),
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['invoice_read']],
