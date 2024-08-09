@@ -45,6 +45,7 @@ class QtdVehicles
     private $provider;
 
     /**
+     * @ORM\Id 
      * @ORM\Column(type="string", length=50)
      * @Groups({"productsByDay_read"})
      */
@@ -52,11 +53,20 @@ class QtdVehicles
     private $app;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Id 
+     * @ORM\Column(name="date", type="datetime",  nullable=false, columnDefinition="DATETIME")
      * @Groups({"productsByDay_read"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
-    private $alter_date;
+    #[ApiFilter(DateFilter::class, properties: ['date'])]
+    private $date;
+
+     /**
+     * @ORM\Id 
+     * @ORM\Column(type="string")
+     * @Groups({"productsByDay_read"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['hour' => 'exact'])]
+    private $hour;
 
     /**
      * @ORM\Column(type="integer")
@@ -64,6 +74,20 @@ class QtdVehicles
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['quantity' => 'exact'])]
     private $quantity;
+
+
+    /**
+     * @ORM\Column(type="integer")
+     * @Groups({"productsByDay_read"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['total' => 'exact'])]
+    private $total;
+
+
+    public function __construct()
+    {
+        $this->date    = new \DateTime('now');
+    }
 
 
     /**
@@ -103,37 +127,73 @@ class QtdVehicles
     }
 
     /**
-     * Get the value of day_work
+     * Get the value of date
      */
-    public function getDayWork()
+    public function getDate()
     {
-        return $this->day_work;
+        return $this->date;
     }
 
     /**
-     * Set the value of day_work
+     * Set the value of date
      */
-    public function setDayWork($day_work): self
+    public function setDate($date): self
     {
-        $this->day_work = $day_work;
+        $this->date = $date;
 
         return $this;
     }
 
     /**
-     * Get the value of total_quantity
+     * Get the value of hour
      */
-    public function getTotalQuantity()
+    public function getHour()
     {
-        return $this->total_quantity;
+        return $this->hour;
     }
 
     /**
-     * Set the value of total_quantity
+     * Set the value of hour
      */
-    public function setTotalQuantity($total_quantity): self
+    public function setHour($hour): self
     {
-        $this->total_quantity = $total_quantity;
+        $this->hour = $hour;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of quantity
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Set the value of quantity
+     */
+    public function setQuantity($quantity): self
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of total
+     */
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    /**
+     * Set the value of total
+     */
+    public function setTotal($total): self
+    {
+        $this->total = $total;
 
         return $this;
     }
