@@ -58,7 +58,7 @@ class Wallet
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
+     * @Groups({"wallet_read", "wallet_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
@@ -76,7 +76,7 @@ class Wallet
      * @ORM\Column(type="integer")
      * @Groups({"invoice_read", "wallet_read", "wallet_write"})
      */
-    private $balance;
+    private $balance = 0;
 
     /**
      * Get the value of id

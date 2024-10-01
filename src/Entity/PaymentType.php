@@ -56,7 +56,7 @@ class PaymentType
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
+     * @Groups({"payment_type_read", "payment_type_write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
