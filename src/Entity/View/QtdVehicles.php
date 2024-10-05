@@ -31,7 +31,7 @@ use ApiPlatform\Metadata\Delete;
             security: 'is_granted(\'ROLE_CLIENT\')',
         ),
     ],
-    normalizationContext: ['groups' => ['productsByDay_read']],
+    normalizationContext: ['groups' => ['productsByDay:read']],
 )]
 class QtdVehicles
 {
@@ -39,7 +39,7 @@ class QtdVehicles
      * @ORM\Id 
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
     private $provider;
@@ -47,7 +47,7 @@ class QtdVehicles
     /**
      * @ORM\Id 
      * @ORM\Column(type="string", length=50)
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['app' => 'partial'])]
     private $app;
@@ -55,7 +55,7 @@ class QtdVehicles
     /**
      * @ORM\Id 
      * @ORM\Column(name="date", type="datetime",  nullable=false, columnDefinition="DATETIME")
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(DateFilter::class, properties: ['date'])]
     private $date;
@@ -63,14 +63,14 @@ class QtdVehicles
      /**
      * @ORM\Id 
      * @ORM\Column(type="string")
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['hour' => 'exact'])]
     private $hour;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['quantity' => 'exact'])]
     private $quantity;
@@ -78,7 +78,7 @@ class QtdVehicles
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"productsByDay_read"})
+     * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['total' => 'exact'])]
     private $total;

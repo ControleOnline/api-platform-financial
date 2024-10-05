@@ -47,20 +47,20 @@ use stdClass;
         ),
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']],
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']],
             uriTemplate: '/invoices',
 
         ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
-            validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']]
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']]
         ),
         new Delete(
             security: 'is_granted(\'ROLE_ADMIN\' or (is_granted(\'ROLE_CLIENT\'))',
-            validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']]
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']]
         ),
         new Get(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
@@ -89,15 +89,15 @@ use stdClass;
         ),
         new Put(
             security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
-            validationContext: ['groups' => ['invoice_write']],
-            denormalizationContext: ['groups' => ['invoice_write']],
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']],
             uriTemplate: '/invoice/{id}/split',
             controller: \ControleOnline\Controller\SplitInvoiceAction::class
         ),
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
-    normalizationContext: ['groups' => ['invoice_read']],
-    denormalizationContext: ['groups' => ['invoice_write']]
+    normalizationContext: ['groups' => ['invoice:read']],
+    denormalizationContext: ['groups' => ['invoice:write']]
 )]
 
 
@@ -109,7 +109,7 @@ class Invoice
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     * @Groups({"invoice_read","logistic_read"})
+     * @Groups({"invoice:read","logistic:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
@@ -127,7 +127,7 @@ class Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
      * })
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact'])]
     private $status;
@@ -139,7 +139,7 @@ class Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="payer_id", referencedColumnName="id")
      * })
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer' => 'exact'])]
     private $payer;
@@ -151,7 +151,7 @@ class Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="receiver_id", referencedColumnName="id")
      * })
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver' => 'exact'])]
     private $receiver;
@@ -159,7 +159,7 @@ class Invoice
     /**
      * @var \DateTime
      * @ORM\Column(name="invoice_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
     private $invoice_date;
@@ -167,7 +167,7 @@ class Invoice
      * @var \DateTime
      *
      * @ORM\Column(name="alter_date", type="datetime",  nullable=false, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
     private $alter_date;
@@ -175,7 +175,7 @@ class Invoice
      * @var \DateTime
      *
      * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATE")
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
     #[ApiFilter(filterClass: DateFilter::class, properties: ['dueDate'])]
@@ -189,7 +189,7 @@ class Invoice
      * @Assert\Type(
      *  type  ="bool"
      * )
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
     private $notified  = false;
@@ -198,7 +198,7 @@ class Invoice
      * @var float
      *
      * @ORM\Column(name="price", type="float",  nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
     private $price;
@@ -210,7 +210,7 @@ class Invoice
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
      * })
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     private $category = null;
@@ -218,14 +218,14 @@ class Invoice
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     private $otherInformations;
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'exact'])]
 
@@ -233,7 +233,7 @@ class Invoice
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     private $paymentType;
@@ -242,7 +242,7 @@ class Invoice
      * @var integer
      *
      * @ORM\Column(name="portion_number", type="integer",  nullable=false)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     private $portion;
 
@@ -250,7 +250,7 @@ class Invoice
      * @var integer
      *
      * @ORM\Column(name="installments", type="integer",  nullable=false)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     private $installments;
 
@@ -259,7 +259,7 @@ class Invoice
      * @var integer
      *
      * @ORM\Column(name="installment_id", type="integer",  nullable=true)
-     * @Groups({"invoice_read","logistic_read","invoice_write","order_invoice_write"})
+     * @Groups({"invoice:read","logistic:read","invoice:write","order_invoice:write"})
      */
     private $installment_id;
 

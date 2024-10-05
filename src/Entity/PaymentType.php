@@ -38,8 +38,8 @@ use ApiPlatform\Metadata\Delete;
             security: 'is_granted(\'ROLE_CLIENT\')',
         ),
     ],
-    normalizationContext: ['groups' => ['payment_type_read']],
-    denormalizationContext: ['groups' => ['payment_type_write']]
+    normalizationContext: ['groups' => ['payment_type:read']],
+    denormalizationContext: ['groups' => ['payment_type:write']]
 )]
 class PaymentType
 {
@@ -47,7 +47,7 @@ class PaymentType
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
+     * @Groups({"invoice:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
 
@@ -56,7 +56,7 @@ class PaymentType
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"payment_type_read", "payment_type_write"})
+     * @Groups({"payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
@@ -64,14 +64,14 @@ class PaymentType
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
+     * @Groups({"invoice:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'partial'])]
     private $paymentType;
 
     /**
      * @ORM\Column(type="string", columnDefinition="ENUM('monthly', 'daily', 'weekly', 'single')")
-     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
+     * @Groups({"invoice:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['frequency' => 'exact'])]
 
@@ -79,7 +79,7 @@ class PaymentType
 
     /**
      * @ORM\Column(type="string", columnDefinition="ENUM('single', 'split')")
-     * @Groups({"invoice_read","payment_type_read", "payment_type_write"})
+     * @Groups({"invoice:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['installments' => 'exact'])]
 

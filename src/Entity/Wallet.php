@@ -39,8 +39,8 @@ use ApiPlatform\Metadata\Delete;
             security: 'is_granted(\'ROLE_CLIENT\')',
         ),
     ],
-    normalizationContext: ['groups' => ['wallet_read']],
-    denormalizationContext: ['groups' => ['wallet_write']]
+    normalizationContext: ['groups' => ['wallet:read']],
+    denormalizationContext: ['groups' => ['wallet:write']]
 )]
 class Wallet
 {
@@ -48,7 +48,7 @@ class Wallet
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
+     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
 
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
@@ -58,7 +58,7 @@ class Wallet
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"wallet_read", "wallet_write"})
+     * @Groups({"wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
 
@@ -66,7 +66,7 @@ class Wallet
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
+     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
 
@@ -74,7 +74,7 @@ class Wallet
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice_read", "wallet_read", "wallet_write"})
+     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
      */
     private $balance = 0;
 

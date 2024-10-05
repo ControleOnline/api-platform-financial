@@ -28,14 +28,14 @@ use ApiPlatform\Metadata\Delete;
             security: 'is_granted(\'ROLE_CLIENT\')',
         ),
     ],
-    normalizationContext: ['groups' => ['orderHour_read']],
+    normalizationContext: ['groups' => ['orderHour:read']],
 )]
 class OrderHour
 {
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
-     * @Groups({"orderHour_read"})
+     * @Groups({"orderHour:read"})
 
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order_hour' => 'exact'])]
@@ -46,7 +46,7 @@ class OrderHour
      * @ORM\Id 
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
      * @ORM\JoinColumn(nullable=false)
-     * @Groups({"orderHour_read"})
+     * @Groups({"orderHour:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
 
@@ -54,7 +54,7 @@ class OrderHour
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"orderHour_read"})
+     * @Groups({"orderHour:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['average_orders' => 'partial'])]
 
