@@ -3,9 +3,7 @@
 namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\Invoice;
-use ControleOnline\Service\DomainService;
 use ControleOnline\Service\HydratorService;
-use ControleOnline\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,14 +16,14 @@ class PaylistController extends AbstractController
 {
     public function __construct(
         protected EntityManagerInterface $manager,
-        protected UserService $userService,
-        private DomainService $domainService,
         private HydratorService $hydratorService
 
     ) {}
+
     /**
-     * @Route("/paylist", name="invoice_paylist", methods={"GET"})
+     * @Route("/paylist", name="paylist", methods={"GET"})
      */
+
     public function __invoke(Request $request): JsonResponse
     {
         try {
