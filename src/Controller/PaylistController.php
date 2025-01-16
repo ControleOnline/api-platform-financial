@@ -2,7 +2,9 @@
 
 namespace ControleOnline\Controller;
 
+use ControleOnline\Entity\Document;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Status;
 use ControleOnline\Service\HydratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -28,26 +30,28 @@ class PaylistController extends AbstractController
     {
         try {
             $document = $request->get('document', null);
-            $company = $request->get('company', null);
-            $result = $this->manager->getRepository(Invoice::class)->findBy([
-                'company' => $company,
+            $receiver = $request->get('company', null);
+
+
+            $status = $this->manager->getRepository(Status::class)->findBy([
+                'realStatus' => 'pending',
+                'context' => 'invoice',
+            ]);
+            $people_document = $this->manager->getRepository(Document::class)->findOneBy([
                 'document' => $document,
             ]);
+            if (!$people_document)
+                throw new Exception('Document not found');
 
-            return new JsonResponse($this->hydratorService->result([]));
-        } catch (Exception $e) {
-            return new JsonResponse([
-                'response' => [
-                    'data'    => [],
-                    'count'   => 0,
-                    'error'   => [
-                        'message' => $e->getMessage(),
-                        'line'   => $e->getLine(),
-                        'file' => $e->getFile()
-                    ],
-                    'success' => false,
-                ],
+            $result = $this->manager->getRepository(Invoice::class)->findBy([
+                'receiver' => $receiver,
+                'payer' => $people_document->getPeople(),
+                'status' => $status,
             ]);
+
+            return new JsonResponse($this->hydratorService->collectionData($result, Invoice::class, 'invoice:read'));
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
         }
     }
 }
