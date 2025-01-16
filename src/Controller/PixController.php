@@ -27,14 +27,15 @@ class PixController extends AbstractController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $invoiceId = $request->get('invoice', null);
+            $json =       json_decode($request->getContent(), true);
+            $invoiceId = $json['invoice'] ?? null;
             if (!$invoiceId)
                 throw new Exception('Invoice not found');
 
             $invoice = $this->manager->getRepository(Invoice::class)->find($invoiceId);
             if (!$invoice)
                 throw new Exception('Invoice not found');
-            
+
             $result = $this->pixService->getPix($invoice);
 
             return new JsonResponse($this->hydratorService->result($result));
