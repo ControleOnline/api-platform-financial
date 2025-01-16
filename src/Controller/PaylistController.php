@@ -22,7 +22,7 @@ class PaylistController extends AbstractController
 
     }
     /**
-     * @Route("/invoice-paylist", name="invoice_paylist", methods={"GET"})
+     * @Route("/paylist", name="invoice_paylist", methods={"GET"})
      */
     public function __invoke(Request $request): JsonResponse
     {
