@@ -22,7 +22,7 @@ class PaylistController extends AbstractController
 
     }
     /**
-     * @Route("/oauth/google/return", name="google_return", methods={"GET","POST"})
+     * @Route("/invoice/paylist", name="google_return", methods={"GET"})
      */
     public function __invoke(Request $request): JsonResponse
     {
