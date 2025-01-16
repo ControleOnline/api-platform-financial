@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ControleOnline\Controller\IncomeStatementAction;
+use ControleOnline\Controller\PaylistController;
 use stdClass;
 
 /**
@@ -41,6 +42,14 @@ use stdClass;
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/income_statements',
             controller: IncomeStatementAction::class
+        ),
+        new GetCollection(
+            uriTemplate: '/paylist',
+            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            controller: PaylistController::class,
+            openapiContext: [
+                'summary' => 'Retrieve invoices based on document and company.',
+            ],
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
