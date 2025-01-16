@@ -50,6 +50,8 @@ class AsaasService
 
     public function getPix(Invoice $invoice)
     {
+
+        die('e');
         $this->init($invoice);
         $receiver = $invoice->getReceiver();
         $pixKey = $this->manager->getRepository(Config::class)->findOneBy([

@@ -55,9 +55,9 @@ use stdClass;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-        new Get(
+        new Post(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
-            uriTemplate: '/invoice/{id}/pix',
+            uriTemplate: '/pix',
             controller: PixController::class,
         ),
         new Post(
