@@ -22,16 +22,13 @@ class PaylistController extends AbstractController
 
     ) {}
 
-    /**
-     * @Route("/paylist", name="paylist", methods={"GET"})
-     */
-
     public function __invoke(Request $request): JsonResponse
     {
         try {
             $document = $request->get('document', null);
             $receiver = $request->get('company', null);
-
+            if (!$document)
+                throw new Exception('Document not found');
 
             $status = $this->manager->getRepository(Status::class)->findBy([
                 'realStatus' => 'pending',
