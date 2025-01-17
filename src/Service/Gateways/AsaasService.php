@@ -11,7 +11,7 @@ use GuzzleHttp\Client;
 
 class AsaasService
 {
-    private $entryPoint = '	https://api.asaas.com/v3';
+    private $entryPoint = 'https://api.asaas.com/v3/';
     private $client;
     public function __construct(
         private EntityManagerInterface $manager,
@@ -23,8 +23,8 @@ class AsaasService
     {
         $receiver = $invoice->getReceiver();
         $asaasKey = $this->manager->getRepository(Config::class)->findOneBy([
-            'company' => $receiver,
-            'key' => 'asaas-key'
+            'people' => $receiver,
+            'config_key' => 'asaas-key'
         ]);
 
         if (!$asaasKey) throw new \Exception('Asaas key not found');
@@ -53,13 +53,13 @@ class AsaasService
         $this->init($invoice);
         $receiver = $invoice->getReceiver();
         $pixKey = $this->manager->getRepository(Config::class)->findOneBy([
-            'company' => $receiver,
-            'key' => 'asaas-receiver-pix-key'
+            'people' => $receiver,
+            'config_key'  => 'asaas-receiver-pix-key'
         ]);
 
         if (!$pixKey) throw new \Exception('Pix key not found');
 
-        $response = $this->client->request('POST',  '/pix/qrCodes/static', [
+        $response = $this->client->request('POST',  'pix/qrCodes/static', [
             'json' => [
                 "addressKey" => $pixKey->getConfigValue(),
                 "value" => $invoice->getPrice(),
@@ -68,6 +68,6 @@ class AsaasService
             ]
         ]);
 
-        $response->getBody();
+        return json_decode($response->getBody()->getContents(), true);
     }
 }
