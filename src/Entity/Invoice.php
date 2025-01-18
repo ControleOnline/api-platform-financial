@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
+use ControleOnline\Controller\BitcoinController;
 use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
