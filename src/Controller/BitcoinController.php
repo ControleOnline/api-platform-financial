@@ -3,7 +3,7 @@
 namespace ControleOnline\Controller;
 
 use ControleOnline\Entity\Invoice;
-use ControleOnline\Service\BitcoinService;
+use ControleOnline\Service\Gateways\BitcoinService;
 use ControleOnline\Service\HydratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;

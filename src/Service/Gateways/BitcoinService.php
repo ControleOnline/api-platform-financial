@@ -1,6 +1,6 @@
 <?php
 
-namespace ControleOnline\Service;
+namespace ControleOnline\Service\Gateways;
 
 use ControleOnline\Entity\Invoice;
 use Endroid\QrCode\Builder\Builder;
