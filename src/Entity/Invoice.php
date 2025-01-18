@@ -61,6 +61,11 @@ use stdClass;
             controller: PixController::class,
         ),
         new Post(
+            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            uriTemplate: '/bitcoin',
+            controller: BitcoinController::class,
+        ),
+        new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']],
