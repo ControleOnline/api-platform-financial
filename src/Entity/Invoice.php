@@ -57,7 +57,7 @@ use stdClass;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-        new GetCollection(
+        new Post(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
             uriTemplate: '/webhook/asaas/return',
             controller: AsaasWebhookController::class
