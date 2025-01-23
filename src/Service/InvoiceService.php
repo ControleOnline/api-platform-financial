@@ -5,6 +5,7 @@ namespace ControleOnline\Service;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderInvoice;
+use ControleOnline\Entity\PaymentType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\QueryBuilder;
