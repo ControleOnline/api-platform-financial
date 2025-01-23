@@ -29,11 +29,11 @@ class AsaasService
         private OrderService $orderService
     ) {}
 
-    private function getApiKey(Invoice $invoice)
+    private function getApiKey(People $people)
     {
-        $receiver = $invoice->getReceiver();
+
         $asaasKey = $this->manager->getRepository(Config::class)->findOneBy([
-            'people' => $receiver,
+            'people' => $people,
             'config_key' => 'asaas-key'
         ]);
 
@@ -42,7 +42,7 @@ class AsaasService
         return $asaasKey->getConfigValue();
     }
 
-    private function init(Invoice $invoice)
+    private function init(People $people)
     {
         if ($this->client)
             return $this->client;
@@ -51,12 +51,12 @@ class AsaasService
             'base_uri' => $this->entryPoint,
             'headers' => [
                 'Accept' => 'application/json',
-                'access_token' => $this->getApiKey($invoice),
+                'access_token' => $this->getApiKey($people),
                 'Content-Type' => 'application/json',
             ]
         ]);
 
-        $this->discoveryWebhook($invoice->getReceiver());
+        $this->discoveryWebhook($people);
     }
 
     public function discoveryWebhook(People $people)
@@ -132,6 +132,7 @@ class AsaasService
 
     public function returnWebhook(People $receiver, array $json)
     {
+        $this->init($receiver);
         switch ($json["event"]) {
             case 'PAYMENT_CREATED':
                 $client = $this->getClient($json['payment']['customer']);
@@ -182,7 +183,7 @@ class AsaasService
 
     public function getPix(Invoice $invoice)
     {
-        $this->init($invoice);
+        $this->init($invoice->getReceiver());
         $receiver = $invoice->getReceiver();
         $pixKey = $this->manager->getRepository(Config::class)->findOneBy([
             'people' => $receiver,
