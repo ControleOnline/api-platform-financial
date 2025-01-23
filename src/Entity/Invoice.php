@@ -16,11 +16,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
+use ControleOnline\Controller\AsaasWebhookController;
 use ControleOnline\Controller\BitcoinController;
 use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
-use ControleOnline\Controller\WebhookController;
 use stdClass;
 
 /**
@@ -58,7 +58,7 @@ use stdClass;
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
         new GetCollection(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
             uriTemplate: '/webhook/asaas/return',
             controller: AsaasWebhookController::class
         ),
