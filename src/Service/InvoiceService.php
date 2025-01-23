@@ -32,7 +32,7 @@ class InvoiceService
     {
 
         $status = $this->manager->getRepository(Status::class)->findOneBy([
-            'status' => 'open',
+            'status' => 'waiting payment',
             'context' => 'invoice'
         ]);
 
@@ -40,7 +40,7 @@ class InvoiceService
         $invoice->setPayer($order->getPayer());
         $invoice->setReceiver($order->getProvider());
         $invoice->setPrice($price);
-        $invoice->setDueDate($dueDate);
+        $invoice->setDueDate(new \DateTime($dueDate));
         $invoice->setWallet($wallet);
         $invoice->setPortion($portion);
         $invoice->setInstallments($installments);
