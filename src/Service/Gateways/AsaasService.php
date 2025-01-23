@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use ControleOnline\Service\PeopleRoleService;
 use GuzzleHttp\Client;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AsaasService
 {
@@ -56,7 +58,7 @@ class AsaasService
         $response = $this->client->request('GET', 'webhooks');
         $webhook =  json_decode($response->getBody()->getContents(), true);
         $url = "https://" . $this->domainService->getMainDomain() . "/webhook/invoice/return";
-        
+
         if ($webhook['totalCount'] != 0 || $webhook['data'][0]['url'] == $url)
             return;
 
@@ -115,7 +117,7 @@ class AsaasService
 
         ]);
     }
-
+    public function returnWebhook(Request $request) {}
 
     public function getPix(Invoice $invoice)
     {
