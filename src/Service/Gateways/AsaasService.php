@@ -2,7 +2,6 @@
 
 namespace ControleOnline\Service\Gateways;
 
-use App\Service\PeopleService;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
@@ -10,6 +9,7 @@ use ControleOnline\Entity\Wallet;
 use ControleOnline\Service\DomainService;
 use ControleOnline\Service\InvoiceService;
 use ControleOnline\Service\OrderService;
+use ControleOnline\Service\PeopleService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use ControleOnline\Service\PeopleRoleService;
@@ -126,7 +126,7 @@ class AsaasService
 
     public function getClient($client_id)
     {
-        $response = $this->client->request('GET',  'customers/id/' . $client_id, []);
+        $response = $this->client->request('GET',  'customers/' . $client_id, []);
         return json_decode($response->getBody()->getContents(), true);
     }
 
