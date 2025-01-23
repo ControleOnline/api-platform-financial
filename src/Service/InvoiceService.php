@@ -33,8 +33,7 @@ class InvoiceService
 
         $status = $this->manager->getRepository(Status::class)->findOneBy([
             'status' => 'open',
-            'context' => 'invoice',
-            'people' => $order->getProvider()
+            'context' => 'invoice'
         ]);
 
         $invoice = new Invoice();
