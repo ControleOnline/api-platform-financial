@@ -21,13 +21,12 @@ class AsaasWebhookController extends AbstractController
     ) {}
 
 
-    public function __invoke(Request $request, $people_id): JsonResponse
+    public function __invoke(Request $request, People $data): JsonResponse
     {
         try {
 
             $json =       json_decode($request->getContent(), true);
-            $people = $this->manager->getRepository(People::class)->find($people_id);
-            $result = $this->asaasService->returnWebhook($people, $json);
+            $result = $this->asaasService->returnWebhook($data, $json);
 
             return new JsonResponse($this->hydratorService->data($result, ['groups' => 'invoice:read']));
         } catch (Exception $e) {
