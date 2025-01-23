@@ -2,15 +2,18 @@
 
 namespace ControleOnline\Service\Gateways;
 
+use App\Service\PeopleService;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\Wallet;
 use ControleOnline\Service\DomainService;
+use ControleOnline\Service\InvoiceService;
+use ControleOnline\Service\OrderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use ControleOnline\Service\PeopleRoleService;
 use GuzzleHttp\Client;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AsaasService
 {
@@ -20,7 +23,10 @@ class AsaasService
         private EntityManagerInterface $manager,
         private Security $security,
         private PeopleRoleService $peopleRoleService,
-        private DomainService $domainService
+        private DomainService $domainService,
+        private PeopleService $peopleService,
+        private InvoiceService $invoiceService,
+        private OrderService $orderService
     ) {}
 
     private function getApiKey(Invoice $invoice)
@@ -50,14 +56,14 @@ class AsaasService
             ]
         ]);
 
-        $this->discoveryWebhook();
+        $this->discoveryWebhook($invoice->getReceiver());
     }
 
-    public function discoveryWebhook()
+    public function discoveryWebhook(People $people)
     {
         $response = $this->client->request('GET', 'webhooks');
         $webhook =  json_decode($response->getBody()->getContents(), true);
-        $url = "https://" . $this->domainService->getMainDomain() . "/webhook/asaas/return";
+        $url = "https://" . $this->domainService->getMainDomain() . "/webhook/asaas/return/" . $people->getId();
 
         if ($webhook['totalCount'] != 0 || $webhook['data'][0]['url'] == $url)
             return;
@@ -117,7 +123,62 @@ class AsaasService
 
         ]);
     }
-    public function returnWebhook(Request $request) {}
+
+    public function getClient($client_id)
+    {
+        $response = $this->client->request('GET',  'customers/id/' . $client_id, []);
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    public function returnWebhook(People $receiver, array $json)
+    {
+        switch ($json["event"]) {
+            case 'PAYMENT_CREATED':
+                $client = $this->getClient($json['payment']['customer']);
+
+
+                $payer = $this->peopleService->discoveryPeopleByDocument(
+                    $client['cpfCnpj'],
+                    $client['personType'] == 'FISICA' ? 'cpf' : 'cnpj',
+                    $client['name']
+                );
+
+                $invoice   = $this->invoiceService->createInvoice(
+                    $this->orderService->createOrder($receiver, $payer),
+                    $json['payment']['value'],
+                    $json['payment']['dueDate'],
+                    $this->discoveryWallet($receiver),
+
+                );
+
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        return  $invoice;
+    }
+
+
+    public function discoveryWallet(People $people)
+    {
+
+        $wallet = $this->manager->getRepository(Wallet::class)->findOneBy([
+            'people' => $people,
+            'wallet' => 'ASAAS'
+        ]);
+        if (!$wallet) {
+            $wallet = new Wallet();
+            $wallet->setPeople($people);
+            $wallet->setWallet('ASAAS');
+            $wallet->setBalance(0);
+            $this->manager->persist($wallet);
+            $this->manager->flush();
+        }
+
+        return $wallet;
+    }
 
     public function getPix(Invoice $invoice)
     {

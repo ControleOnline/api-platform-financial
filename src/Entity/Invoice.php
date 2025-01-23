@@ -59,7 +59,7 @@ use stdClass;
         ),
         new Post(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
-            uriTemplate: '/webhook/asaas/return',
+            uriTemplate: '/webhook/asaas/return/{people_id}',
             controller: AsaasWebhookController::class
         ),
         new Post(

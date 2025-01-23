@@ -2,10 +2,15 @@
 
 namespace ControleOnline\Service;
 
+use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Order;
+use ControleOnline\Entity\OrderInvoice;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\Wallet;
 
 class InvoiceService
 {
@@ -14,11 +19,37 @@ class InvoiceService
     public function __construct(
         private EntityManagerInterface $manager,
         private Security $security,
-        private PeopleService $PeopleService,
+        private PeopleService $peopleService,
         RequestStack $requestStack
 
     ) {
         $this->request  = $requestStack->getCurrentRequest();
+    }
+
+
+    public function createInvoice(Order $order, $price, $dueDate, Wallet $wallet, $portion = 1, $installments = 1, $installment_id =  null)
+    {
+
+        $invoice = new Invoice();
+        $invoice->setPayer($order->getPayer());
+        $invoice->setReceiver($order->getProvider());
+        $invoice->setPrice($price);
+        $invoice->setDueDate($dueDate);
+        $invoice->setWallet($wallet);
+        $invoice->setPortion($portion);
+        $invoice->setInstallments($installments);
+        $invoice->setInstallmentId($installment_id);
+
+        $orderInvoice = new OrderInvoice();
+        $orderInvoice->setOrder($order);
+        $orderInvoice->setInvoice($invoice);
+        $orderInvoice->setRealPrice($price);
+
+        $this->manager->persist($orderInvoice);
+        $this->manager->persist($invoice);
+
+        $this->manager->flush();
+        return $invoice;
     }
 
     public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
@@ -30,7 +61,7 @@ class InvoiceService
             $queryBuilder->setParameter('order', $order);
         }
 
-        $companies   = $this->PeopleService->getMyCompanies();
+        $companies   = $this->peopleService->getMyCompanies();
         $queryBuilder->andWhere(sprintf('%s.payer IN(:companies) OR %s.receiver IN(:companies)', $rootAlias, $rootAlias));
         $queryBuilder->setParameter('companies', $companies);
 
