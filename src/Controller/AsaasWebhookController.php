@@ -2,6 +2,7 @@
 
 namespace ControleOnline\Controller;
 
+use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
 use ControleOnline\Service\Gateways\AsaasService;
 use ControleOnline\Service\HydratorService;
@@ -26,9 +27,9 @@ class AsaasWebhookController extends AbstractController
         try {
 
             $json =       json_decode($request->getContent(), true);
-            $result = $this->asaasService->returnWebhook($data, $json);
+            $invoice = $this->asaasService->returnWebhook($data, $json);
 
-            return new JsonResponse($this->hydratorService->data($result, ['groups' => 'invoice:read']));
+            return new JsonResponse($this->hydratorService->item(Invoice::class, $invoice->getId(), ['groups' => 'invoice:read']));
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
