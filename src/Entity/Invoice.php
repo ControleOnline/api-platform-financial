@@ -20,6 +20,7 @@ use ControleOnline\Controller\BitcoinController;
 use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
+use ControleOnline\Controller\WebhookController;
 use stdClass;
 
 /**
@@ -55,6 +56,11 @@ use stdClass;
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+        ),
+        new GetCollection(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/webhook/asaas/return',
+            controller: AsaasWebhookController::class
         ),
         new Post(
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',

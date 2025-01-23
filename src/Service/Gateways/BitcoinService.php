@@ -3,9 +3,9 @@
 namespace ControleOnline\Service\Gateways;
 
 use ControleOnline\Entity\Invoice;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\Writer\PngWriter;
+use \Endroid\QrCode\Builder\Builder;
+use \Endroid\QrCode\Encoding\Encoding;
+use \Endroid\QrCode\Writer\PngWriter;
 
 class BitcoinService
 {
