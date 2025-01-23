@@ -57,7 +57,7 @@ class AsaasService
     {
         $response = $this->client->request('GET', 'webhooks');
         $webhook =  json_decode($response->getBody()->getContents(), true);
-        $url = "https://" . $this->domainService->getMainDomain() . "/webhook/invoice/return";
+        $url = "https://" . $this->domainService->getMainDomain() . "/webhook/asaas/return";
 
         if ($webhook['totalCount'] != 0 || $webhook['data'][0]['url'] == $url)
             return;
