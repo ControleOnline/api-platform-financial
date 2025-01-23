@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\People;
+use ControleOnline\Entity\Status;
 use ControleOnline\Entity\Wallet;
 
 class InvoiceService
@@ -30,6 +31,12 @@ class InvoiceService
     public function createInvoice(Order $order, $price, $dueDate, Wallet $wallet, $portion = 1, $installments = 1, $installment_id =  null)
     {
 
+        $status = $this->manager->getRepository(Status::class)->findOneBy([
+            'status' => 'open',
+            'context' => 'invoice',
+            'people' => $order->getProvider()
+        ]);
+
         $invoice = new Invoice();
         $invoice->setPayer($order->getPayer());
         $invoice->setReceiver($order->getProvider());
@@ -39,6 +46,7 @@ class InvoiceService
         $invoice->setPortion($portion);
         $invoice->setInstallments($installments);
         $invoice->setInstallmentId($installment_id);
+        $invoice->setStatus($status);
 
         $orderInvoice = new OrderInvoice();
         $orderInvoice->setOrder($order);
