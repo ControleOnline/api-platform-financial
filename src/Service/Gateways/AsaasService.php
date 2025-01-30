@@ -76,6 +76,7 @@ class AsaasService
                 "enabled" => true,
                 "interrupted" => false,
                 "sendType" => "NON_SEQUENTIALLY",
+                'authToken' => $this->getApiKey($people),
                 "events" => [
                     'PAYMENT_CREATED',
                     //  'PAYMENT_AWAITING_RISK_ANALYSIS',
