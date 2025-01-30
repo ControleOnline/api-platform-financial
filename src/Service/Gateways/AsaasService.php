@@ -13,7 +13,6 @@ use ControleOnline\Service\PeopleService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use ControleOnline\Service\PeopleRoleService;
-use Exception;
 use GuzzleHttp\Client;
 
 class AsaasService
@@ -77,7 +76,7 @@ class AsaasService
                 "enabled" => true,
                 "interrupted" => false,
                 "sendType" => "NON_SEQUENTIALLY",
-                'authToken' => $this->getWebhookApiKey($people),
+                "authToken" => $this->getWebhookApiKey($people),
                 "events" => [
                     'PAYMENT_CREATED',
                     //  'PAYMENT_AWAITING_RISK_ANALYSIS',
@@ -140,9 +139,9 @@ class AsaasService
     private function checkWebhookApiKey(People $people, $token)
     {
         if ($this->getWebhookApiKey($people) != $token)
-            throw new Exception('Invalid token');
+            throw new \Exception('Invalid token');
     }
-    
+
     public function returnWebhook(People $receiver, array $json, $token)
     {
 
