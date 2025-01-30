@@ -28,8 +28,6 @@ class AsaasWebhookController extends AbstractController
 
             $json =       json_decode($request->getContent(), true);
             $token = $request->headers->get('asaas-access-token');
-  
-
             $invoice = $this->asaasService->returnWebhook($data, $json,$token);
 
             return new JsonResponse($this->hydratorService->item(Invoice::class, $invoice->getId(), ['groups' => 'invoice:read']));
