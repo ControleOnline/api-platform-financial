@@ -13,6 +13,7 @@ use ControleOnline\Service\PeopleService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use ControleOnline\Service\PeopleRoleService;
+use Exception;
 use GuzzleHttp\Client;
 
 class AsaasService
@@ -29,7 +30,7 @@ class AsaasService
         private OrderService $orderService
     ) {}
 
-    public function getApiKey(People $people)
+    private function getApiKey(People $people)
     {
 
         $asaasKey = $this->manager->getRepository(Config::class)->findOneBy([
@@ -76,7 +77,7 @@ class AsaasService
                 "enabled" => true,
                 "interrupted" => false,
                 "sendType" => "NON_SEQUENTIALLY",
-                'authToken' => $this->getApiKey($people),
+                'authToken' => $this->getWebhookApiKey($people),
                 "events" => [
                     'PAYMENT_CREATED',
                     //  'PAYMENT_AWAITING_RISK_ANALYSIS',
@@ -131,8 +132,22 @@ class AsaasService
         return json_decode($response->getBody()->getContents(), true);
     }
 
-    public function returnWebhook(People $receiver, array $json)
+    private function getWebhookApiKey(People $people)
     {
+        return md5($this->getApiKey($people));
+    }
+
+    private function checkWebhookApiKey(People $people, $token)
+    {
+        if ($this->getWebhookApiKey($people) != $token)
+            throw new Exception('Invalid token');
+    }
+    
+    public function returnWebhook(People $receiver, array $json, $token)
+    {
+
+        $this->checkWebhookApiKey($receiver, $token);
+
         $this->init($receiver);
         switch ($json["event"]) {
             case 'PAYMENT_CREATED':
