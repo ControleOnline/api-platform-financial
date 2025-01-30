@@ -29,7 +29,7 @@ class AsaasService
         private OrderService $orderService
     ) {}
 
-    private function getApiKey(People $people)
+    public function getApiKey(People $people)
     {
 
         $asaasKey = $this->manager->getRepository(Config::class)->findOneBy([
