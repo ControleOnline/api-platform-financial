@@ -28,7 +28,7 @@ class AsaasWebhookController extends AbstractController
 
             $json =       json_decode($request->getContent(), true);
             $token = $request->headers->get('asaas-access-token');
-            if ($this->asaasService->getApiKey($data) != $token) {
+            if ($data->getId() . $this->asaasService->getApiKey($data) != $token) {
                 throw new Exception('Invalid token');
             }
 

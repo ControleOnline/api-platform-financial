@@ -51,7 +51,7 @@ class AsaasService
             'base_uri' => $this->entryPoint,
             'headers' => [
                 'Accept' => 'application/json',
-                'access_token' => $this->getApiKey($people),
+                'access_token' => $people->getId() . $this->getApiKey($people),
                 'Content-Type' => 'application/json',
             ]
         ]);
