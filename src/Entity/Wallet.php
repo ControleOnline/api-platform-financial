@@ -48,7 +48,7 @@ class Wallet
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
+     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
 
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
@@ -66,7 +66,7 @@ class Wallet
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
+     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
 
@@ -74,7 +74,7 @@ class Wallet
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice:read", "wallet:read", "wallet:write"})
+     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     private $balance = 0;
 
