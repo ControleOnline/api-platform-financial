@@ -34,7 +34,7 @@ use stdClass;
     operations: [
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
-            validationContext: ['groups' => ['invoice_details:read']],
+            normalizationContext: ['groups' => ['invoice_details:read']],
         ),
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
