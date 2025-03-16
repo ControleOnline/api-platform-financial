@@ -16,28 +16,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @ORM\Entity
  */
-
 #[ApiResource(
     operations: [
-        new Get(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-        ),
-        new GetCollection(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-        ),
-        new Post(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-        ),
-        new Put(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-        ),
-        new Delete(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-        ),
+        new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Post(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new Delete(security: 'is_granted(\'ROLE_CLIENT\')'),
     ],
     normalizationContext: ['groups' => ['wallet:read']],
     denormalizationContext: ['groups' => ['wallet:write']]
@@ -48,11 +39,9 @@ class Wallet
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
-
+     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
-
     private $id;
 
     /**
@@ -61,92 +50,97 @@ class Wallet
      * @Groups({"wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
-
     private $people;
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
+     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
-
     private $wallet;
 
     /**
      * @ORM\Column(type="integer")
-     * @Groups({"invoice:read","invoice_details:read", "wallet:read", "wallet:write"})
+     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     private $balance = 0;
 
     /**
-     * Get the value of id
+     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\WalletPaymentType", mappedBy="wallet")
+     * @Groups({"wallet:read"})
      */
+    private $walletPaymentTypes;
+
+    public function __construct()
+    {
+        $this->walletPaymentTypes = new ArrayCollection();
+    }
+
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of id
-     */
     public function setId($id): self
     {
         $this->id = $id;
-
         return $this;
     }
 
-    /**
-     * Get the value of people
-     */
     public function getPeople()
     {
         return $this->people;
     }
 
-    /**
-     * Set the value of people
-     */
     public function setPeople($people): self
     {
         $this->people = $people;
-
         return $this;
     }
 
-    /**
-     * Get the value of wallet
-     */
     public function getWallet()
     {
         return $this->wallet;
     }
 
-    /**
-     * Set the value of wallet
-     */
     public function setWallet($wallet): self
     {
         $this->wallet = $wallet;
-
         return $this;
     }
 
-    /**
-     * Get the value of balance
-     */
     public function getBalance()
     {
         return $this->balance;
     }
 
-    /**
-     * Set the value of balance
-     */
     public function setBalance($balance): self
     {
         $this->balance = $balance;
+        return $this;
+    }
 
+    public function getWalletPaymentTypes(): Collection
+    {
+        return $this->walletPaymentTypes;
+    }
+
+    public function addWalletPaymentType(WalletPaymentType $walletPaymentType): self
+    {
+        if (!$this->walletPaymentTypes->contains($walletPaymentType)) {
+            $this->walletPaymentTypes[] = $walletPaymentType;
+            $walletPaymentType->setWallet($this);
+        }
+        return $this;
+    }
+
+    public function removeWalletPaymentType(WalletPaymentType $walletPaymentType): self
+    {
+        if ($this->walletPaymentTypes->removeElement($walletPaymentType)) {
+            if ($walletPaymentType->getWallet() === $this) {
+                $walletPaymentType->setWallet(null);
+            }
+        }
         return $this;
     }
 }
