@@ -22,11 +22,9 @@ class InvoiceService
         private EntityManagerInterface $manager,
         private Security $security,
         private PeopleService $peopleService,
-        RequestStack $requestStack
+        private RequestStack $requestStack
 
-    ) {
-        $this->request  = $requestStack->getCurrentRequest();
-    }
+    ) {}
 
 
     public function createInvoice(Order $order, $price, $dueDate, Wallet $wallet, $portion = 1, $installments = 1, $installment_id =  null)
@@ -48,18 +46,31 @@ class InvoiceService
         $invoice->setInstallmentId($installment_id);
         $invoice->setStatus($status);
         $invoice->setPaymentType($paymentType);
-
-
+        $this->manager->persist($invoice);
+        $this->createOrderInvoice($order, $invoice, $price);
+        $this->manager->flush();
+        return $invoice;
+    }
+    public function createOrderInvoice($order, $invoice, $price = 0)
+    {
         $orderInvoice = new OrderInvoice();
         $orderInvoice->setOrder($order);
         $orderInvoice->setInvoice($invoice);
         $orderInvoice->setRealPrice($price);
 
         $this->manager->persist($orderInvoice);
-        $this->manager->persist($invoice);
-
         $this->manager->flush();
-        return $invoice;
+        return $orderInvoice;
+    }
+
+    public function afterPersist(Invoice $invoice)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $payload   = json_decode($request->getContent());
+        if (isset($payload->order)) {
+            $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
+            $this->createOrderInvoice($order, $invoice,  $order->getPrice());
+        }
     }
 
     public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
