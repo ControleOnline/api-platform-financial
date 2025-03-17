@@ -94,7 +94,7 @@ class InvoiceService
                 'status' => 'paid'
             ]);
             var_dump($status);
-
+            return;
             $order->setStatus($status);
             $this->manager->persist($order);
             $this->manager->flush();
