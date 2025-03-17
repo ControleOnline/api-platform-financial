@@ -78,7 +78,7 @@ class InvoiceService
 
     public function payOrder(Order $order)
     {
-        $order = $this->manager->getRepository(Status::class)->find($order->getId());
+        $order = $this->manager->getRepository(Order::class)->find($order->getId());
         $orderStatus = $order->getStatus()->getStatus();
         if ($orderStatus != 'waiting payment') return;
         $paidValue = 0;
