@@ -94,11 +94,10 @@ class InvoiceService
                 'context' => 'order',
                 'status' => 'paid'
             ]);
-            var_dump($status);
 
-            //$order->setStatus($status);
-            //$this->manager->persist($order);
-            //$this->manager->flush();
+            $order->setStatus($status);
+            $this->manager->persist($order);
+            $this->manager->flush();
         }
     }
 
