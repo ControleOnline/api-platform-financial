@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ControleOnline\Entity\People;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\Wallet;
 
@@ -62,7 +61,6 @@ class InvoiceService
 
         $this->manager->persist($orderInvoice);
         $this->manager->flush();
-        $order->addInvoice($orderInvoice);
         $this->payOrder($order);
         return $orderInvoice;
     }
@@ -78,6 +76,7 @@ class InvoiceService
 
     public function payOrder(Order $order)
     {
+        $order = $this->manager->getRepository(Status::class)->find($order->getId());
         $orderStatus = $order->getStatus()->getStatus();
         if ($orderStatus != 'waiting payment') return;
         $paidValue = 0;
@@ -88,8 +87,10 @@ class InvoiceService
         }
 
         if ($paidValue >= $order->getPrice()) {
-
-            $status =  $this->manager->getRepository(Status::class)->findOneBy([
+            $this->manager->getConnection()->getConfiguration()->setSQLLogger(
+                new \Doctrine\DBAL\Logging\EchoSQLLogger()
+            );
+            $status = $this->manager->getRepository(Status::class)->findOneBy([
                 'context' => 'order',
                 'status' => 'paid'
             ]);
