@@ -53,7 +53,7 @@ class InvoiceService
         $this->manager->flush();
         return $invoice;
     }
-    public function createOrderInvoice($order, $invoice, $price = 0)
+    public function createOrderInvoice(Order $order, Invoice $invoice, $price = 0)
     {
         $orderInvoice = new OrderInvoice();
         $orderInvoice->setOrder($order);
@@ -62,6 +62,8 @@ class InvoiceService
 
         $this->manager->persist($orderInvoice);
         $this->manager->flush();
+        $order->addInvoice($orderInvoice);
+        $this->payOrder($order);
         return $orderInvoice;
     }
 
@@ -72,6 +74,24 @@ class InvoiceService
             $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
             $this->createOrderInvoice($order, $invoice,  $order->getPrice());
         }
+    }
+
+    public function payOrder(Order $order)
+    {
+        $status = $order->getStatus()->getStatus();
+        if ($status != 'waiting payment') return;
+        $paidValue = 0;
+        foreach ($order->getInvoice() as $orderInvoice) {
+            $invoice = $orderInvoice->getInvoice();
+            if ($invoice->getstatus()->getstatus() == 'paid')
+                $paidValue += $invoice->getPrice();
+        }
+
+        if ($paidValue >= $order->getPrice())
+            $order->setStatus($this->manager->getRepository(Status::class)->findOneBy([
+                'context' => 'order',
+                'status' => 'paid'
+            ]));
     }
 
     public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
