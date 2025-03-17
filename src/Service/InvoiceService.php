@@ -21,7 +21,8 @@ class InvoiceService
         private EntityManagerInterface $manager,
         private Security $security,
         private PeopleService $peopleService,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private BraspagService $braspagService
 
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
@@ -72,6 +73,7 @@ class InvoiceService
             $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
             $this->createOrderInvoice($order, $invoice,  $order->getPrice());
         }
+        //$this->braspagService->split($invoice);
     }
 
     public function payOrder(Order $order)
@@ -88,13 +90,11 @@ class InvoiceService
 
         if ($paidValue >= $order->getPrice()) {
 
-            $this->manager->getConnection()->getConfiguration()->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger());
             $status = $this->manager->getRepository(Status::class)->findOneBy([
                 'context' => 'order',
                 'status' => 'paid'
             ]);
-            var_dump($status);
-            return;
+
             $order->setStatus($status);
             $this->manager->persist($order);
             $this->manager->flush();
