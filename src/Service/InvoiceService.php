@@ -87,9 +87,7 @@ class InvoiceService
         }
 
         if ($paidValue >= $order->getPrice()) {
-            $this->manager->getConnection()->getConfiguration()->setSQLLogger(
-                new \Doctrine\DBAL\Logging\EchoSQLLogger()
-            );
+
             $status = $this->manager->getRepository(Status::class)->findOneBy([
                 'context' => 'order',
                 'status' => 'paid'
