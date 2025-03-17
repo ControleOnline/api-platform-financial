@@ -24,7 +24,9 @@ class InvoiceService
         private PeopleService $peopleService,
         private RequestStack $requestStack
 
-    ) {}
+    ) {
+        $this->request = $this->requestStack->getCurrentRequest();
+    }
 
 
     public function createInvoice(Order $order, $price, $dueDate, Wallet $wallet, $portion = 1, $installments = 1, $installment_id =  null)
@@ -65,8 +67,7 @@ class InvoiceService
 
     public function afterPersist(Invoice $invoice)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $payload   = json_decode($request->getContent());
+        $payload   = json_decode($this->request->getContent());
         if (isset($payload->order)) {
             $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
             $this->createOrderInvoice($order, $invoice,  $order->getPrice());
