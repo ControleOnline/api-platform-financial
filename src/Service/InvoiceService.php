@@ -78,8 +78,8 @@ class InvoiceService
 
     public function payOrder(Order $order)
     {
-        $status = $order->getStatus()->getStatus();
-        if ($status != 'waiting payment') return;
+        $orderStatus = $order->getStatus()->getStatus();
+        if ($orderStatus != 'waiting payment') return;
         $paidValue = 0;
         foreach ($order->getInvoice() as $orderInvoice) {
             $invoice = $orderInvoice->getInvoice();
@@ -87,11 +87,17 @@ class InvoiceService
                 $paidValue += $invoice->getPrice();
         }
 
-        if ($paidValue >= $order->getPrice())
-            $order->setStatus($this->manager->getRepository(Status::class)->findOneBy([
+        if ($paidValue >= $order->getPrice()) {
+
+            $status =  $this->manager->getRepository(Status::class)->findOneBy([
                 'context' => 'order',
                 'status' => 'paid'
-            ]));
+            ]);
+
+            $order->setStatus($status);
+            $this->manager->persist($order);
+            $this->manager->flush();
+        }
     }
 
     public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
