@@ -24,80 +24,85 @@ class InvoiceDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $currentUser = $this->security->getUser();
-        if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN'))
+        if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN')) {
             throw new \Exception('You should not pass!!!');
-
+        }
 
         $this->filters = $context['filters'] ?? [];
 
-        $inflow = $this->getInflow();
-        $withdrawal = $this->getWithdrawal();
+        $payments = $this->getPayments();
 
-        return [[
-            'inflow' => $inflow,
-            'withdrawal' => $withdrawal,
-            'total' => ((isset($inflow['total']) ? $inflow['total'] : 0) - (isset($withdrawal['total']) ? $withdrawal['total'] : 0))
-        ]];
+        return [['payments' => $payments]];
     }
 
     private function createBaseQuery()
     {
         $this->qb = $this->entityManager->createQueryBuilder()
             ->select('SUM(i.price) as totalPrice')
-            ->addSelect('w.id as walletId', 'w.wallet')
+            ->addSelect('dw.id as dwalletId', 'dw.wallet as dwallet')
+            ->addSelect('ow.id as owalletId', 'ow.wallet as owallet')
             ->addSelect('pt.id as paymentTypeId', 'pt.paymentType')
             ->from(Invoice::class, 'i')
-            ->join('i.destinationWallet', 'w')
+            ->join('i.destinationWallet', 'dw')
             ->join('i.paymentType', 'pt')
-            ->groupBy('w.id, pt.id');
+            ->leftJoin('i.sourceWallet', 'ow')
+            ->groupBy('dw.id, ow.id, pt.id');
 
         $this->applyCommonFilters();
     }
 
-    private function getWithdrawal(): array
+    private function getPayments(): array
     {
         $this->createBaseQuery();
-        $this->qb->andWhere('i.sourceWallet IS NOT NULL');
         $results = $this->qb->getQuery()->getResult();
         return $this->getResult($results);
     }
 
-    private function getInflow(): array
-    {
-        $this->createBaseQuery();
-        $this->qb->andWhere('i.sourceWallet IS NULL');
-        $results = $this->qb->getQuery()->getResult();
-        return $this->getResult($results);
-    }
-
-    private function getResult($results)
+    private function getResult($results): array
     {
         $data = [];
         foreach ($results as $row) {
-            $walletId = $row['walletId'];
+            $dWalletId = $row['dwalletId'];
+            $oWalletId = $row['owalletId'];
             $paymentTypeId = $row['paymentTypeId'];
             $totalPrice = (float) $row['totalPrice'];
 
-            if (!isset($data['wallet'][$walletId]))
-                $data['wallet'][$walletId] = [
-                    'wallet' => $row['wallet'],
+            if (!isset($data['wallet'][$dWalletId]))
+                $data['wallet'][$dWalletId] = [
+                    'wallet' => $row['dwallet'],
                     'payment' => [],
                     'total' => 0.0,
                 ];
 
-            if (!isset($data['wallet'][$walletId]['payment'][$paymentTypeId]))
-                $data['wallet'][$walletId]['payment'][$paymentTypeId] = [
+
+            if (!isset($data['wallet'][$dWalletId]['payment'][$paymentTypeId])) {
+                $data['wallet'][$dWalletId]['payment'][$paymentTypeId] = [
                     'payment' => $row['paymentType'],
-                    'total' => 0.0,
+                    'inflow' => 0.0,
+                    'withdrawal' => 0.0,
                 ];
+            }
+
+            if ($oWalletId === null)
+
+                $data['wallet'][$dWalletId]['payment'][$paymentTypeId]['inflow'] += $totalPrice;
+            elseif ($oWalletId === $dWalletId)
+                $data['wallet'][$dWalletId]['payment'][$paymentTypeId]['withdrawal'] += $totalPrice;
+
+
+            $data['wallet'][$dWalletId]['total'] = array_sum(
+                array_map(
+                    fn($payment) => $payment['inflow'] - $payment['withdrawal'],
+                    $data['wallet'][$dWalletId]['payment']
+                )
+            );
 
             if (!isset($data['total']))
                 $data['total'] = 0.0;
 
-            $data['wallet'][$walletId]['payment'][$paymentTypeId]['total'] += $totalPrice;
-            $data['wallet'][$walletId]['total'] += $totalPrice;
-            $data['total'] += $totalPrice;
+            $data['total'] += $oWalletId === null ? $totalPrice : -$totalPrice;
         }
+
         return $data;
     }
 
