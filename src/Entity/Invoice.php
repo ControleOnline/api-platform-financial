@@ -298,7 +298,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\User")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['user' => 'exact'])]
