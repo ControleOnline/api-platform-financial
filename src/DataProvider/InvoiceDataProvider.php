@@ -74,19 +74,32 @@ class InvoiceDataProvider implements ProviderInterface
     {
         $data = [];
         foreach ($results as $row) {
-            $data[$source] = [
-                'wallet' => [
-                    'id' => $row['walletId'],
-                    'name' => $row['wallet'],
-                    'payment' => [
-                        'id' => $row['paymentTypeId'],
-                        'name' => $row['paymentType'],
-                        'total' => (float) $row['totalPrice'],
-                    ],
-                    'total' => (float) $row['totalPrice'],
-                ],
-                'total' => (float) $row['totalPrice'],
-            ];
+            $walletId = $row['walletId'];
+            $paymentTypeId = $row['paymentTypeId'];
+            $totalPrice = (float) $row['totalPrice'];
+
+            // Inicializa a estrutura se ainda não existir
+            if (!isset($data[$source]['wallet'][$walletId])) {
+                $data[$source]['wallet'][$walletId] = [
+                    'wallet' => $row['wallet'],
+                    'payment' => [],
+                    'total' => 0.0,
+                ];
+            }
+            if (!isset($data[$source]['wallet'][$walletId]['payment'][$paymentTypeId])) {
+                $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId] = [
+                    'payment' => $row['paymentType'],
+                    'total' => 0.0,
+                ];
+            }
+            if (!isset($data[$source]['total'])) {
+                $data[$source]['total'] = 0.0;
+            }
+
+            // Soma os valores
+            $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId]['total'] += $totalPrice;
+            $data[$source]['wallet'][$walletId]['total'] += $totalPrice;
+            $data[$source]['total'] += $totalPrice;
         }
         return $data;
     }
