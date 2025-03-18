@@ -45,7 +45,7 @@ class InvoiceDataProvider implements ProviderInterface
         $this->qb = $this->entityManager->createQueryBuilder()
             ->select('SUM(i.price) as totalPrice')
             ->addSelect('w.id as walletId', 'w.wallet')
-            ->addSelect('pt.id as paymentTypeId', 'pt.payment_type')
+            ->addSelect('pt.id as paymentTypeId', 'pt.paymentType')
             ->from(Invoice::class, 'i')
             ->join('i.destinationWallet', 'w')
             ->join('i.paymentType', 'pt')
@@ -80,7 +80,7 @@ class InvoiceDataProvider implements ProviderInterface
                     'name' => $row['wallet'],
                     'payment' => [
                         'id' => $row['paymentTypeId'],
-                        'name' => $row['payment_type'],
+                        'name' => $row['paymentType'],
                         'total' => (float) $row['totalPrice'],
                     ],
                     'total' => (float) $row['totalPrice'],
