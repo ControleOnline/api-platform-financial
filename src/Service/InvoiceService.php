@@ -90,11 +90,17 @@ class InvoiceService
         $destination_wallet = $invoice->getDestinationWallet();
         $souce_wallet = $invoice->getSourceWallet();
 
-        if ($destination_wallet)
+        if ($destination_wallet) {
             $destination_wallet->setBalance($destination_wallet->getBalance() + $invoice->getPrice());
-
-        if ($souce_wallet)
+            $this->manager->persist($destination_wallet);
+        }
+        
+        if ($souce_wallet) {
             $souce_wallet->setBalance($souce_wallet->getBalance() - $invoice->getPrice());
+            $this->manager->persist($souce_wallet);
+        }
+
+        $this->manager->flush();
     }
 
     public function payOrder(Order $order)
