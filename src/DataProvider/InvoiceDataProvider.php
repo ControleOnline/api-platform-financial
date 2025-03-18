@@ -33,11 +33,11 @@ class InvoiceDataProvider implements ProviderInterface
         $inflow = $this->getInflow();
         $withdrawal = $this->getWithdrawal();
 
-        return [
+        return [[
             'inflow' => $inflow,
             'withdrawal' => $withdrawal,
             'total' => ((isset($inflow['total']) ? $inflow['total'] : 0) - (isset($withdrawal['total']) ? $withdrawal['total'] : 0))
-        ];
+        ]];
     }
 
     private function createBaseQuery()
