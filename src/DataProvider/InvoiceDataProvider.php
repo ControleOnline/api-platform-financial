@@ -59,7 +59,7 @@ class InvoiceDataProvider implements ProviderInterface
         $this->createBaseQuery();
         $this->qb->andWhere('i.sourceWallet IS NOT NULL');
         $results = $this->qb->getQuery()->getResult();
-        return $this->getResult($results);
+        return $this->getResult('withdrawal', $results);
     }
 
     private function getInflow(): array
@@ -67,14 +67,14 @@ class InvoiceDataProvider implements ProviderInterface
         $this->createBaseQuery();
         $this->qb->andWhere('i.sourceWallet IS NULL');
         $results = $this->qb->getQuery()->getResult();
-        return $this->getResult($results);
+        return $this->getResult('inflow', $results);
     }
 
-    private function getResult($results)
+    private function getResult($source, $results)
     {
         $data = [];
         foreach ($results as $row) {
-            $data[] = [
+            $data[$source] = [
                 'wallet' => [
                     'id' => $row['walletId'],
                     'name' => $row['wallet'],
