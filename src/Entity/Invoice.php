@@ -308,8 +308,8 @@ class Invoice
      * @ORM\Column(type="string", length=50)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['identifier' => 'exact'])]
-    private $identifier;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['device' => 'exact'])]
+    private $device;
 
     public function __construct()
     {
@@ -679,19 +679,19 @@ class Invoice
     }
 
     /**
-     * Get the value of identifier
+     * Get the value of device
      */
-    public function getIdentifier()
+    public function getDevice()
     {
-        return $this->identifier;
+        return $this->device;
     }
 
     /**
-     * Set the value of identifier
+     * Set the value of device
      */
-    public function setIdentifier($identifier): self
+    public function setDevice($device): self
     {
-        $this->identifier = $identifier;
+        $this->device = $device;
 
         return $this;
     }
