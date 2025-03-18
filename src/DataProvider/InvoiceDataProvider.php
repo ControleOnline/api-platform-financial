@@ -79,7 +79,7 @@ class InvoiceDataProvider implements ProviderInterface
                 $data['wallet'][$dWalletId]['payment'][$paymentTypeId] = [
                     'payment' => $row['paymentType'],
                     'inflow' => 0.0,
-                    'withdrawal' => 0.0,
+                    'withdrawal' => 10,
                 ];
             }
 
