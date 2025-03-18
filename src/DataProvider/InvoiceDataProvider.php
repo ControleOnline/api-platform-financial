@@ -36,7 +36,7 @@ class InvoiceDataProvider implements ProviderInterface
         return [
             'inflow' => $inflow,
             'withdrawal' => $withdrawal,
-            $data['total'] = ((isset($inflow['total']) ? $inflow['total'] : 0) - (isset($withdrawal['total']) ? $withdrawal['total'] : 0))
+            'total' => ((isset($inflow['total']) ? $inflow['total'] : 0) - (isset($withdrawal['total']) ? $withdrawal['total'] : 0))
         ];
     }
 
