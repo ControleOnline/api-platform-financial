@@ -12,6 +12,9 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\Wallet;
+use Exception;
+
+use function PHPUnit\Framework\throwException;
 
 class InvoiceService
 {
@@ -29,8 +32,13 @@ class InvoiceService
     }
 
 
-    public function createInvoice(Order $order, $price, $dueDate, Wallet $wallet, $portion = 1, $installments = 1, $installment_id =  null)
+    public function createInvoice(Order $order, $price, $dueDate, Wallet $source_wallet = null, Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null)
     {
+
+        if (!$source_wallet && !$destination_wallet)
+            throw new Exception("Need a source or destination Wallet", 301);
+
+
         $paymentType = $this->manager->getRepository(PaymentType::class)->find(1);
 
         $status = $this->manager->getRepository(Status::class)->findOneBy([
@@ -42,7 +50,8 @@ class InvoiceService
         $invoice->setReceiver($order->getProvider());
         $invoice->setPrice($price);
         $invoice->setDueDate(new \DateTime($dueDate));
-        $invoice->setWallet($wallet);
+        $invoice->setSourceWallet($source_wallet);
+        $invoice->setDestinationWallet($destination_wallet);
         $invoice->setPortion($portion);
         $invoice->setInstallments($installments);
         $invoice->setInstallmentId($installment_id);
