@@ -75,7 +75,7 @@ class InvoiceService
         return $orderInvoice;
     }
 
-    public function afterPersist(Invoice $invoice)
+    public function postPersist(Invoice $invoice)
     {
         $payload   = json_decode($this->request->getContent());
         if (isset($payload->order)) {

@@ -255,7 +255,7 @@ class Invoice
     private $source_wallet;
 
 
-     /**
+    /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
@@ -295,6 +295,21 @@ class Invoice
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     private $installment_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\User")
+     * @ORM\JoinColumn(nullable=false)
+     * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['user' => 'exact'])]
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=50)
+     * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
+     */
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['identifier' => 'exact'])]
+    private $identifier;
 
     public function __construct()
     {
@@ -427,8 +442,6 @@ class Invoice
         return $this->status;
     }
 
-
-
     /**
      * Set notified
      *
@@ -536,7 +549,7 @@ class Invoice
         return $this;
     }
 
-    
+
 
     /**
      * Get the value of paymentType
@@ -642,6 +655,42 @@ class Invoice
     public function setDestinationWallet($destination_wallet): self
     {
         $this->destination_wallet = $destination_wallet;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of user
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * Set the value of user
+     */
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of identifier
+     */
+    public function getIdentifier()
+    {
+        return $this->identifier;
+    }
+
+    /**
+     * Set the value of identifier
+     */
+    public function setIdentifier($identifier): self
+    {
+        $this->identifier = $identifier;
 
         return $this;
     }
