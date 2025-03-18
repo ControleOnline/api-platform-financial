@@ -70,7 +70,7 @@ class InvoiceDataProvider implements ProviderInterface
             if (!isset($data['wallet'][$dWalletId]))
                 $data['wallet'][$dWalletId] = [
                     'wallet' => $row['dwallet'],
-                    'inflow-wallet' => 'xxx' . $row['owallet'],
+                    'inflow-wallet' => $row['owallet'],
                     'payment' => [],
                     'total' => 0.0,
                 ];
@@ -80,7 +80,7 @@ class InvoiceDataProvider implements ProviderInterface
                 $data['wallet'][$dWalletId]['payment'][$paymentTypeId] = [
                     'payment' => $row['paymentType'],
                     'inflow' => 0.0,
-                    'withdrawal' => 10,
+                    'withdrawal' => 0,
                 ];
             }
 
