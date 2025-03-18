@@ -37,7 +37,7 @@ class WalletPaymentType
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"wallet_payment_type:read", "wallet_payment_type:write"})
+     * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
@@ -53,14 +53,14 @@ class WalletPaymentType
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType", inversedBy="walletPaymentTypes")
      * @ORM\JoinColumn(name="payment_type_id", nullable=false)
-     * @Groups({"wallet_payment_type:read", "wallet_payment_type:write"})
+     * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     private $paymentType;
 
     /**
      * @ORM\Column(type="string", length=80)
-     * @Groups({"wallet_payment_type:read", "wallet_payment_type:write"})
+     * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentCode' => 'partial'])]
     private $paymentCode;

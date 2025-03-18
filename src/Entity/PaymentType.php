@@ -39,7 +39,7 @@ class PaymentType
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
+     * @Groups({"invoice:read","wallet:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     private $id;
@@ -54,21 +54,21 @@ class PaymentType
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
+     * @Groups({"invoice:read","wallet:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'partial'])]
     private $paymentType;
 
     /**
      * @ORM\Column(type="string", columnDefinition="ENUM('monthly', 'daily', 'weekly', 'single')")
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
+     * @Groups({"invoice:read","wallet:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['frequency' => 'exact'])]
     private $frequency;
 
     /**
      * @ORM\Column(type="string", columnDefinition="ENUM('single', 'split')")
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
+     * @Groups({"invoice:read","wallet:read","wallet_payment_type:read","invoice_details:read","payment_type:read", "payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['installments' => 'exact'])]
     private $installments;
