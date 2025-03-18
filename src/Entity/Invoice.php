@@ -320,6 +320,7 @@ class Invoice
         $this->otherInformations = json_encode(new stdClass());
         $this->portion = 0;
         $this->installments = 0;
+        $this->price = 0;
     }
     /**
      * Get id

@@ -83,6 +83,18 @@ class InvoiceService
             $this->createOrderInvoice($order, $invoice,  $order->getPrice());
         }
         //$this->braspagService->split($invoice);
+        $this->refreshWalletValue($invoice);
+    }
+    private function refreshWalletValue(Invoice $invoice)
+    {
+        $destination_wallet = $invoice->getDestinationWallet();
+        $souce_wallet = $invoice->getSourceWallet();
+
+        if ($destination_wallet)
+            $destination_wallet->setBalance($destination_wallet->getBalance() + $invoice->getPrice());
+
+        if ($souce_wallet)
+            $souce_wallet->setBalance($souce_wallet->getBalance() - $invoice->getPrice());
     }
 
     public function payOrder(Order $order)
