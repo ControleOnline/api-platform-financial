@@ -24,19 +24,19 @@ class InvoiceDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $currentUser = $this->security->getUser();
-        if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN')) {
+        if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN'))
             throw new \Exception('You should not pass!!!');
-        }
+
 
         $this->filters = $context['filters'] ?? [];
 
         $inflow = $this->getInflow();
-
         $withdrawal = $this->getWithdrawal();
 
         return [
-            'inflow' => $this->getInflow($inflow),
-            'withdrawal' => $this->getWithdrawal($withdrawal),
+            'inflow' => $inflow,
+            'withdrawal' => $withdrawal,
+            $data['total'] = ((isset($inflow['total']) ? $inflow['total'] : 0) - (isset($withdrawal['total']) ? $withdrawal['total'] : 0))
         ];
     }
 
@@ -78,25 +78,22 @@ class InvoiceDataProvider implements ProviderInterface
             $paymentTypeId = $row['paymentTypeId'];
             $totalPrice = (float) $row['totalPrice'];
 
-            // Inicializa a estrutura se ainda não existir
-            if (!isset($data[$source]['wallet'][$walletId])) {
+            if (!isset($data[$source]['wallet'][$walletId]))
                 $data[$source]['wallet'][$walletId] = [
                     'wallet' => $row['wallet'],
                     'payment' => [],
                     'total' => 0.0,
                 ];
-            }
-            if (!isset($data[$source]['wallet'][$walletId]['payment'][$paymentTypeId])) {
+
+            if (!isset($data[$source]['wallet'][$walletId]['payment'][$paymentTypeId]))
                 $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId] = [
                     'payment' => $row['paymentType'],
                     'total' => 0.0,
                 ];
-            }
-            if (!isset($data[$source]['total'])) {
-                $data[$source]['total'] = 0.0;
-            }
 
-            // Soma os valores
+            if (!isset($data[$source]['total']))
+                $data[$source]['total'] = 0.0;
+
             $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId]['total'] += $totalPrice;
             $data[$source]['wallet'][$walletId]['total'] += $totalPrice;
             $data[$source]['total'] += $totalPrice;
@@ -104,13 +101,13 @@ class InvoiceDataProvider implements ProviderInterface
         return $data;
     }
 
-
     private function applyCommonFilters()
     {
         $this->applyDeviceFilter();
         $this->applyIdGtFilter();
         $this->applyUserFilter();
     }
+
     private function applyUserFilter(): void
     {
         $this->qb->andWhere('i.user = :user')
@@ -119,17 +116,15 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function applyDeviceFilter(): void
     {
-        if (isset($this->filters['device'])) {
+        if (isset($this->filters['device']))
             $this->qb->andWhere('i.device = :device')
                 ->setParameter('device', $this->filters['device']);
-        }
     }
 
     private function applyIdGtFilter(): void
     {
-        if (isset($this->filters['id_gt'])) {
+        if (isset($this->filters['id_gt']))
             $this->qb->andWhere('i.id > :idGt')
                 ->setParameter('idGt', (int) $this->filters['id_gt']);
-        }
     }
 }
