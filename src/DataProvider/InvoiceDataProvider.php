@@ -59,7 +59,7 @@ class InvoiceDataProvider implements ProviderInterface
         $this->createBaseQuery();
         $this->qb->andWhere('i.sourceWallet IS NOT NULL');
         $results = $this->qb->getQuery()->getResult();
-        return $this->getResult('withdrawal', $results);
+        return $this->getResult($results);
     }
 
     private function getInflow(): array
@@ -67,10 +67,10 @@ class InvoiceDataProvider implements ProviderInterface
         $this->createBaseQuery();
         $this->qb->andWhere('i.sourceWallet IS NULL');
         $results = $this->qb->getQuery()->getResult();
-        return $this->getResult('inflow', $results);
+        return $this->getResult($results);
     }
 
-    private function getResult($source, $results)
+    private function getResult($results)
     {
         $data = [];
         foreach ($results as $row) {
@@ -78,25 +78,25 @@ class InvoiceDataProvider implements ProviderInterface
             $paymentTypeId = $row['paymentTypeId'];
             $totalPrice = (float) $row['totalPrice'];
 
-            if (!isset($data[$source]['wallet'][$walletId]))
-                $data[$source]['wallet'][$walletId] = [
+            if (!isset($data['wallet'][$walletId]))
+                $data['wallet'][$walletId] = [
                     'wallet' => $row['wallet'],
                     'payment' => [],
                     'total' => 0.0,
                 ];
 
-            if (!isset($data[$source]['wallet'][$walletId]['payment'][$paymentTypeId]))
-                $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId] = [
+            if (!isset($data['wallet'][$walletId]['payment'][$paymentTypeId]))
+                $data['wallet'][$walletId]['payment'][$paymentTypeId] = [
                     'payment' => $row['paymentType'],
                     'total' => 0.0,
                 ];
 
-            if (!isset($data[$source]['total']))
-                $data[$source]['total'] = 0.0;
+            if (!isset($data['total']))
+                $data['total'] = 0.0;
 
-            $data[$source]['wallet'][$walletId]['payment'][$paymentTypeId]['total'] += $totalPrice;
-            $data[$source]['wallet'][$walletId]['total'] += $totalPrice;
-            $data[$source]['total'] += $totalPrice;
+            $data['wallet'][$walletId]['payment'][$paymentTypeId]['total'] += $totalPrice;
+            $data['wallet'][$walletId]['total'] += $totalPrice;
+            $data['total'] += $totalPrice;
         }
         return $data;
     }
