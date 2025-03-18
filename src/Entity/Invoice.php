@@ -21,6 +21,7 @@ use ControleOnline\Controller\BitcoinController;
 use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
+use ControleOnline\DataProvider\InvoiceDataProvider;
 use stdClass;
 
 /**
@@ -35,6 +36,12 @@ use stdClass;
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',
             normalizationContext: ['groups' => ['invoice_details:read']],
+        ),
+        new GetCollection(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            uriTemplate: '/invoice/inflow',
+            provider: InvoiceDataProvider::class,
+            normalizationContext: ['groups' => ['invoice:read']],
         ),
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',

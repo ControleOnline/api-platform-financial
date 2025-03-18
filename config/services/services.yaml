@@ -17,3 +17,6 @@ services:
         tags: ['console.command']
     ControleOnline\Filter\:
         resource: '../../src/Filter'            
+    ControleOnline\DataProvider\InvoiceDataProvider:
+        tags:
+            - { name: 'api_platform.state_provider' }
