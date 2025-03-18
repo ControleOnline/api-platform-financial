@@ -247,7 +247,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['sourceWallet' => 'exact'])]
@@ -257,7 +257,7 @@ class Invoice
 
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['destinationWallet' => 'exact'])]
