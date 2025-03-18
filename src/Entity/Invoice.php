@@ -250,9 +250,9 @@ class Invoice
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['source_wallet' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['sourceWallet' => 'exact'])]
 
-    private $source_wallet;
+    private $sourceWallet;
 
 
     /**
@@ -260,9 +260,9 @@ class Invoice
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['destination_wallet' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['destinationWallet' => 'exact'])]
 
-    private $destination_wallet;
+    private $destinationWallet;
     /**
      * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
      * @ORM\JoinColumn(nullable=false)
@@ -624,37 +624,37 @@ class Invoice
     }
 
     /**
-     * Get the value of source_wallet
+     * Get the value of sourceWallet
      */
     public function getSourceWallet()
     {
-        return $this->source_wallet;
+        return $this->sourceWallet;
     }
 
     /**
-     * Set the value of source_wallet
+     * Set the value of sourceWallet
      */
-    public function setSourceWallet($source_wallet): self
+    public function setSourceWallet($sourceWallet): self
     {
-        $this->source_wallet = $source_wallet;
+        $this->sourceWallet = $sourceWallet;
 
         return $this;
     }
 
     /**
-     * Get the value of destination_wallet
+     * Get the value of destinationWallet
      */
     public function getDestinationWallet()
     {
-        return $this->destination_wallet;
+        return $this->destinationWallet;
     }
 
     /**
-     * Set the value of destination_wallet
+     * Set the value of destinationWallet
      */
-    public function setDestinationWallet($destination_wallet): self
+    public function setDestinationWallet($destinationWallet): self
     {
-        $this->destination_wallet = $destination_wallet;
+        $this->destinationWallet = $destinationWallet;
 
         return $this;
     }
