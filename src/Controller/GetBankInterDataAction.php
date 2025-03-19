@@ -115,7 +115,7 @@ class GetBankInterDataAction
         $payer = new GetProviderDataPerInvoiceId($this->manager);
         $provAndPayerData = $payer->repoSql($invoiceId);
         if (empty($provAndPayerData)) {
-            throw new Exception("O beneficiário não possui uma 'config_key' com um 'payment_type' definido como 'inter' ou 'itau'");
+            throw new Exception("O beneficiário não possui uma 'configKey' com um 'payment_type' definido como 'inter' ou 'itau'");
         }
         $payerId = $provAndPayerData['payer_people_id'];
         $providerId = $provAndPayerData['provider_id'];
@@ -127,9 +127,9 @@ class GetBankInterDataAction
          * @var Config $provEtt
          */
         $provEtt = $this->manager->getRepository(Config::class)->findBy(
-            ['people' => $providerId, 'config_key' => ['crt_inter', 'key_inter', 'conta_inter']]
+            ['people' => $providerId, 'configKey' => ['crt_inter', 'key_inter', 'conta_inter']]
         );
-        $msgErrExp = "Não localizou em 'config.config_key' um dos dados 'conta_inter' ou 'crt_inter' ou 'key_inter' para o Beneficiário ID: $providerId";
+        $msgErrExp = "Não localizou em 'config.configKey' um dos dados 'conta_inter' ou 'crt_inter' ou 'key_inter' para o Beneficiário ID: $providerId";
         if (empty($provEtt)) {
             throw new Exception($msgErrExp);
         }
@@ -146,10 +146,10 @@ class GetBankInterDataAction
         $pathCertCRT = $pathRoot . DIRECTORY_SEPARATOR . $configs['crt_inter'];
         $pathCertKEY = $pathRoot . DIRECTORY_SEPARATOR . $configs['key_inter'];
         if (!file_exists($pathCertCRT)) {
-            throw new Exception("O Aquivo '.crt' referenciado em 'config.config_value' não existe em '$pathCertCRT' para o people_id: $providerId");
+            throw new Exception("O Aquivo '.crt' referenciado em 'config.configValue' não existe em '$pathCertCRT' para o people_id: $providerId");
         }
         if (!file_exists($pathCertKEY)) {
-            throw new Exception("O Aquivo '.key' referenciado em 'config.config_value' não existe em '$pathCertKEY' para o people_id: $providerId");
+            throw new Exception("O Aquivo '.key' referenciado em 'config.configValue' não existe em '$pathCertKEY' para o people_id: $providerId");
         }
         // ----------------------------------------
 

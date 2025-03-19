@@ -34,7 +34,7 @@ class AsaasService
 
         $asaasKey = $this->manager->getRepository(Config::class)->findOneBy([
             'people' => $people,
-            'config_key' => 'asaas-key'
+            'configKey' => 'asaas-key'
         ]);
 
         if (!$asaasKey) throw new \Exception('Asaas key not found');
@@ -202,7 +202,7 @@ class AsaasService
         $receiver = $invoice->getReceiver();
         $pixKey = $this->manager->getRepository(Config::class)->findOneBy([
             'people' => $receiver,
-            'config_key'  => 'asaas-receiver-pix-key'
+            'configKey'  => 'asaas-receiver-pix-key'
         ]);
 
         if (!$pixKey) throw new \Exception('Pix key not found');

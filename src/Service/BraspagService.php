@@ -64,7 +64,7 @@ class BraspagService
     {
         $config = $this->manager->getRepository(Config::class)->findOneBy([
             'people' => $people,
-            'config_key' => 'braspag-' . $key
+            'configKey' => 'braspag-' . $key
         ]);
 
         return $config ? $config->getConfigValue() : null;
