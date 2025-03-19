@@ -149,13 +149,14 @@ class InvoiceDataProvider implements ProviderInterface
     private function applyCashRegisterFilter(): void
     {
         if (isset($this->filters['device']) && isset($this->filters['receiver']))
-            $cashRegisterInitial = $this->configService->getConfig(
+            $deviceConfig = $this->configService->getConfig(
                 $this->filters['receiver'],
-                'pdv-' . $this->filters['device']
+                'pdv-' . $this->filters['device'],
+                true
             );
 
-        if ($cashRegisterInitial)
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-order']))
             $this->qb->andWhere('i.id > :idGt')
-                ->setParameter('idGt',  $cashRegisterInitial);
+                ->setParameter('idGt',  $deviceConfig['cash-wallet-order']);
     }
 }
