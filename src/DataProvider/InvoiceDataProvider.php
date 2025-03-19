@@ -5,21 +5,21 @@ namespace ControleOnline\DataProvider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Service\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 
 class InvoiceDataProvider implements ProviderInterface
 {
-    private $entityManager;
-    private $security;
+
     private $qb;
     private $filters = [];
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security)
-    {
-        $this->entityManager = $entityManager;
-        $this->security = $security;
-    }
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private Security $security,
+        private ConfigService $configService
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
@@ -120,13 +120,19 @@ class InvoiceDataProvider implements ProviderInterface
         return $data;
     }
 
-    private function applyCommonFilters()
+    private function applyCommonFilters(): void
     {
         $this->applyDeviceFilter();
-        $this->applyIdGtFilter();
+        $this->applyCashRegisterFilter();
         $this->applyUserFilter();
+        $this->applyReceiverFilter();
     }
-
+    private function applyReceiverFilter(): void
+    {
+        if (isset($this->filters['receiver']))
+            $this->qb->andWhere('i.receiver = :receiver')
+                ->setParameter('receiver', $this->filters['receiver']);
+    }
     private function applyUserFilter(): void
     {
         $this->qb->andWhere('i.user = :user')
@@ -140,10 +146,16 @@ class InvoiceDataProvider implements ProviderInterface
                 ->setParameter('device', $this->filters['device']);
     }
 
-    private function applyIdGtFilter(): void
+    private function applyCashRegisterFilter(): void
     {
-        if (isset($this->filters['id_gt']))
+        if (isset($this->filters['device']) && isset($this->filters['receiver']))
+            $cashRegisterInitial = $this->configService->getConfig(
+                'pdv-' . $this->filters['device'],
+                $this->filters['receiver']
+            );
+
+        if ($cashRegisterInitial)
             $this->qb->andWhere('i.id > :idGt')
-                ->setParameter('idGt', (int) $this->filters['id_gt']);
+                ->setParameter('idGt',  $cashRegisterInitial);
     }
 }
