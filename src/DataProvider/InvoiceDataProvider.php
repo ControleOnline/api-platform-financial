@@ -32,9 +32,15 @@ class InvoiceDataProvider implements ProviderInterface
 
         $payments = $this->getPayments();
 
+
+        $this->createBaseQuery();
+        $query = $this->qb->getQuery()->getSQL();
+
+
         return [[
             'payments' => $payments,
-            'filters' =>  $this->filters
+            'filters' =>  $this->filters,
+            'query' => $query
         ]];
     }
 
