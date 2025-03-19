@@ -55,7 +55,7 @@ class InvoiceDataProvider implements ProviderInterface
             ->join('i.destinationWallet', 'dw')
             ->join('i.paymentType', 'pt')
             ->leftJoin('i.sourceWallet', 'ow')
-            ->groupBy('dw.id, ow.id, pt.id');
+            ->groupBy('ow.id, dw.id, pt.id');
 
         $this->applyCommonFilters();
     }
