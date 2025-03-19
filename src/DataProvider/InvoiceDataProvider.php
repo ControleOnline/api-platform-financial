@@ -69,8 +69,8 @@ class InvoiceDataProvider implements ProviderInterface
 
             if (!isset($data['wallet'][$dWalletId]))
                 $data['wallet'][$dWalletId] = [
-                    'wallet' => $row['dwallet'],
-                    'withdrawal-wallet' => $row['owallet'],
+                    'wallet' => $row['owallet'] ?: $row['dwallet'],
+                    'withdrawal-wallet' => $row['owallet'] ? $row['dwallet'] : $row['owallet'],
                     'payment' => [],
                     'total' => 0.0,
                 ];
