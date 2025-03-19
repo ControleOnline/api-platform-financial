@@ -150,8 +150,8 @@ class InvoiceDataProvider implements ProviderInterface
     {
         if (isset($this->filters['device']) && isset($this->filters['receiver']))
             $cashRegisterInitial = $this->configService->getConfig(
-                'pdv-' . $this->filters['device'],
-                $this->filters['receiver']
+                $this->filters['receiver'],
+                'pdv-' . $this->filters['device']
             );
 
         if ($cashRegisterInitial)
