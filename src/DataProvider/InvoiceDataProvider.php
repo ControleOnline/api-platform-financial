@@ -106,7 +106,7 @@ class InvoiceDataProvider implements ProviderInterface
 
             $data['wallet'][$dWalletId]['total'] = array_sum(
                 array_map(
-                    fn($payment) => $payment['inflow'] + $payment['withdrawal'],
+                    fn($payment) => $payment['inflow'] - $payment['withdrawal'],
                     $data['wallet'][$dWalletId]['payment']
                 )
             );
