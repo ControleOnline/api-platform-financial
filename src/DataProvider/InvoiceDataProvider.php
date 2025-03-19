@@ -32,7 +32,10 @@ class InvoiceDataProvider implements ProviderInterface
 
         $payments = $this->getPayments();
 
-        return [['payments' => $payments]];
+        return [[
+            'payments' => $payments,
+            'filters' =>  $this->filters
+        ]];
     }
 
     private function createBaseQuery()
@@ -60,9 +63,7 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function getResult($results): array
     {
-        $data = [
-            'filters' =>  $this->filters
-        ];
+        $data = [];
         foreach ($results as $row) {
             $dWalletId = $row['dwalletId'];
             $oWalletId = $row['owalletId'];
