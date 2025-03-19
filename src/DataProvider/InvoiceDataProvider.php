@@ -87,7 +87,7 @@ class InvoiceDataProvider implements ProviderInterface
             if ($oWalletId === null)
 
                 $data['wallet'][$dWalletId]['payment'][$paymentTypeId]['inflow'] += $totalPrice;
-            elseif ($oWalletId === $dWalletId)
+            else
                 $data['wallet'][$dWalletId]['payment'][$paymentTypeId]['withdrawal'] += $totalPrice;
 
 
