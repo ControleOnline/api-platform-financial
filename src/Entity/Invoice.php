@@ -37,7 +37,7 @@ use stdClass;
             security: 'is_granted(\'ROLE_CLIENT\')',
             normalizationContext: ['groups' => ['invoice_details:read']],
         ),
-        new Get(
+        new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/invoice/inflow',
             provider: InvoiceDataProvider::class,
