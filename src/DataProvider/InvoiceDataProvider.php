@@ -71,8 +71,8 @@ class InvoiceDataProvider implements ProviderInterface
     {
         $data = [];
         foreach ($results as $row) {
-            $dWalletId = $row['dwalletId'];
             $oWalletId = $row['owalletId'];
+            $dWalletId = $oWalletId ?: $row['dwalletId'];
             $paymentTypeId = $row['paymentTypeId'];
             $totalPrice = (float) $row['totalPrice'];
 
