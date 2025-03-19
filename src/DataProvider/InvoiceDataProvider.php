@@ -60,7 +60,9 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function getResult($results): array
     {
-        $data = [];
+        $data = [
+            'filters' =>  $this->filters
+        ];
         foreach ($results as $row) {
             $dWalletId = $row['dwalletId'];
             $oWalletId = $row['owalletId'];
