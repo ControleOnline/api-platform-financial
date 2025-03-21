@@ -59,10 +59,10 @@ class WalletPaymentType
     private $paymentType;
 
     /**
-     * @ORM\Column(type="string", length=80)
+     * @ORM\Column(type="string", length=80, nullable=true)
      * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentCode' => 'partial'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentCode' => 'exact'])]
     private $paymentCode;
 
     public function getId()
