@@ -5,6 +5,7 @@ namespace ControleOnline\DataProvider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\People;
 use ControleOnline\Service\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
@@ -150,7 +151,7 @@ class InvoiceDataProvider implements ProviderInterface
     {
         if (isset($this->filters['device']) && isset($this->filters['receiver']))
             $deviceConfig = $this->configService->getConfig(
-                $this->filters['receiver'],
+                $this->entityManager->getRepository(People::class)->find($this->filters['receiver']),
                 'pdv-' . $this->filters['device'],
                 true
             );
