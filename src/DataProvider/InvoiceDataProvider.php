@@ -156,8 +156,8 @@ class InvoiceDataProvider implements ProviderInterface
                 true
             );
 
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-order']))
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
             $this->qb->andWhere('i.id > :idGt')
-                ->setParameter('idGt',  $deviceConfig['cash-wallet-order']);
+                ->setParameter('idGt',  $deviceConfig['cash-wallet-open-id']);
     }
 }
