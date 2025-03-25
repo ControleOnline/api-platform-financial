@@ -207,7 +207,7 @@ class Invoice
      * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATE")
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
-    #[ApiFilter(filterClass: OrderFilter::class, properties: ['dueDate' => 'DESC'])]
+    #[ApiFilter(OrderFilter::class, properties: ['dueDate' => 'DESC', 'id' => 'DESC'])]
     #[ApiFilter(filterClass: DateFilter::class, properties: ['dueDate'])]
     private $dueDate;
 
