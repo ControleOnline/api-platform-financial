@@ -15,7 +15,7 @@ class WalletService
         private PeopleService $PeopleService
     ) {}
 
-    public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
+    public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
     {
         $this->PeopleService->checkCompany('people', $queryBuilder, $resourceClass, $applyTo, $rootAlias);
     }

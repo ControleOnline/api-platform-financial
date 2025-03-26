@@ -128,7 +128,7 @@ class InvoiceService
         }
     }
 
-    public function secutiryFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
+    public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
     {
 
         if ($order = $this->request->query->get('orderId', null)) {
