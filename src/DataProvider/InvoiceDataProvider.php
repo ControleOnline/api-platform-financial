@@ -152,7 +152,7 @@ class InvoiceDataProvider implements ProviderInterface
         if (isset($this->filters['device']) && isset($this->filters['receiver']))
             $deviceConfig = $this->configService->getConfig(
                 $this->entityManager->getRepository(People::class)->find($this->filters['receiver']),
-                'pdv-' . $this->filters['device'],
+                'pos-' . $this->filters['device'],
                 true
             );
 
