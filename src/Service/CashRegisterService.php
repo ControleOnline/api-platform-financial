@@ -26,12 +26,12 @@ class CashRegisterService
             ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
-            ->where('op.id > :minId')
-            ->andWhere('op.id < :maxId')
-            ->andWhere('o.device = :device')
+            ->where('o.device = :device')
             ->andWhere('o.provider = :provider')
+            ->andWhere('op.id > :minId')
+            ->andWhere('op.id < :maxId')
             ->groupBy('p.id')
-            ->orderBy('p.id', 'ASC');
+            ->orderBy('p.product', 'ASC');
 
         $queryBuilder
             ->setParameter('minId', 0)
