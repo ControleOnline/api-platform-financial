@@ -27,6 +27,8 @@ class CashRegisterService
             ->addSelect('SUM(op.price) AS order_product_price')
             ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
+            ->join('o.order_invoice', 'oi')
+            ->join('oi.invoice', 'i')
             ->join('op.order', 'o')
             ->andWhere('o.device = :device')
             ->andWhere('o.provider = :provider')
@@ -41,11 +43,11 @@ class CashRegisterService
         $deviceConfig = $device->getConfigs(true);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $queryBuilder->andWhere('op.id > :minId')
+            $queryBuilder->andWhere('i.id > :minId')
                 ->setParameter('minId',  $deviceConfig['cash-wallet-open-id']);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']))
-            $queryBuilder->andWhere('op.id < :maxId')
+            $queryBuilder->andWhere('i.id < :maxId')
                 ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
 
 
