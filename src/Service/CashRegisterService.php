@@ -30,13 +30,10 @@ class CashRegisterService
             ->join('op.order', 'o')
             ->andWhere('o.device = :device')
             ->andWhere('o.provider = :provider')
-            ->andWhere('op.id > :minId')
-            ->andWhere('op.id < :maxId')
             ->groupBy('p.id')
             ->orderBy('p.product', 'ASC');
 
         $queryBuilder
-
             ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
 
@@ -44,11 +41,11 @@ class CashRegisterService
         $deviceConfig = $device->getConfigs(true);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $queryBuilder
+            $queryBuilder->andWhere('op.id > :minId')
                 ->setParameter('minId',  $deviceConfig['cash-wallet-open-id']);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']))
-            $queryBuilder
+            $queryBuilder->andWhere('op.id < :maxId')
                 ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
 
 
