@@ -19,15 +19,15 @@ class CashRegisterService
         $orderProductRepository = $this->entityManager->getRepository(OrderProduct::class);
 
         $queryBuilder = $orderProductRepository->createQueryBuilder('op')
-            ->select('p.product AS product_name')
-            ->select('p.description AS product_description')
+            ->addSelect('p.product AS product_name')
+            ->addSelect('p.description AS product_description')
             ->addSelect('p.sku AS product_sku')
             ->addSelect('SUM(op.quantity) AS quantity')
             ->addSelect('SUM(op.price) AS order_product_price')
             ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
-            ->where('o.device = :device')
+            ->andWhere('o.device = :device')
             ->andWhere('o.provider = :provider')
             ->andWhere('op.id > :minId')
             ->andWhere('op.id < :maxId')
