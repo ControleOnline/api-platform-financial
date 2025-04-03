@@ -45,7 +45,7 @@ use stdClass;
             provider: InvoiceDataProvider::class,
             normalizationContext: ['groups' => ['invoice:read']],
         ),
-        new Get(
+        new GetCollection(
             security: 'is_granted(\'ROLE_CLIENT\')',
             uriTemplate: '/cash-register',
             controller: GetCashRegisterController::class
