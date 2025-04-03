@@ -20,6 +20,7 @@ class CashRegisterService
 
         $queryBuilder = $orderProductRepository->createQueryBuilder('op')
             ->select('p.product AS product_name')
+            ->select('p.description AS product_description')
             ->addSelect('p.sku AS product_sku')
             ->addSelect('SUM(op.quantity) AS quantity')
             ->addSelect('SUM(op.price) AS order_product_price')
