@@ -11,7 +11,8 @@ class CashRegisterService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private PrintService $printService
+        private PrintService $printService,
+        private ConfigService $configService
     ) {}
 
     public function generateData(Device $device, People $provider)
@@ -35,10 +36,21 @@ class CashRegisterService
             ->orderBy('p.product', 'ASC');
 
         $queryBuilder
-            ->setParameter('minId', 0)
-            ->setParameter('maxId', 9999999999)
+
             ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
+
+
+        $deviceConfig = $device->getConfigs(true);
+
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
+            $queryBuilder
+                ->setParameter('minId',  $deviceConfig['cash-wallet-open-id']);
+
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']))
+            $queryBuilder
+                ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
+
 
         return $queryBuilder->getQuery()->getArrayResult();
     }

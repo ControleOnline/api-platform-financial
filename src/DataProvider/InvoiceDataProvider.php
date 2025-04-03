@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
+use ControleOnline\Service\CashRegisterService;
 use ControleOnline\Service\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
@@ -19,7 +20,8 @@ class InvoiceDataProvider implements ProviderInterface
     public function __construct(
         private EntityManagerInterface $entityManager,
         private Security $security,
-        private ConfigService $configService
+        private ConfigService $configService,
+        private CashRegisterService $cashRegisterService
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
@@ -149,15 +151,13 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function applyCashRegisterFilter(): void
     {
-        if (isset($this->filters['device']) && isset($this->filters['receiver']))
-            $deviceConfig = $this->configService->getConfig(
-                $this->entityManager->getRepository(People::class)->find($this->filters['receiver']),
-                'pos-' . $this->filters['device'],
-                true
-            );
+        if (isset($this->filters['device'])) {
+            $device = $this->entityManager->getRepository(People::class)->find($this->filters['device']);
+            $deviceConfig = $device->getConfigs(true);
 
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $this->qb->andWhere('i.id > :idGt')
-                ->setParameter('idGt',  $deviceConfig['cash-wallet-open-id']);
+            if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
+                $this->qb->andWhere('i.id > :idGt')
+                    ->setParameter('idGt',  $deviceConfig['cash-wallet-open-id']);
+        }
     }
 }
