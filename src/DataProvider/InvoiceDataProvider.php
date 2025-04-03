@@ -4,6 +4,7 @@ namespace ControleOnline\DataProvider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ControleOnline\Entity\Device;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
 use ControleOnline\Service\CashRegisterService;
@@ -152,7 +153,7 @@ class InvoiceDataProvider implements ProviderInterface
     private function applyCashRegisterFilter(): void
     {
         if (isset($this->filters['device'])) {
-            $device = $this->entityManager->getRepository(People::class)->find($this->filters['device']);
+            $device = $this->entityManager->getRepository(Device::class)->find($this->filters['device']);
             $deviceConfig = $device->getConfigs(true);
 
             if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
