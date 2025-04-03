@@ -38,7 +38,7 @@ class CashRegisterService
 
         $queryBuilder
             ->setParameter('type', ['product', 'custom'])
-            ->setParameter('device', $device->getId())
+            ->setParameter('device', $device->getDevice())
             ->setParameter('provider', $provider->getId());
 
 
