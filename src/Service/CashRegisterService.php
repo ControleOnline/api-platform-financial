@@ -24,7 +24,7 @@ class CashRegisterService
             ->addSelect('p.description AS product_description')
             ->addSelect('p.sku AS product_sku')
             ->addSelect('SUM(op.quantity) AS quantity')
-            ->addSelect('SUM(op.price) AS order_product_price')
+            ->addSelect('op.price AS order_product_price')
             ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
@@ -32,10 +32,12 @@ class CashRegisterService
             ->join('oi.invoice', 'i')
             ->andWhere('o.device = :device')
             ->andWhere('o.provider = :provider')
+            ->andWhere('p.type IN(:type)')
             ->groupBy('p.id')
             ->orderBy('p.product', 'ASC');
 
         $queryBuilder
+            ->setParameter('type', ['product', 'custom'])
             ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
 
