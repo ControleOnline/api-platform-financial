@@ -20,12 +20,12 @@ class GetCashRegisterController extends AbstractController
     public function __invoke(Request $request): JsonResponse
     {
         $deviceId = $request->query->get('device');
-        $companyId = $request->query->get('company');
+        $providerId = $request->query->get('provider');
 
         $device = $this->entityManager->getRepository(Device::class)->find($deviceId);
-        $company = $this->entityManager->getRepository(People::class)->find($companyId);
+        $provider = $this->entityManager->getRepository(People::class)->find($providerId);
 
-        $data = $this->cashRegister->generateData($device, $company);
+        $data = $this->cashRegister->generateData($device, $provider);
 
         return new JsonResponse($data);
     }
