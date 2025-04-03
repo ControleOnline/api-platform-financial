@@ -46,7 +46,7 @@ class CashRegisterService
             $queryBuilder->andWhere('i.id > :minId')
                 ->setParameter('minId',  $deviceConfig['cash-wallet-open-id']);
 
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']))
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
             $queryBuilder->andWhere('i.id < :maxId')
                 ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
 
