@@ -28,7 +28,7 @@ class CashRegisterService
             ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
-            ->join('o.order_invoice', 'oi')
+            ->join('o.invoice', 'oi')
             ->join('oi.invoice', 'i')
             ->andWhere('o.device = :device')
             ->andWhere('o.provider = :provider')
