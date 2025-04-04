@@ -148,11 +148,13 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function applyDeviceFilter(): void
     {
-        if (isset($this->filters['device']))
+        if (isset($this->filters['device'])) {
+            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device']]);
             $this->qb
                 ->join('i.device', 'd')
                 ->andWhere('d.device = :device')
-                ->setParameter('device', $this->filters['device']);
+                ->setParameter('device', $device);
+        }
     }
 
     private function applyCashRegisterFilter(): void
