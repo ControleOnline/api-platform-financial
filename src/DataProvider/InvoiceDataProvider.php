@@ -148,8 +148,10 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function applyDeviceFilter(): void
     {
-        if (isset($this->filters['device'])) {
-            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device']]);
+        error_log(implode(',', $this->filters));
+
+        if (isset($this->filters['device.device'])) {
+            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $this->qb
                 ->join('i.device', 'd')
                 ->andWhere('d.device = :device')
@@ -159,9 +161,9 @@ class InvoiceDataProvider implements ProviderInterface
 
     private function applyCashRegisterFilter(): void
     {
-        if (isset($this->filters['device']) && isset($this->filters['receiver'])) {
+        if (isset($this->filters['device.device']) && isset($this->filters['receiver'])) {
             $device_config = null;
-            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device']]);
+            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
             if ($device && $people)
                 $device_config =  $this->deviceService->discoveryDeviceConfig(
