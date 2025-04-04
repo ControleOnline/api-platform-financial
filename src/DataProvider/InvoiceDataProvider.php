@@ -150,11 +150,10 @@ class InvoiceDataProvider implements ProviderInterface
     private function applyDeviceFilter(): void
     {
         if (isset($this->filters['device.device'])) {
-            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $this->qb
                 ->join('i.device', 'd')
                 ->andWhere('d.device = :device')
-                ->setParameter('device', $device);
+                ->setParameter('device', $this->filters['device.device']);
         }
     }
 
