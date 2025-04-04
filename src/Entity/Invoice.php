@@ -324,10 +324,16 @@ class Invoice
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=50)
-     * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
+     * @var \ControleOnline\Entity\Device
+     *
+     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Device")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="device_id", referencedColumnName="id", nullable=true)
+     * })
+     * @Groups({"device_config:read","device:read","device_config:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['device' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['device.device' => 'exact'])]
     private $device;
 
     public function __construct()
