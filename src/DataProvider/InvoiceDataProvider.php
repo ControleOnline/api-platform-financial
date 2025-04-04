@@ -158,10 +158,14 @@ class InvoiceDataProvider implements ProviderInterface
     private function applyCashRegisterFilter(): void
     {
         if (isset($this->filters['device']) && isset($this->filters['receiver'])) {
-            $device_config =  $this->deviceService->discoveryDeviceConfig(
-                $this->entityManager->getRepository(Device::class)->find($this->filters['device']),
-                $this->entityManager->getRepository(People::class)->find($this->filters['receiver'])
-            )->getConfigs(true);
+            $device_config = null;
+            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device']]);
+            $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
+            if ($device && $people)
+                $device_config =  $this->deviceService->discoveryDeviceConfig(
+                    $device,
+                    $people
+                )->getConfigs(true);
 
             if ($device_config && isset($device_config['cash-wallet-open-id']))
                 $this->qb->andWhere('i.id > :idGt')
