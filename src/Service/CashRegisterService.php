@@ -12,7 +12,9 @@ class CashRegisterService
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PrintService $printService,
-        private ConfigService $configService
+        private ConfigService $configService,
+        private DeviceService $deviceService
+
     ) {}
 
     public function generateData(Device $device, People $provider)
@@ -30,7 +32,8 @@ class CashRegisterService
             ->join('op.order', 'o')
             ->join('o.invoice', 'oi')
             ->join('oi.invoice', 'i')
-            ->andWhere('o.device = :device')
+            ->join('o.device', 'd')
+            ->andWhere('d.device = :device')
             ->andWhere('o.provider = :provider')
             ->andWhere('p.type IN(:type)')
             ->groupBy('p.id')
@@ -38,11 +41,14 @@ class CashRegisterService
 
         $queryBuilder
             ->setParameter('type', ['product', 'custom'])
-            ->setParameter('device', $device->getDevice())
+            ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
 
+        $deviceConfig =  $this->deviceService->discoveryDeviceConfig(
+            $device,
+            $provider
+        )->getConfigs(true);
 
-        $deviceConfig = $device->getConfigs(true);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
             $queryBuilder->andWhere('i.id > :minId')
