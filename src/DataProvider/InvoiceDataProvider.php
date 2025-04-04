@@ -47,7 +47,8 @@ class InvoiceDataProvider implements ProviderInterface
         return [[
             'payments' => $payments,
             'filters' =>  $this->filters,
-            'query' => $query
+            'query' => $query,
+            'user' => $this->security->getUser()->getId()
         ]];
     }
 
