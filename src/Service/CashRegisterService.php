@@ -57,9 +57,6 @@ class CashRegisterService
             $queryBuilder->andWhere('i.id < :maxId')
                 ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
 
-
-        error_log($queryBuilder->getQuery()->getSql());
-
         return $queryBuilder->getQuery()->getArrayResult();
     }
 
