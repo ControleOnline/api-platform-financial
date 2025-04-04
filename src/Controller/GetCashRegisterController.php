@@ -25,7 +25,6 @@ class GetCashRegisterController extends AbstractController
         $provider = $this->entityManager->getRepository(People::class)->find($providerId);
         $device = $this->entityManager->getRepository(Device::class)->findOneBy([
             'device' =>  $deviceId,
-            'people' =>   $providerId,
         ]);
         $data = $this->cashRegister->generateData($device, $provider);
 
