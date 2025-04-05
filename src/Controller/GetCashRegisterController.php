@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 class GetCashRegisterController extends AbstractController
 {
@@ -21,7 +21,7 @@ class GetCashRegisterController extends AbstractController
 
     /**
      * @Route("/invoice/inflow", name="invoice_inflow", methods={"GET"})
-     * @IsGranted("ROLE_ADMIN")
+     * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
      */
     public function getInflow(Request $request): JsonResponse
     {
@@ -39,7 +39,7 @@ class GetCashRegisterController extends AbstractController
 
     /**
      * @Route("/cash-register", name="cash_register", methods={"POST"})
-     * @IsGranted("ROLE_CLIENT")
+     * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
      */
     public function printCashRegister(Request $request): JsonResponse
     {
