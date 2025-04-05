@@ -25,7 +25,7 @@ class GetCashRegisterController extends AbstractController
     ) {}
 
     /**
-     * @Route("/cash-register", name="invoice_inflow", methods={"GET"})
+     * @Route("/cash-register", name="cash_register", methods={"GET"})
      * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
      */
     public function getCashRegister(Request $request): JsonResponse
@@ -43,7 +43,7 @@ class GetCashRegisterController extends AbstractController
     }
 
     /**
-     * @Route("/cash-register/print", name="cash_register", methods={"POST"})
+     * @Route("/cash-register/print", name="print_cash_register", methods={"POST"})
      * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
      */
     public function printCashRegister(Request $request): JsonResponse
@@ -62,7 +62,7 @@ class GetCashRegisterController extends AbstractController
     }
 
     /**
-     * @Route("/income_statements", name="cash_register", methods={"POST"})
+     * @Route("/income_statements", name="invoice_inflow", methods={"POST"})
      * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
      */
     public function getIncomeStatements(Request $request): Response
