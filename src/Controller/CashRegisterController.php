@@ -16,7 +16,7 @@ use ControleOnline\Entity\Invoice;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetCashRegisterController extends AbstractController
+class CashRegisterController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $manager,
