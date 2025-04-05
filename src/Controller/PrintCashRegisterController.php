@@ -26,7 +26,7 @@ class PrintCashRegisterController extends AbstractController
         $deviceType = $data['device-type'];
         $company = $this->entityManager->getRepository(People::class)->find($data['company']);
         $device = $this->entityManager->getRepository(Device::class)->findOneBy([
-            'device' => $data['device']
+            'device' => $request->headers->get('device')
         ]);
 
         $printData = $this->print->generatePrintData($device, $company, $printType, $deviceType);
