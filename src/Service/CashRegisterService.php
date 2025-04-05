@@ -13,6 +13,7 @@ class CashRegisterService
         private EntityManagerInterface $entityManager,
         private PrintService $printService,
         private ConfigService $configService,
+        private InFlowService $inFlowService,
         private DeviceService $deviceService
 
     ) {}
@@ -60,27 +61,65 @@ class CashRegisterService
         return $queryBuilder->getQuery()->getArrayResult();
     }
 
-    public function generatePrintData(Device $device, People $provider, string $printType, string $deviceType)
+    
+    public function generatePrintData(Device $device, $provider, string $printType, string $deviceType)
     {
         $products = $this->generateData($device, $provider);
+
+        $filters = [
+            'device.device' => $device->getDevice(),
+            'receiver' => $provider->getId()
+        ];
+        $paymentData = $this->inFlowService->getPayments($filters);
 
         $this->printService->addLine("RELATÓRIO DE CAIXA");
         $this->printService->addLine(date('d/m/Y H:i'));
         $this->printService->addLine($provider->getName());
         $this->printService->addLine("", "", "-");
+
+        foreach ($paymentData['wallet'] as $walletId => $wallet) {
+            $this->printService->addLine(strtoupper($wallet['wallet']) . ":");
+
+            foreach ($wallet['payment'] as $payment) {
+                if ($payment['inflow'] > 0) {
+                    $this->printService->addLine(
+                        "  " . $payment['payment'],
+                        "R$ " . number_format($payment['inflow'], 2, ',', '.'),
+                        "."
+                    );
+                }
+                if ($payment['withdrawal'] > 0) {
+                    $this->printService->addLine(
+                        "  Sangria " . $wallet['withdrawal-wallet'],
+                        "R$ " . number_format($payment['withdrawal'], 2, ',', '.'),
+                        "."
+                    );
+                }
+            }
+
+            $this->printService->addLine(
+                "  Total",
+                "R$ " . number_format($wallet['total'], 2, ',', '.'),
+                "."
+            );
+            $this->printService->addLine("", "", "-");
+        }
+
         $total = 0;
+        $this->printService->addLine("PRODUTOS:");
         foreach ($products as $product) {
             $quantity = $product['quantity'];
-            $productName = $product['product_name'];
-            $price = $product['order_product_price'];
+            $productName = substr($product['product_name'], 0, 20);
             $subtotal = $product['order_product_total'];
             $total += $subtotal;
+
             $this->printService->addLine(
-                "$quantity X " . $productName,
+                "  $quantity X " . $productName,
                 "R$ " . number_format($subtotal, 2, ',', '.'),
                 "."
             );
         }
+
         $this->printService->addLine("", "", "-");
         $this->printService->addLine(
             "TOTAL",
