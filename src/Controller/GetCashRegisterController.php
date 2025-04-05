@@ -9,6 +9,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class GetCashRegisterController extends AbstractController
 {
@@ -17,7 +19,11 @@ class GetCashRegisterController extends AbstractController
         private CashRegisterService $cashRegister
     ) {}
 
-    public function __invoke(Request $request): JsonResponse
+    /**
+     * @Route("/invoice/inflow", name="invoice_inflow", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
+     */
+    public function getInflow(Request $request): JsonResponse
     {
         $deviceId = $request->query->get('device');
         $providerId = $request->query->get('provider');
@@ -29,5 +35,24 @@ class GetCashRegisterController extends AbstractController
         $data = $this->cashRegister->generateData($device, $provider);
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * @Route("/cash-register", name="cash_register", methods={"POST"})
+     * @IsGranted("ROLE_CLIENT")
+     */
+    public function printCashRegister(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $printType = $data['print-type'];
+        $deviceType = $data['device-type'];
+        $company = $this->entityManager->getRepository(People::class)->find($data['people']);
+        $device = $this->entityManager->getRepository(Device::class)->findOneBy([
+            'device' => $data['device']
+        ]);
+
+        $printData = $this->cashRegister->generatePrintData($device, $company, $printType, $deviceType);
+
+        return new JsonResponse($printData);
     }
 }

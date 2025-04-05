@@ -18,11 +18,9 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ControleOnline\Controller\AsaasWebhookController;
 use ControleOnline\Controller\BitcoinController;
-use ControleOnline\Controller\GetCashRegisterController;
 use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
-use ControleOnline\Controller\PrintCashRegisterController;
 use ControleOnline\DataProvider\InvoiceDataProvider;
 use stdClass;
 
@@ -44,16 +42,6 @@ use stdClass;
             uriTemplate: '/invoice/inflow',
             provider: InvoiceDataProvider::class,
             normalizationContext: ['groups' => ['invoice:read']],
-        ),
-        new GetCollection(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/cash-register',
-            controller: GetCashRegisterController::class
-        ),
-        new Post(
-            security: 'is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/cash-register/print',
-            controller: PrintCashRegisterController::class
         ),
         new Get(
             security: 'is_granted(\'ROLE_CLIENT\')',

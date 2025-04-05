@@ -16,7 +16,6 @@ class PrintCashRegisterController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private CashRegisterService $print
-
     ) {}
 
     public function __invoke(Request $request): JsonResponse
