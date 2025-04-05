@@ -62,6 +62,33 @@ class CashRegisterService
 
     public function generatePrintData(Device $device, People $provider, string $printType, string $deviceType)
     {
-        $this->generateData($device, $provider);
+        $products = $this->generateData($device, $provider);
+
+        $this->printService->addLine("RELATÓRIO DE CAIXA");
+        $this->printService->addLine(date('d/m/Y H:i'));
+        $this->printService->addLine($provider->getName());
+        $this->printService->addLine("", "", "-");
+        $total = 0;
+        foreach ($products as $product) {
+            $quantity = $product['quantity'];
+            $productName = $product['product_name'];
+            $price = $product['order_product_price'];
+            $subtotal = $product['order_product_total'];
+            $total += $subtotal;
+            $this->printService->addLine(
+                "$quantity X " . $productName,
+                "R$ " . number_format($subtotal, 2, ',', '.'),
+                "."
+            );
+        }
+        $this->printService->addLine("", "", "-");
+        $this->printService->addLine(
+            "TOTAL",
+            "R$ " . number_format($total, 2, ',', '.'),
+            " "
+        );
+        $this->printService->addLine("", "", "-");
+
+        return $this->printService->generatePrintData($printType, $deviceType);
     }
 }
