@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ControleOnline\Controller\AsaasWebhookController;
 use ControleOnline\Controller\BitcoinController;
-use ControleOnline\Controller\IncomeStatementAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\PixController;
 use ControleOnline\DataProvider\InvoiceDataProvider;
@@ -49,11 +48,7 @@ use stdClass;
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: \ControleOnline\Controller\GetBankItauDataAction::class
         ),
-        new GetCollection(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
-            uriTemplate: '/income_statements',
-            controller: IncomeStatementAction::class
-        ),
+
         new GetCollection(
             uriTemplate: '/paylist',
             security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
