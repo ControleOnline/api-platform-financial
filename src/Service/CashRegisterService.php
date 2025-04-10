@@ -40,7 +40,7 @@ class CashRegisterService
             ->orderBy('p.product', 'ASC');
 
         $queryBuilder
-            ->setParameter('type', ['product', 'custom'])
+            ->setParameter('type', ['product', 'custom', 'manufactured'])
             ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
 

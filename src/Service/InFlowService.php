@@ -43,6 +43,8 @@ class InFlowService
             ->addSelect('ow.id as owalletId', 'ow.wallet as owallet')
             ->addSelect('pt.id as paymentTypeId', 'pt.paymentType')
             ->from(Invoice::class, 'i')
+            ->join('i.order', 'oi')
+            ->join('oi.order', 'o')
             ->join('i.destinationWallet', 'dw')
             ->join('i.paymentType', 'pt')
             ->leftJoin('i.sourceWallet', 'ow')
