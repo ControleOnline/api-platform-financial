@@ -58,10 +58,13 @@ class CashRegisterService
             $queryBuilder->andWhere('i.id < :maxId')
                 ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
 
+
+        error_log($queryBuilder->getQuery()->getSQL());
+
         return $queryBuilder->getQuery()->getArrayResult();
     }
 
-    
+
     public function generatePrintData(Device $device, $provider, string $printType, string $deviceType)
     {
         $products = $this->generateData($device, $provider);
