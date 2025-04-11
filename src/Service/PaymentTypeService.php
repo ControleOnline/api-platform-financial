@@ -4,7 +4,8 @@ namespace ControleOnline\Service;
 
 use ControleOnline\Entity\Invoice;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use Doctrine\ORM\QueryBuilder;
 
 class PaymentTypeService

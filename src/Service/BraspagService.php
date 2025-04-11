@@ -4,7 +4,8 @@ namespace ControleOnline\Service;
 
 use ControleOnline\Entity\Invoice;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use Braspag\Split\Domains\Sale\SplitPayments;
 use Braspag\Split\Request\Sale as RequestSale;
 use Braspag\Split\Domains\Environment;

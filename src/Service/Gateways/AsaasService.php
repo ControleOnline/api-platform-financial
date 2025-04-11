@@ -11,7 +11,8 @@ use ControleOnline\Service\InvoiceService;
 use ControleOnline\Service\OrderService;
 use ControleOnline\Service\PeopleService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use ControleOnline\Service\PeopleRoleService;
 use GuzzleHttp\Client;
 

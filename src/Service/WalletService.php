@@ -8,7 +8,8 @@ use ControleOnline\Entity\People;
 use ControleOnline\Entity\Wallet;
 use ControleOnline\Entity\WalletPaymentType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use Doctrine\ORM\QueryBuilder;
 
 class WalletService

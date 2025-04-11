@@ -6,7 +6,8 @@ use ControleOnline\Entity\Device;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 
 class InFlowService
 {
@@ -122,7 +123,7 @@ class InFlowService
     private function applyUserFilter(): void
     {
         $this->qb->andWhere('i.user = :user')
-            ->setParameter('user', $this->security->getUser());
+            ->setParameter('user', $this->security->getToken()->getUser());
     }
 
     private function applyDeviceFilter(): void

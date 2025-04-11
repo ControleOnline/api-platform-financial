@@ -7,7 +7,8 @@ use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderInvoice;
 use ControleOnline\Entity\PaymentType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\Status;

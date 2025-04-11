@@ -9,7 +9,8 @@ use ControleOnline\Service\ConfigService;
 use ControleOnline\Service\DeviceService;
 use ControleOnline\Service\InFlowService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+ AS Security;
 
 class InvoiceDataProvider implements ProviderInterface
 {
@@ -27,7 +28,7 @@ class InvoiceDataProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $currentUser = $this->security->getUser();
+        $currentUser = $this->security->getToken()->getUser();
         if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN')) {
             throw new \Exception('You should not pass!!!');
         }
