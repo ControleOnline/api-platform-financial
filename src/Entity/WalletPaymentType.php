@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\GetCollection;
@@ -17,9 +18,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
@@ -31,38 +29,39 @@ use ApiPlatform\Metadata\Delete;
     normalizationContext: ['groups' => ['wallet_payment_type:read']],
     denormalizationContext: ['groups' => ['wallet_payment_type:write']]
 )]
+#[ORM\Entity]
 class WalletPaymentType
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
      * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet", inversedBy="walletPaymentTypes")
-     * @ORM\JoinColumn(name="wallet_id", nullable=false)
      * @Groups({"wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'exact'])]
+    #[ORM\JoinColumn(name: 'wallet_id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Wallet::class, inversedBy: 'walletPaymentTypes')]
     private $wallet;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType", inversedBy="walletPaymentTypes")
-     * @ORM\JoinColumn(name="payment_type_id", nullable=false)
      * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
+    #[ORM\JoinColumn(name: 'payment_type_id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\PaymentType::class, inversedBy: 'walletPaymentTypes')]
     private $paymentType;
 
     /**
-     * @ORM\Column(type="string", length=80, nullable=true)
      * @Groups({"wallet:read","wallet_payment_type:read", "wallet_payment_type:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentCode' => 'exact'])]
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
     private $paymentCode;
 
     public function getId()

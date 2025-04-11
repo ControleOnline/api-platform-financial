@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\GetCollection;
@@ -25,10 +26,6 @@ use stdClass;
 
 /**
  * Invoice
- *
- * @ORM\EntityListeners ({ControleOnline\Listener\LogListener::class})
- * @ORM\Table (name="invoice")
- * @ORM\Entity (repositoryClass="ControleOnline\Repository\InvoiceRepository")
  */
 #[ApiResource(
     operations: [
@@ -124,6 +121,9 @@ use stdClass;
     normalizationContext: ['groups' => ['invoice:read']],
     denormalizationContext: ['groups' => ['invoice:write']]
 )]
+#[ORM\Table(name: 'invoice')]
+#[ORM\EntityListeners([LogListener::class])]
+#[ORM\Entity(repositoryClass: \ControleOnline\Repository\InvoiceRepository::class)]
 
 
 class Invoice
@@ -131,85 +131,77 @@ class Invoice
     /**
      * @var integer
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Groups({"invoice:read","invoice_details:read","logistic:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private $id;
     /**
      * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\OneToMany(targetEntity="\ControleOnline\Entity\OrderInvoice", mappedBy="invoice")
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
+    #[ORM\OneToMany(targetEntity: OrderInvoice::class, mappedBy: 'invoice')]
     private $order;
     /**
      * @var \ControleOnline\Entity\Status
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Status")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="status_id", referencedColumnName="id")
-     * })
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact'])]
+    #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Status::class)]
     private $status;
 
     /**
      * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="payer_id", referencedColumnName="id")
-     * })
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer' => 'exact'])]
+    #[ORM\JoinColumn(name: 'payer_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
     private $payer;
 
     /**
      * @var \ControleOnline\Entity\People
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="receiver_id", referencedColumnName="id")
-     * })
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver' => 'exact'])]
+    #[ORM\JoinColumn(name: 'receiver_id', referencedColumnName: 'id')]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
     private $receiver;
 
     /**
      * @var \DateTime
-     * @ORM\Column(name="invoice_date", type="datetime",  nullable=false, columnDefinition="DATETIME")
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
+    #[ORM\Column(name: 'invoice_date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME')]
     private $invoice_date;
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="alter_date", type="datetime",  nullable=false, columnDefinition="DATETIME on update CURRENT_TIMESTAMP")
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
+    #[ORM\Column(name: 'alter_date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME on update CURRENT_TIMESTAMP')]
     private $alter_date;
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="due_date", type="datetime",  nullable=false, columnDefinition="DATE")
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(OrderFilter::class, properties: ['dueDate' => 'DESC', 'id' => 'DESC'])]
     #[ApiFilter(filterClass: DateFilter::class, properties: ['dueDate'])]
+    #[ORM\Column(name: 'due_date', type: 'datetime', nullable: false, columnDefinition: 'DATE')]
     private $dueDate;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(name="notified", type="boolean",  nullable=false)
      * @Groups({"invoice_pay_notified_edit"})
      * @Assert\Type(
      *  type  ="bool"
@@ -217,106 +209,103 @@ class Invoice
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
+    #[ORM\Column(name: 'notified', type: 'boolean', nullable: false)]
     private $notified  = false;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="price", type="float",  nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
+    #[ORM\Column(name: 'price', type: 'float', nullable: true)]
     private $price;
 
     /**
      * @var \ControleOnline\Entity\Category
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Category")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="category_id", referencedColumnName="id", nullable=true)
-     * })
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
+    #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Category::class)]
     private $category = null;
 
 
     /**
-     * @ORM\Column(type="json")
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
+    #[ORM\Column(type: 'json')]
     private $otherInformations;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
-     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['sourceWallet' => 'exact'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Wallet::class)]
 
     private $sourceWallet;
 
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Wallet")
-     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['destinationWallet' => 'exact'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Wallet::class)]
 
     private $destinationWallet;
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\PaymentType")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\PaymentType::class)]
     private $paymentType;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="portion_number", type="integer",  nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
+    #[ORM\Column(name: 'portion_number', type: 'integer', nullable: false)]
     private $portion;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="installments", type="integer",  nullable=false)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
+    #[ORM\Column(name: 'installments', type: 'integer', nullable: false)]
     private $installments;
 
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="installment_id", type="integer",  nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
+    #[ORM\Column(name: 'installment_id', type: 'integer', nullable: true)]
     private $installment_id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\User")
-     * @ORM\JoinColumn(nullable=true)
      * @Groups({"invoice:read","invoice_details:read","logistic:read","invoice:write","order_invoice:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['user' => 'exact'])]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\User::class)]
     private $user;
 
     /**
      * @var \ControleOnline\Entity\Device
      *
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\Device")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="device_id", referencedColumnName="id", nullable=true)
-     * })
      * @Groups({"device_config:read","device:read","device_config:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['device' => 'exact'])]
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['device.device' => 'exact'])]
+    #[ORM\JoinColumn(name: 'device_id', referencedColumnName: 'id', nullable: true)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\Device::class)]
     private $device;
 
     public function __construct()
@@ -519,7 +508,7 @@ class Invoice
 
     public function getDateAsString(\DateTime $date = null): string
     {
-        return ($date !== null ? $date : (new \DateTime))->format('Y-m-d');
+        return ($date ?? new \DateTime)->format('Y-m-d');
     }
 
     /**

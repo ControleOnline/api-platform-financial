@@ -1,6 +1,7 @@
 <?php
 
-namespace ControleOnline\Entity;
+namespace ControleOnline\Entity; 
+use ControleOnline\Listener\LogListener;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\GetCollection;
@@ -19,9 +20,6 @@ use ApiPlatform\Metadata\Delete;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-/**
- * @ORM\Entity
- */
 #[ApiResource(
     operations: [
         new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
@@ -33,42 +31,43 @@ use Doctrine\Common\Collections\Collection;
     normalizationContext: ['groups' => ['wallet:read']],
     denormalizationContext: ['groups' => ['wallet:write']]
 )]
+#[ORM\Entity]
 class Wallet
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
      * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups({"wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
     private $people;
 
     /**
-     * @ORM\Column(type="string", length=50)
      * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $wallet;
 
     /**
-     * @ORM\Column(type="integer")
      * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
      */
+    #[ORM\Column(type: 'integer')]
     private $balance = 0;
 
     /**
-     * @ORM\OneToMany(targetEntity="ControleOnline\Entity\WalletPaymentType", mappedBy="wallet")
      * @Groups({"wallet:read"})
      */
+    #[ORM\OneToMany(targetEntity: \ControleOnline\Entity\WalletPaymentType::class, mappedBy: 'wallet')]
     private $walletPaymentTypes;
 
     public function __construct()

@@ -20,12 +20,7 @@ use ApiPlatform\Metadata\Delete;
 
 
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="vw_products_by_day")
- */
-
- #[ApiResource(
+#[ApiResource(
     operations: [
         new GetCollection(
             security: 'is_granted(\'ROLE_CLIENT\')',
@@ -33,54 +28,56 @@ use ApiPlatform\Metadata\Delete;
     ],
     normalizationContext: ['groups' => ['productsByDay:read']],
 )]
+ #[ORM\Table(name: 'vw_products_by_day')]
+ #[ORM\Entity]
 class QtdVehicles
 {
     /**
-     * @ORM\Id 
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
     private $provider;
 
     /**
-     * @ORM\Id 
-     * @ORM\Column(type="string", length=50)
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['app' => 'partial'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'string', length: 50)]
     private $app;
 
     /**
-     * @ORM\Id 
-     * @ORM\Column(name="date", type="datetime",  nullable=false, columnDefinition="DATETIME")
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(DateFilter::class, properties: ['date'])]
+    #[ORM\Id]
+    #[ORM\Column(name: 'date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME')]
     private $date;
 
      /**
-     * @ORM\Id 
-     * @ORM\Column(type="string")
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['hour' => 'exact'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'string')]
     private $hour;
 
     /**
-     * @ORM\Column(type="integer")
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['quantity' => 'exact'])]
+    #[ORM\Column(type: 'integer')]
     private $quantity;
 
 
     /**
-     * @ORM\Column(type="integer")
      * @Groups({"productsByDay:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['total' => 'exact'])]
+    #[ORM\Column(type: 'integer')]
     private $total;
 
 

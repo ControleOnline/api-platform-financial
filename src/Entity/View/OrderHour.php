@@ -17,11 +17,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="vw_orders_by_hour")
- */
-
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -30,33 +25,34 @@ use ApiPlatform\Metadata\Delete;
     ],
     normalizationContext: ['groups' => ['orderHour:read']],
 )]
+#[ORM\Table(name: 'vw_orders_by_hour')]
+#[ORM\Entity]
 class OrderHour
 {
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
      * @Groups({"orderHour:read"})
-
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order_hour' => 'exact'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
 
     private $order_hour;
 
     /**
-     * @ORM\Id 
-     * @ORM\ManyToOne(targetEntity="ControleOnline\Entity\People")
-     * @ORM\JoinColumn(nullable=false)
      * @Groups({"orderHour:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
+    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
 
     private $provider;
 
     /**
-     * @ORM\Column(type="string", length=50)
      * @Groups({"orderHour:read"})
      */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['average_orders' => 'partial'])]
+    #[ORM\Column(type: 'string', length: 50)]
 
     private $average_orders;
 
