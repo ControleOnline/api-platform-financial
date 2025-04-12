@@ -63,16 +63,14 @@ class InvoiceRepository extends ServiceEntityRepository
         ";
 
         $conn = $this->getEntityManager()->getConnection();
-        $stmt = $conn->prepare($sql);
-
         $filters = ['year' => $year, 'people_id' => $people->getId()];
 
         if ($month)
             $filters['month'] = $month;
 
-        $stmt->execute($filters);
+        $result = $conn->executeQuery($sql, $filters)->fetchAllAssociative();
 
-        return $this->organizeData($people, $stmt->fetchAllAssociative());
+        return $this->organizeData($people, $result);
     }
 
 

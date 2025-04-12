@@ -28,10 +28,6 @@ class InFlowService
         $this->filters = $filters;
 
         $this->createBaseQuery();
-
-        error_log($this->qb->getQuery()->getSQL());
-
-
         $results = $this->qb->getQuery()->getResult();
         return $this->getResult($results);
     }

@@ -48,7 +48,7 @@ use stdClass;
 
         new GetCollection(
             uriTemplate: '/paylist',
-            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            security: 'is_granted(\'PUBLIC_ACCESS\')',
             controller: PaylistController::class,
             openapiContext: [
                 'summary' => 'Retrieve invoices based on document and company.',
@@ -58,12 +58,12 @@ use stdClass;
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
         new Post(
-            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            security: 'is_granted(\'PUBLIC_ACCESS\')',
             uriTemplate: '/pix',
             controller: PixController::class,
         ),
         new Post(
-            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            security: 'is_granted(\'PUBLIC_ACCESS\')',
             uriTemplate: '/bitcoin',
             controller: BitcoinController::class,
         ),
@@ -85,7 +85,7 @@ use stdClass;
             denormalizationContext: ['groups' => ['invoice:write']]
         ),
         new Get(
-            security: 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
+            security: 'is_granted(\'PUBLIC_ACCESS\')',
             uriTemplate: '/finance/{id}/download',
             requirements: ['id' => '[\\w-]+'],
             controller: \ControleOnline\Controller\GetBankInterDataAction::class
