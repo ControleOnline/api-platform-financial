@@ -21,14 +21,13 @@ class CashRegisterService
     {
         $orderProductRepository = $this->entityManager->getRepository(OrderProduct::class);
 
-        $subQueryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('DISTINCT op.quantity AS quantity')
-            ->addSelect('op.total AS total')
-            ->addSelect('p.product AS product_name')
+        $queryBuilder = $orderProductRepository->createQueryBuilder('op')
+            ->select('DISTINCT p.product AS product_name')
             ->addSelect('p.description AS product_description')
             ->addSelect('p.sku AS product_sku')
-            ->addSelect('op.price AS order_product_price')
-            ->from(OrderProduct::class, 'op')
+            ->addSelect('SUM(op.quantity) AS quantity')
+            ->addSelect('MIN(op.price) AS order_product_price')
+            ->addSelect('SUM(op.total) AS order_product_total')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
             ->join('o.invoice', 'oi')
@@ -37,7 +36,17 @@ class CashRegisterService
             ->andWhere('d.id = :device')
             ->andWhere('o.provider = :provider')
             ->andWhere('i.receiver = :provider')
-            ->andWhere('p.type IN(:type)');
+            ->andWhere('p.type IN(:type)')
+            ->groupBy('p.id')
+            ->addGroupBy('p.product')
+            ->addGroupBy('p.description')
+            ->addGroupBy('p.sku')
+            ->orderBy('p.product', 'ASC');
+
+        $queryBuilder
+            ->setParameter('type', ['product', 'custom', 'manufactured'])
+            ->setParameter('device', $device->getId())
+            ->setParameter('provider', $provider->getId());
 
         $deviceConfig = $this->deviceService->discoveryDeviceConfig(
             $device,
@@ -45,38 +54,13 @@ class CashRegisterService
         )->getConfigs(true);
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id'])) {
-            $subQueryBuilder->andWhere('i.id > :minId')
+            $queryBuilder->andWhere('i.id > :minId')
                 ->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
         }
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0) {
-            $subQueryBuilder->andWhere('i.id <= :maxId')
+            $queryBuilder->andWhere('i.id <= :maxId')
                 ->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
-        }
-
-        $queryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('sub.product_name')
-            ->addSelect('sub.product_description')
-            ->addSelect('sub.product_sku')
-            ->addSelect('SUM(sub.quantity) AS quantity')
-            ->addSelect('MIN(sub.order_product_price) AS order_product_price')
-            ->addSelect('SUM(sub.total) AS order_product_total')
-            ->from('(' . $subQueryBuilder->getQuery()->getDQL() . ')', 'sub')
-            ->groupBy('sub.product_name')
-            ->addGroupBy('sub.product_description')
-            ->addGroupBy('sub.product_sku')
-            ->orderBy('sub.product_name', 'ASC');
-
-        $queryBuilder
-            ->setParameter('type', ['product', 'custom', 'manufactured'])
-            ->setParameter('device', $device->getId())
-            ->setParameter('provider', $provider->getId());
-
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id'])) {
-            $queryBuilder->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
-        }
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0) {
-            $queryBuilder->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
         }
 
         error_log($queryBuilder->getQuery()->getSQL());

@@ -32,29 +32,20 @@ class InFlowService
 
     private function createBaseQuery()
     {
-        $subQueryBuilder = $this->entityManager->createQueryBuilder()
-            ->select('DISTINCT i.price AS price')
-            ->addSelect('dw.id AS dwalletId', 'dw.wallet AS dwallet')
-            ->addSelect('ow.id AS owalletId', 'ow.wallet AS owallet')
-            ->addSelect('pt.id AS paymentTypeId', 'pt.paymentType AS paymentType')
+        $this->qb = $this->entityManager->createQueryBuilder()
+            ->select('SUM(DISTINCT i.price) as totalPrice')
+            ->addSelect('dw.id as dwalletId', 'dw.wallet as dwallet')
+            ->addSelect('ow.id as owalletId', 'ow.wallet as owallet')
+            ->addSelect('pt.id as paymentTypeId', 'pt.paymentType')
             ->from(Invoice::class, 'i')
             ->join('i.destinationWallet', 'dw')
             ->join('i.paymentType', 'pt')
-            ->leftJoin('i.sourceWallet', 'ow');
+            ->leftJoin('i.sourceWallet', 'ow')
+            ->groupBy('dw.id')
+            ->addGroupBy('pt.id')
+            ->addGroupBy('ow.id');
 
-        $this->applyCommonFilters($subQueryBuilder);
-
-        $this->qb = $this->entityManager->createQueryBuilder()
-            ->select('SUM(sub.price) AS totalPrice')
-            ->addSelect('sub.dwalletId', 'sub.dwallet')
-            ->addSelect('sub.owalletId', 'sub.owallet')
-            ->addSelect('sub.paymentTypeId', 'sub.paymentType')
-            ->from('(' . $subQueryBuilder->getQuery()->getDQL() . ')', 'sub')
-            ->groupBy('sub.dwalletId', 'sub.paymentTypeId', 'sub.owalletId');
-
-        foreach ($subQueryBuilder->getParameters() as $parameter) {
-            $this->qb->setParameter($parameter->getName(), $parameter->getValue());
-        }
+        $this->applyCommonFilters();
     }
 
     private function getResult($results): array
@@ -109,32 +100,31 @@ class InFlowService
         return $data;
     }
 
-    private function applyCommonFilters($qb = null): void
+    private function applyCommonFilters(): void
     {
-        $qb = $qb ?: $this->qb;
-        $this->applyDeviceFilter($qb);
-        $this->applyCashRegisterFilter($qb);
-        $this->applyReceiverFilter($qb);
+        $this->applyDeviceFilter();
+        $this->applyCashRegisterFilter();
+        $this->applyReceiverFilter();
     }
 
-    private function applyReceiverFilter($qb): void
+    private function applyReceiverFilter(): void
     {
         if (isset($this->filters['receiver'])) {
-            $qb->andWhere('i.receiver = :receiver')
+            $this->qb->andWhere('i.receiver = :receiver')
                 ->setParameter('receiver', $this->filters['receiver']);
         }
     }
 
-    private function applyDeviceFilter($qb): void
+    private function applyDeviceFilter(): void
     {
         if (isset($this->filters['device.device'])) {
-            $qb->join('i.device', 'd')
+            $this->qb->join('i.device', 'd')
                 ->andWhere('d.device = :device')
                 ->setParameter('device', $this->filters['device.device']);
         }
     }
 
-    private function applyCashRegisterFilter($qb): void
+    private function applyCashRegisterFilter(): void
     {
         if (isset($this->filters['device.device']) && isset($this->filters['receiver'])) {
             $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
@@ -147,12 +137,12 @@ class InFlowService
                 )->getConfigs(true);
 
                 if ($device_config && isset($device_config['cash-wallet-open-id'])) {
-                    $qb->andWhere('i.id > :idGt')
+                    $this->qb->andWhere('i.id > :idGt')
                         ->setParameter('idGt', $device_config['cash-wallet-open-id']);
                 }
 
                 if ($device_config && isset($device_config['cash-wallet-closed-id']) && $device_config['cash-wallet-closed-id'] > 0) {
-                    $qb->andWhere('i.id <= :idLt')
+                    $this->qb->andWhere('i.id <= :idLt')
                         ->setParameter('idLt', $device_config['cash-wallet-closed-id']);
                 }
             }
