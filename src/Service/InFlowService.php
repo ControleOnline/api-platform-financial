@@ -7,7 +7,7 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
- AS Security;
+as Security;
 
 class InFlowService
 {
@@ -31,7 +31,7 @@ class InFlowService
         $results = $this->qb->getQuery()->getResult();
         return $this->getResult($results);
     }
-    
+
     private function createBaseQuery()
     {
         $this->qb = $this->entityManager->createQueryBuilder()
@@ -107,7 +107,6 @@ class InFlowService
     {
         $this->applyDeviceFilter();
         $this->applyCashRegisterFilter();
-        $this->applyUserFilter();
         $this->applyReceiverFilter();
     }
     private function applyReceiverFilter(): void
@@ -115,11 +114,6 @@ class InFlowService
         if (isset($this->filters['receiver']))
             $this->qb->andWhere('i.receiver = :receiver')
                 ->setParameter('receiver', $this->filters['receiver']);
-    }
-    private function applyUserFilter(): void
-    {
-        $this->qb->andWhere('i.user = :user')
-            ->setParameter('user', $this->security->getToken()->getUser());
     }
 
     private function applyDeviceFilter(): void
