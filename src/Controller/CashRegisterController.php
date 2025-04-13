@@ -14,7 +14,7 @@ use ControleOnline\Service\HydratorService;
 use ControleOnline\Entity\Invoice;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Http\Attribute\Security;
 
 class CashRegisterController extends AbstractController
 {
