@@ -108,7 +108,6 @@ class CashRegisterService
             }
         }
 
-        error_log($query->getSQL());
         return $query->getArrayResult();
     }
 

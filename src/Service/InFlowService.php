@@ -72,7 +72,7 @@ class InFlowService
         if (isset($this->filters['device.device']) && isset($this->filters['receiver'])) {
             $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
-            
+
             if ($device && $people) {
                 $device_config = $this->deviceService->discoveryDeviceConfig(
                     $device,
@@ -107,7 +107,7 @@ class InFlowService
         if (isset($this->filters['device.device']) && isset($this->filters['receiver'])) {
             $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
-            
+
             if ($device && $people) {
                 $device_config = $this->deviceService->discoveryDeviceConfig(
                     $device,
@@ -124,7 +124,6 @@ class InFlowService
             }
         }
 
-        error_log($query->getSQL());
         $results = $query->getArrayResult();
         return $this->getResult($results);
     }
