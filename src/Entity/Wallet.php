@@ -1,73 +1,61 @@
 <?php
+namespace ControleOnline\Entity;
 
-namespace ControleOnline\Entity; 
-use ControleOnline\Listener\LogListener;
-
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Delete;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use ControleOnline\Entity\People;
+use ControleOnline\Entity\WalletPaymentType;
 
+#[ORM\Entity]
 #[ApiResource(
     operations: [
-        new Get(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new GetCollection(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Post(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Put(security: 'is_granted(\'ROLE_CLIENT\')'),
-        new Delete(security: 'is_granted(\'ROLE_CLIENT\')'),
+        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
+        new Get(security: "is_granted('ROLE_CLIENT')"),
+        new Post(security: "is_granted('ROLE_CLIENT')"),
+        new Put(security: "is_granted('ROLE_CLIENT')"),
+        new Delete(security: "is_granted('ROLE_CLIENT')")
     ],
     normalizationContext: ['groups' => ['wallet:read']],
     denormalizationContext: ['groups' => ['wallet:write']]
 )]
-#[ORM\Entity]
+#[ApiFilter(SearchFilter::class, properties: [
+    'id' => 'exact',
+    'people' => 'exact',
+    'wallet' => 'partial'
+])]
 class Wallet
 {
-    /**
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write'])]
     private $id;
 
-    /**
-     * @Groups({"wallet:read", "wallet:write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['people' => 'exact'])]
+    #[ORM\ManyToOne(targetEntity: People::class)]
     #[ORM\JoinColumn(nullable: false)]
-    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
+    #[Groups(['wallet:read', 'wallet:write'])]
     private $people;
 
-    /**
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['wallet' => 'partial'])]
     #[ORM\Column(type: 'string', length: 50)]
+    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write'])]
     private $wallet;
 
-    /**
-     * @Groups({"invoice:read","wallet_payment_type:read","invoice_details:read", "wallet:read", "wallet:write"})
-     */
     #[ORM\Column(type: 'integer')]
+    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write'])]
     private $balance = 0;
 
-    /**
-     * @Groups({"wallet:read"})
-     */
-    #[ORM\OneToMany(targetEntity: \ControleOnline\Entity\WalletPaymentType::class, mappedBy: 'wallet')]
+    #[ORM\OneToMany(targetEntity: WalletPaymentType::class, mappedBy: 'wallet')]
+    #[Groups(['wallet:read'])]
     private $walletPaymentTypes;
 
     public function __construct()

@@ -3,22 +3,14 @@
 namespace ControleOnline\Entity\View;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ControleOnline\Entity\People;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Delete;
-
-
-
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -28,170 +20,113 @@ use ApiPlatform\Metadata\Delete;
     ],
     normalizationContext: ['groups' => ['productsByDay:read']],
 )]
- #[ORM\Table(name: 'vw_products_by_day')]
- #[ORM\Entity]
+#[ORM\Table(name: 'vw_products_by_day')]
+#[ORM\Entity]
 class QtdVehicles
 {
-    /**
-     * @Groups({"productsByDay:read"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\Id]
-    #[ORM\ManyToOne(targetEntity: \ControleOnline\Entity\People::class)]
-    private $provider;
+    #[ORM\ManyToOne(targetEntity: People::class)]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['provider' => 'exact'])]
+    #[Groups(['productsByDay:read'])]
+    private People $provider;
 
-    /**
-     * @Groups({"productsByDay:read"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['app' => 'partial'])]
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 50)]
-    private $app;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['app' => 'partial'])]
+    #[Groups(['productsByDay:read'])]
+    private string $app;
 
-    /**
-     * @Groups({"productsByDay:read"})
-     */
-    #[ApiFilter(DateFilter::class, properties: ['date'])]
     #[ORM\Id]
-    #[ORM\Column(name: 'date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME')]
-    private $date;
+    #[ORM\Column(name: 'date', type: 'datetime', nullable: false)]
+    #[ApiFilter(DateFilter::class, properties: ['date'])]
+    #[Groups(['productsByDay:read'])]
+    private DateTime $date;
 
-     /**
-     * @Groups({"productsByDay:read"})
-     */
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['hour' => 'exact'])]
     #[ORM\Id]
     #[ORM\Column(type: 'string')]
-    private $hour;
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['hour' => 'exact'])]
+    #[Groups(['productsByDay:read'])]
+    private string $hour;
 
-    /**
-     * @Groups({"productsByDay:read"})
-     */
+    #[ORM\Column(type: 'integer')]
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['quantity' => 'exact'])]
+    #[Groups(['productsByDay:read'])]
+    private int $quantity;
+
     #[ORM\Column(type: 'integer')]
-    private $quantity;
-
-
-    /**
-     * @Groups({"productsByDay:read"})
-     */
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['total' => 'exact'])]
-    #[ORM\Column(type: 'integer')]
-    private $total;
-
+    #[Groups(['productsByDay:read'])]
+    private int $total;
 
     public function __construct()
     {
-        $this->date    = new \DateTime('now');
+        $this->date = new DateTime('now');
     }
 
-
-    /**
-     * Get the value of provider
-     */
-    public function getProvider()
+    public function getProvider(): People
     {
         return $this->provider;
     }
 
-    /**
-     * Set the value of provider
-     */
-    public function setProvider($provider): self
+    public function setProvider(People $provider): self
     {
         $this->provider = $provider;
-
         return $this;
     }
 
-    /**
-     * Get the value of app
-     */
-    public function getApp()
+    public function getApp(): string
     {
         return $this->app;
     }
 
-    /**
-     * Set the value of app
-     */
-    public function setApp($app): self
+    public function setApp(string $app): self
     {
         $this->app = $app;
-
         return $this;
     }
 
-    /**
-     * Get the value of date
-     */
-    public function getDate()
+    public function getDate(): DateTime
     {
         return $this->date;
     }
 
-    /**
-     * Set the value of date
-     */
-    public function setDate($date): self
+    public function setDate(DateTime $date): self
     {
         $this->date = $date;
-
         return $this;
     }
 
-    /**
-     * Get the value of hour
-     */
-    public function getHour()
+    public function getHour(): string
     {
         return $this->hour;
     }
 
-    /**
-     * Set the value of hour
-     */
-    public function setHour($hour): self
+    public function setHour(string $hour): self
     {
         $this->hour = $hour;
-
         return $this;
     }
 
-    /**
-     * Get the value of quantity
-     */
-    public function getQuantity()
+    public function getQuantity(): int
     {
         return $this->quantity;
     }
 
-    /**
-     * Set the value of quantity
-     */
-    public function setQuantity($quantity): self
+    public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
-
         return $this;
     }
 
-    /**
-     * Get the value of total
-     */
-    public function getTotal()
+    public function getTotal(): int
     {
         return $this->total;
     }
 
-    /**
-     * Set the value of total
-     */
-    public function setTotal($total): self
+    public function setTotal(int $total): self
     {
         $this->total = $total;
-
         return $this;
     }
 }
