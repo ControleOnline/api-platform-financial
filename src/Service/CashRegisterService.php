@@ -15,52 +15,73 @@ class CashRegisterService
         private ConfigService $configService,
         private InFlowService $inFlowService,
         private DeviceService $deviceService
-
     ) {}
 
     public function generateData(Device $device, People $provider)
     {
         $orderProductRepository = $this->entityManager->getRepository(OrderProduct::class);
 
-        $queryBuilder = $orderProductRepository->createQueryBuilder('op')
+        $subQueryBuilder = $this->entityManager->createQueryBuilder()
+            ->select('DISTINCT op.quantity AS quantity')
+            ->addSelect('op.total AS total')
             ->addSelect('p.product AS product_name')
             ->addSelect('p.description AS product_description')
             ->addSelect('p.sku AS product_sku')
-            ->addSelect('SUM(op.quantity) AS quantity')
             ->addSelect('op.price AS order_product_price')
-            ->addSelect('SUM(op.total) AS order_product_total')
+            ->from(OrderProduct::class, 'op')
             ->join('op.product', 'p')
             ->join('op.order', 'o')
             ->join('o.invoice', 'oi')
             ->join('oi.invoice', 'i')
-            ->andWhere('o.device = :device')
+            ->join('i.device', 'd')
+            ->andWhere('d.id = :device')
             ->andWhere('o.provider = :provider')
-            ->andWhere('p.type IN(:type)')
-            ->groupBy('p.id')
-            ->orderBy('p.product', 'ASC');
+            ->andWhere('i.receiver = :provider')
+            ->andWhere('p.type IN(:type)');
+
+        $deviceConfig = $this->deviceService->discoveryDeviceConfig(
+            $device,
+            $provider
+        )->getConfigs(true);
+
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id'])) {
+            $subQueryBuilder->andWhere('i.id > :minId')
+                ->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
+        }
+
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0) {
+            $subQueryBuilder->andWhere('i.id <= :maxId')
+                ->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
+        }
+
+        $queryBuilder = $this->entityManager->createQueryBuilder()
+            ->select('sub.product_name')
+            ->addSelect('sub.product_description')
+            ->addSelect('sub.product_sku')
+            ->addSelect('SUM(sub.quantity) AS quantity')
+            ->addSelect('MIN(sub.order_product_price) AS order_product_price')
+            ->addSelect('SUM(sub.total) AS order_product_total')
+            ->from('(' . $subQueryBuilder->getQuery()->getDQL() . ')', 'sub')
+            ->groupBy('sub.product_name')
+            ->addGroupBy('sub.product_description')
+            ->addGroupBy('sub.product_sku')
+            ->orderBy('sub.product_name', 'ASC');
 
         $queryBuilder
             ->setParameter('type', ['product', 'custom', 'manufactured'])
             ->setParameter('device', $device->getId())
             ->setParameter('provider', $provider->getId());
 
-        $deviceConfig =  $this->deviceService->discoveryDeviceConfig(
-            $device,
-            $provider
-        )->getConfigs(true);
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id'])) {
+            $queryBuilder->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
+        }
+        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0) {
+            $queryBuilder->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
+        }
 
-
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $queryBuilder->andWhere('i.id > :minId')
-                ->setParameter('minId',  $deviceConfig['cash-wallet-open-id']);
-
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
-            $queryBuilder->andWhere('i.id <= :maxId')
-                ->setParameter('maxId',  $deviceConfig['cash-wallet-closed-id']);
         error_log($queryBuilder->getQuery()->getSQL());
         return $queryBuilder->getQuery()->getArrayResult();
     }
-
 
     public function generatePrintData(Device $device, $provider, string $printType, string $deviceType)
     {
