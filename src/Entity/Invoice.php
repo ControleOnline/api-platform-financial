@@ -53,9 +53,7 @@ use stdClass;
             uriTemplate: '/paylist',
             security: 'is_granted(\'PUBLIC_ACCESS\')',
             controller: PaylistController::class,
-            openapiContext: [
-                'summary' => 'Retrieve invoices based on document and company.',
-            ],
+            description: 'Retrieve invoices based on document and company.'
         ),
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
