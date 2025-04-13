@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use ControleOnline\Service\HydratorService;
 use ControleOnline\Entity\Invoice;
@@ -24,10 +24,8 @@ class CashRegisterController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    /**
-     * @Route("/cash-register", name="cash_register", methods={"GET"})
-     * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
-     */
+    #[Route('/cash-register', name: 'cash_register', methods: ['GET'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getCashRegister(Request $request): JsonResponse
     {
         $deviceId = $request->query->get('device');
@@ -42,10 +40,8 @@ class CashRegisterController extends AbstractController
         return new JsonResponse($data);
     }
 
-    /**
-     * @Route("/cash-register/print", name="print_cash_register", methods={"POST"})
-     * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
-     */
+    #[Route('/cash-register/print', name: 'print_cash_register', methods: ['POST'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function printCashRegister(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -61,10 +57,8 @@ class CashRegisterController extends AbstractController
         return new JsonResponse($printData);
     }
 
-    /**
-     * @Route("/income_statements", name="invoice_inflow", methods={"POST"})
-     * @Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")
-     */
+    #[Route('/income_statements', name: 'invoice_inflow', methods: ['POST'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getIncomeStatements(Request $request): Response
     {
         try {
