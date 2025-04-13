@@ -29,6 +29,7 @@ class InFlowService
 
         $this->createBaseQuery();
         $results = $this->qb->getQuery()->getResult();
+        error_log($this->qb->getQuery()->getSQL());
         return $this->getResult($results);
     }
 
