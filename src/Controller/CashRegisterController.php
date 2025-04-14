@@ -57,7 +57,7 @@ class CashRegisterController extends AbstractController
         return new JsonResponse($printData);
     }
 
-    #[Route('/income_statements', name: 'invoice_inflow', methods: ['POST'])]
+    #[Route('/income_statements', name: 'invoice_inflow', methods: ['GET'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getIncomeStatements(Request $request): Response
     {

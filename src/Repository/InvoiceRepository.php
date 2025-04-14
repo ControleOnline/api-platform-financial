@@ -43,7 +43,7 @@ class InvoiceRepository extends ServiceEntityRepository
                     UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12
                 ) AS months
             LEFT JOIN vw_invoice_monthly_report AS report ON months.month = report.month
-                AND report.payer_id != report.receiver_id
+                AND (report.payer_id != report.receiver_id OR report.payer_id IS NULL OR report.receiver_id IS NULL)
                 AND report.year = :year 
                 AND (report.payer_id = :people_id OR report.receiver_id = :people_id)
                 ";
