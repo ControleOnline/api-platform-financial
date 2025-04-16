@@ -36,7 +36,7 @@ class InFlowService
         $rsm->addScalarResult('paymentType', 'paymentType');
 
         $sql = '
-            SELECT 
+            SELECT
                 SUM(sub.price) AS totalPrice,
                 sub.dwallet_id AS dwalletId,
                 sub.dwallet AS dwallet,
@@ -44,21 +44,32 @@ class InFlowService
                 sub.owallet AS owallet,
                 sub.payment_type_id AS paymentTypeId,
                 sub.payment_type AS paymentType
-            FROM (
-                SELECT DISTINCT
-                    i.id,
-                    i.price,
-                    dw.id AS dwallet_id,
-                    dw.wallet AS dwallet,
-                    ow.id AS owallet_id,
-                    ow.wallet AS owallet,
-                    pt.id AS payment_type_id,
-                    pt.payment_type AS payment_type
-                FROM invoice i
-                INNER JOIN wallet dw ON i.destination_wallet_id = dw.id
-                INNER JOIN payment_type pt ON i.payment_type_id = pt.id
-                LEFT JOIN wallet ow ON i.source_wallet_id = ow.id
-                WHERE 1=1
+            FROM
+                (
+                    SELECT
+                        i.id AS invoice_id,
+                        i.price,
+                        dw.id AS dwallet_id,
+                        dw.wallet AS dwallet,
+                        ow.id AS owallet_id,
+                        ow.wallet AS owallet,
+                        pt.id AS payment_type_id,
+                        pt.payment_type AS payment_type
+                    FROM
+                        invoice i
+                    JOIN order_invoice oi ON oi.invoice_id = i.id
+                    JOIN orders o ON o.id = oi.order_id
+                    JOIN device d ON d.id = i.device_id
+                    LEFT JOIN wallet dw ON i.destination_wallet_id = dw.id
+                    LEFT JOIN payment_type pt ON i.payment_type_id = pt.id
+                    LEFT JOIN wallet ow ON i.source_wallet_id = ow.id
+                    WHERE
+                        1 = 1
+                ) sub
+            GROUP BY
+                sub.dwallet_id,
+                sub.payment_type_id,
+                sub.owallet_id
         ';
 
         if (isset($this->filters['receiver'])) {
@@ -73,26 +84,21 @@ class InFlowService
             $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
             $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
 
-            if ($device && $people) {
+            $device_config = null;
+            if ($device && $people)
                 $device_config = $this->deviceService->discoveryDeviceConfig(
                     $device,
                     $people
                 )->getConfigs(true);
 
-                if ($device_config && isset($device_config['cash-wallet-open-id'])) {
-                    $sql .= ' AND i.id > :idGt';
-                }
+            if ($device_config && isset($device_config['cash-wallet-open-id'])) {
+                $sql .= ' AND i.id > :idGt';
+            }
 
-                if ($device_config && isset($device_config['cash-wallet-closed-id']) && $device_config['cash-wallet-closed-id'] > 0) {
-                    $sql .= ' AND i.id <= :idLt';
-                }
+            if ($device_config && isset($device_config['cash-wallet-closed-id']) && $device_config['cash-wallet-closed-id'] > 0) {
+                $sql .= ' AND i.id <= :idLt';
             }
         }
-
-        $sql .= '
-            ) sub
-            GROUP BY sub.dwallet_id, sub.payment_type_id, sub.owallet_id
-        ';
 
         $query = $this->entityManager->createNativeQuery($sql, $rsm);
 
@@ -105,22 +111,12 @@ class InFlowService
         }
 
         if (isset($this->filters['device.device']) && isset($this->filters['receiver'])) {
-            $device = $this->entityManager->getRepository(Device::class)->findOneBy(['device' => $this->filters['device.device']]);
-            $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
+            if ($device_config && isset($device_config['cash-wallet-open-id'])) {
+                $query->setParameter('idGt', $device_config['cash-wallet-open-id']);
+            }
 
-            if ($device && $people) {
-                $device_config = $this->deviceService->discoveryDeviceConfig(
-                    $device,
-                    $people
-                )->getConfigs(true);
-
-                if ($device_config && isset($device_config['cash-wallet-open-id'])) {
-                    $query->setParameter('idGt', $device_config['cash-wallet-open-id']);
-                }
-
-                if ($device_config && isset($device_config['cash-wallet-closed-id']) && $device_config['cash-wallet-closed-id'] > 0) {
-                    $query->setParameter('idLt', $device_config['cash-wallet-closed-id']);
-                }
+            if ($device_config && isset($device_config['cash-wallet-closed-id']) && $device_config['cash-wallet-closed-id'] > 0) {
+                $query->setParameter('idLt', $device_config['cash-wallet-closed-id']);
             }
         }
 
