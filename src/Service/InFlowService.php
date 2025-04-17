@@ -111,6 +111,10 @@ class InFlowService
             $query->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
 
         $results = $query->getArrayResult();
+
+        error_log($sql);
+        error_log(json_encode($deviceConfig));
+
         return $this->formatResult($results);
     }
 
