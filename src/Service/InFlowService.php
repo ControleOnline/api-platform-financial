@@ -105,11 +105,11 @@ class InFlowService
 
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $query->setParameter('idGt', $deviceConfig['cash-wallet-open-id']);
+            $query->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
 
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
-            $query->setParameter('idLt', $deviceConfig['cash-wallet-closed-id']);
+            $query->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
 
         $results = $query->getArrayResult();
         return $this->formatResult($results);
