@@ -37,7 +37,7 @@ class InFlowService
         1 = 1 
         AND i.receiver_id = :provider
         AND d.id = :device ';
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
+        if ($deviceConfig && !empty($deviceConfig['cash-wallet-open-id']) && $deviceConfig['cash-wallet-open-id'] > 0)
             $sql .= 'AND i.id > :minId ';
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
             $sql .= ' AND i.id <= :maxId ';
@@ -103,10 +103,8 @@ class InFlowService
         if (isset($this->filters['device.device']))
             $query->setParameter('device', $this->filters['device.device']);
 
-
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
+        if ($deviceConfig && !empty($deviceConfig['cash-wallet-open-id']) && $deviceConfig['cash-wallet-open-id'] > 0)
             $query->setParameter('minId', $deviceConfig['cash-wallet-open-id']);
-
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
             $query->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
