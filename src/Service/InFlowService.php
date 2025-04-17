@@ -69,7 +69,7 @@ class InFlowService
 
         $sql = '
             SELECT
-                SUM(sub.price) AS totalPrice,
+                SUM(i.price) AS totalPrice,
                 dw.id AS dwalletId,
                 dw.wallet AS dwallet,
                 ow.id AS owalletId,
