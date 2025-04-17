@@ -42,23 +42,8 @@ class CashRegisterService
             FROM order_product op 
             INNER JOIN product p ON op.product_id = p.id
             WHERE op.order_id IN
-            (
-                SELECT DISTINCT 
-                    o.id AS order_id
-                FROM
-                    invoice i
-                JOIN order_invoice oi ON oi.invoice_id = i.id
-                JOIN orders o ON o.id = oi.order_id
-                JOIN device d ON d.id = i.device_id
-                WHERE
-                    1 = 1 
-                    AND i.receiver_id = :provider
-                    AND d.id = :device ';
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']))
-            $sql .= 'AND i.id > :minId ';
-        if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
-            $sql .= ' AND i.id <= :maxId ';
-
+            (';
+        $sql .= $this->inFlowService->getSubquery($deviceConfig);
         $sql .= ') AND p.type IN (:type)
             GROUP BY p.id, p.product, p.description, p.sku
             ORDER BY p.product ASC
