@@ -24,7 +24,7 @@ class InFlowService
     ) {}
 
 
-    public function getSubquery(?DeviceConfig $deviceConfig)
+    public function getSubquery($deviceConfig)
     {
         $sql = 'SELECT DISTINCT 
         o.id AS order_id
