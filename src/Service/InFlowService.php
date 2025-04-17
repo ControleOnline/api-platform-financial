@@ -70,16 +70,16 @@ class InFlowService
         $sql = '
             SELECT
                 SUM(sub.price) AS totalPrice,
-                dw.id AS dwallet_id,
+                dw.id AS dwalletId,
                 dw.wallet AS dwallet,
-                ow.id AS owallet_id,
+                ow.id AS owalletId,
                 ow.wallet AS owallet,
-                pt.id AS payment_type_id,
+                pt.id AS paymentTypeId,
                 pt.payment_type AS paymentType
             FROM
                 (';
         $sql .= $this->getSubquery($deviceConfig);
-        $sql .=    ') sub
+        $sql .= ') sub
             JOIN invoice i ON i.id = sub.invoice_id
             JOIN wallet dw ON i.destination_wallet_id = dw.id
             JOIN payment_type pt ON i.payment_type_id = pt.id
@@ -112,10 +112,10 @@ class InFlowService
             $query->setParameter('idLt', $deviceConfig['cash-wallet-closed-id']);
 
         $results = $query->getArrayResult();
-        return $this->getResult($results);
+        return $this->formatResult($results);
     }
 
-    private function getResult($results): array
+    private function formatResult($results): array
     {
         $data = [];
         foreach ($results as $row) {
