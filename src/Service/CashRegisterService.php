@@ -52,7 +52,7 @@ class CashRegisterService
         $query = $this->entityManager->createNativeQuery($sql, $rsm);
         $query
             ->setParameter('type', ['product', 'custom', 'manufactured'])
-            ->setParameter('device', $device->getId())
+            ->setParameter('device', $device->getDevice())
             ->setParameter('provider', $provider->getId());
 
         if ($deviceConfig && isset($deviceConfig['cash-wallet-open-id']) && $deviceConfig['cash-wallet-open-id'] > 0)
@@ -64,7 +64,7 @@ class CashRegisterService
 
         error_log($sql);
         error_log(json_encode($deviceConfig));
-        
+
         return $query->getArrayResult();
     }
 

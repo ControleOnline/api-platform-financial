@@ -36,7 +36,7 @@ class InFlowService
     WHERE
         1 = 1 
         AND i.receiver_id = :provider
-        AND d.id = :device ';
+        AND d.device = :device ';
         if ($deviceConfig && !empty($deviceConfig['cash-wallet-open-id']) && $deviceConfig['cash-wallet-open-id'] > 0)
             $sql .= 'AND i.id > :minId ';
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
