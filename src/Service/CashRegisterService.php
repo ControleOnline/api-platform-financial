@@ -61,10 +61,6 @@ class CashRegisterService
         if ($deviceConfig && isset($deviceConfig['cash-wallet-closed-id']) && $deviceConfig['cash-wallet-closed-id'] > 0)
             $query->setParameter('maxId', $deviceConfig['cash-wallet-closed-id']);
 
-
-        error_log($sql);
-        error_log(json_encode($deviceConfig));
-
         return $query->getArrayResult();
     }
 

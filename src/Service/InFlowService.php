@@ -112,9 +112,6 @@ class InFlowService
 
         $results = $query->getArrayResult();
 
-        error_log($sql);
-        error_log(json_encode($deviceConfig));
-
         return $this->formatResult($results);
     }
 
