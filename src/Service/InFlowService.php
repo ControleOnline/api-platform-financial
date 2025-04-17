@@ -80,7 +80,8 @@ class InFlowService
                 (';
         $sql .= $this->getSubquery($deviceConfig);
         $sql .= ') sub
-            JOIN invoice i ON i.id = sub.invoice_id
+            JOIN order_invoice oi ON oi.order_id = sub.id
+            JOIN invoice i ON i.id = oi.invoice_id
             JOIN wallet dw ON i.destination_wallet_id = dw.id
             JOIN payment_type pt ON i.payment_type_id = pt.id
             LEFT JOIN wallet ow ON i.source_wallet_id = ow.id
