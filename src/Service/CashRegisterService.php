@@ -5,6 +5,7 @@ namespace ControleOnline\Service;
 use ControleOnline\Entity\Device;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
+use ControleOnline\Entity\Spool;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 
@@ -64,7 +65,7 @@ class CashRegisterService
         return $query->getArrayResult();
     }
 
-    public function generatePrintData(Device $device, $provider, string $printType, string $deviceType)
+    public function generatePrintData(Device $device, People $provider):Spool
     {
         $products = $this->generateData($device, $provider);
 
@@ -130,6 +131,6 @@ class CashRegisterService
         );
         $this->printService->addLine("", "", "-");
 
-        return $this->printService->generatePrintData($printType, $deviceType);
+        return $this->printService->generatePrintData($device);
     }
 }

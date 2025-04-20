@@ -8,7 +8,7 @@ use ControleOnline\Entity\OrderInvoice;
 use ControleOnline\Entity\PaymentType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
- AS Security;
+as Security;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\Status;
@@ -26,7 +26,8 @@ class InvoiceService
         private Security $security,
         private PeopleService $peopleService,
         private RequestStack $requestStack,
-        private BraspagService $braspagService
+        private BraspagService $braspagService,
+        private StatusService $statusService
 
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
@@ -42,10 +43,12 @@ class InvoiceService
 
         $paymentType = $this->manager->getRepository(PaymentType::class)->find(1);
 
-        $status = $this->manager->getRepository(Status::class)->findOneBy([
-            'status' => 'waiting payment',
-            'context' => 'invoice'
-        ]);
+        $status = $this->statusService->discoveryStatus(
+            'open',
+            'waiting payment',
+            'invoice'
+        );
+
         $invoice = new Invoice();
         $invoice->setPayer($order->getPayer());
         $invoice->setReceiver($order->getProvider());
@@ -95,7 +98,7 @@ class InvoiceService
             $destination_wallet->setBalance($destination_wallet->getBalance() + $invoice->getPrice());
             $this->manager->persist($destination_wallet);
         }
-        
+
         if ($souce_wallet) {
             $souce_wallet->setBalance($souce_wallet->getBalance() - $invoice->getPrice());
             $this->manager->persist($souce_wallet);
@@ -118,10 +121,12 @@ class InvoiceService
 
         if ($paidValue >= $order->getPrice()) {
 
-            $status = $this->manager->getRepository(Status::class)->findOneBy([
-                'context' => 'order',
-                'status' => 'paid'
-            ]);
+            $status = $this->statusService->discoveryStatus(
+                'closed',
+                'paid',
+                'order'
+            );
+
 
             $order->setStatus($status);
             $this->manager->persist($order);

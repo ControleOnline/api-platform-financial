@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use ControleOnline\Service\HydratorService;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Spool;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\Security;
@@ -28,33 +29,39 @@ class CashRegisterController extends AbstractController
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getCashRegister(Request $request): JsonResponse
     {
-        $deviceId = $request->query->get('device');
-        $providerId = $request->query->get('provider');
+        try {
+            $deviceId = $request->query->get('device');
+            $providerId = $request->query->get('provider');
 
-        $provider = $this->manager->getRepository(People::class)->find($providerId);
-        $device = $this->manager->getRepository(Device::class)->findOneBy([
-            'device' =>  $deviceId,
-        ]);
-        $data = $this->cashRegister->generateData($device, $provider);
+            $provider = $this->manager->getRepository(People::class)->find($providerId);
+            $device = $this->manager->getRepository(Device::class)->findOneBy([
+                'device' =>  $deviceId,
+            ]);
+            $data = $this->cashRegister->generateData($device, $provider);
 
-        return new JsonResponse($data);
+            return new JsonResponse($data);
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
+        }
     }
 
     #[Route('/cash-register/print', name: 'print_cash_register', methods: ['POST'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function printCashRegister(Request $request): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $printType = $data['print-type'];
-        $deviceType = $data['device-type'];
-        $company = $this->manager->getRepository(People::class)->find($data['people']);
-        $device = $this->manager->getRepository(Device::class)->findOneBy([
-            'device' => $data['device']
-        ]);
+        try {
 
-        $printData = $this->cashRegister->generatePrintData($device, $company, $printType, $deviceType);
+            $data = json_decode($request->getContent(), true);
+            $company = $this->manager->getRepository(People::class)->find($data['people']);
+            $device = $this->manager->getRepository(Device::class)->findOneBy([
+                'device' => $data['device']
+            ]);
 
-        return new JsonResponse($printData);
+            $printData = $this->cashRegister->generatePrintData($device, $company);
+            return new JsonResponse($this->hydratorService->item(Spool::class, $printData->getId(), "spool_item:read"), Response::HTTP_OK);
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
+        }
     }
 
     #[Route('/income_statements', name: 'invoice_inflow', methods: ['GET'])]

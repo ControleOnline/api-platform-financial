@@ -12,20 +12,16 @@ use ControleOnline\Entity\Status;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Order;
 use App\Library\Itau\ItauClient;
+use ControleOnline\Service\StatusService;
 
 class GetBankItauDataAction
 {
-    /**
-     * Entity Manager
-     *
-     * @var EntityManagerInterface
-     */
-    private $manager = null;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->manager = $entityManager;
-    }
+
+    public function __construct(
+        private EntityManagerInterface $manager,
+        private StatusService $statusService
+    ) {}
 
     public function __invoke(Invoice $data, Request $request, string $operation): JsonResponse
     {
@@ -142,10 +138,12 @@ class GetBankItauDataAction
 
         // mark order as paid
         if ($payment->isPromissePaid()) {
-            $status = $this->manager->getRepository(Status::class)
-                ->findOneBy([
-                    'status' => 'waiting retrieve'
-                ]);
+
+            $status = $this->statusService->discoveryStatus(
+                'open',
+                'waiting retrieve',
+                'invoice'
+            );
 
             foreach ($invoice->getOrder() as $orders) {
                 $o = $orders->getOrder();
@@ -161,10 +159,12 @@ class GetBankItauDataAction
         // mark invoice as paid
 
         if ($payment->isPaid()) {
-            $status = $this->manager->getRepository(Status::class)
-                ->findOneBy([
-                    'status' => 'paid'
-                ]);
+            $status = $this->statusService->discoveryStatus(
+                'closed',
+                'paid',
+                'invoice'
+            );
+
             $invoice->setStatus($status);
 
             $this->manager->persist($invoice);
