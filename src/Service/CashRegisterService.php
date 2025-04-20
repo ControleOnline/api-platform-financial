@@ -131,6 +131,6 @@ class CashRegisterService
         );
         $this->printService->addLine("", "", "-");
 
-        return $this->printService->generatePrintData($device);
+        return $this->printService->generatePrintData($device,$provider);
     }
 }
