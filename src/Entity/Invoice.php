@@ -17,8 +17,6 @@ use ApiPlatform\Metadata\Put;
 use ControleOnline\Controller\GetBankInterDataAction;
 use ControleOnline\Controller\GetBankItauDataAction;
 use ControleOnline\Controller\PaylistController;
-use ControleOnline\Controller\PixController;
-use ControleOnline\Controller\BitcoinController;
 use ControleOnline\Controller\SplitInvoiceAction;
 use ControleOnline\DataProvider\InvoiceDataProvider;
 use ControleOnline\Listener\LogListener;
@@ -58,16 +56,7 @@ use stdClass;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-        new Post(
-            security: 'is_granted(\'PUBLIC_ACCESS\')',
-            uriTemplate: '/pix',
-            controller: PixController::class,
-        ),
-        new Post(
-            security: 'is_granted(\'PUBLIC_ACCESS\')',
-            uriTemplate: '/bitcoin',
-            controller: BitcoinController::class,
-        ),
+     
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             validationContext: ['groups' => ['invoice:write']],
