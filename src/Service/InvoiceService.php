@@ -122,7 +122,7 @@ class InvoiceService
         if ($paidValue >= $order->getPrice()) {
 
             $status = $this->statusService->discoveryStatus(
-                'closed',
+                'open',
                 'paid',
                 'order'
             );
