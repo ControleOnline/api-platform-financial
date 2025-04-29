@@ -9,17 +9,20 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use ControleOnline\Service\BraspagService;
 use Braspag\Split\Exception\BraspagSplitException;
-use Psr\Log\LoggerInterface;
+use ControleOnline\Service\LoggerService;
 
 
 class SplitInvoiceAction
 {
+    protected static $logger;
 
-
-    public function __construct(private EntityManagerInterface $manager, private BraspagService $braspag, private  LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerService $loggerService,
+        private EntityManagerInterface $manager,
+        private BraspagService $braspag,
+    ) {
+        self::$logger = $loggerService->getLogger('braspag');
     }
-
 
     /**
      * @param Invoice $data
