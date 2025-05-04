@@ -6,6 +6,7 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderInvoice;
 use ControleOnline\Entity\PaymentType;
+use ControleOnline\Entity\People;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
 as Security;
@@ -13,6 +14,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\Wallet;
+use DateTime;
 use Exception;
 
 use function PHPUnit\Framework\throwException;
@@ -33,27 +35,40 @@ class InvoiceService
         $this->request = $this->requestStack->getCurrentRequest();
     }
 
-
-    public function createInvoice(Order $order, $price, $dueDate, Wallet $source_wallet = null, Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null)
+    public function setPayed(Invoice $invoice)
     {
+        $status = $this->statusService->discoveryStatus(
+            'closed',
+            'paid',
+            'invoice'
+        );
+        $invoice->setStatus($status);
+        $this->manager->persist($invoice);
+        $this->manager->flush();
+        return $invoice;
+    }
 
-        if (!$source_wallet && !$destination_wallet)
-            throw new Exception("Need a source or destination Wallet", 301);
-
+    public function createInvoice(
+        ?Order $order = null,
+        ?People $payer = null,
+        People $receiver,
+        $price,
+        Status $status,
+        DateTime $dueDate,
+        ?Wallet $source_wallet = null,
+        ?Wallet $destination_wallet = null,
+        $portion = 1,
+        $installments = 1,
+        $installment_id =  null
+    ): Invoice {
 
         $paymentType = $this->manager->getRepository(PaymentType::class)->find(1);
 
-        $status = $this->statusService->discoveryStatus(
-            'open',
-            'waiting payment',
-            'invoice'
-        );
-
         $invoice = new Invoice();
-        $invoice->setPayer($order->getPayer());
-        $invoice->setReceiver($order->getProvider());
+        $invoice->setPayer($payer);
+        $invoice->setReceiver($receiver);
         $invoice->setPrice($price);
-        $invoice->setDueDate(new \DateTime($dueDate));
+        $invoice->setDueDate($dueDate);
         $invoice->setSourceWallet($source_wallet);
         $invoice->setDestinationWallet($destination_wallet);
         $invoice->setPortion($portion);
@@ -62,11 +77,26 @@ class InvoiceService
         $invoice->setStatus($status);
         $invoice->setPaymentType($paymentType);
         $this->manager->persist($invoice);
-        $this->createOrderInvoice($order, $invoice, $price);
+        if ($order)
+            $this->createOrderInvoice($order, $invoice, $price);
         $this->manager->flush();
         return $invoice;
     }
-    public function createOrderInvoice(Order $order, Invoice $invoice, $price = 0)
+
+    public function createInvoiceByOrder(Order $order, $price,?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null): Invoice
+    {
+
+        if (!$source_wallet && !$destination_wallet)
+            throw new Exception("Need a source or destination Wallet", 301);
+        $status = $this->statusService->discoveryStatus(
+            'open',
+            'waiting payment',
+            'invoice'
+        );
+        return $this->createInvoice($order, $order->getPayer() ?: $order->getClient(), $order->getProvider(), $price, $status, $dueDate,  $source_wallet, $destination_wallet, $portion, $installments, $installment_id);
+    }
+
+    protected function createOrderInvoice(Order $order, Invoice $invoice, $price = 0): OrderInvoice
     {
         $orderInvoice = new OrderInvoice();
         $orderInvoice->setOrder($order);
@@ -81,7 +111,8 @@ class InvoiceService
 
     public function postPersist(Invoice $invoice)
     {
-        $payload   = json_decode($this->request->getContent());
+        if (!$this->request) return;
+        $payload = json_decode($this->request->getContent());
         if (isset($payload->order)) {
             $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
             $this->createOrderInvoice($order, $invoice,  $order->getPrice());
