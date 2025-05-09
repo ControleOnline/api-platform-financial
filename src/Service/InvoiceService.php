@@ -29,7 +29,8 @@ class InvoiceService
         private PeopleService $peopleService,
         private RequestStack $requestStack,
         private BraspagService $braspagService,
-        private StatusService $statusService
+        private StatusService $statusService,
+        private OrderPrintService $orderPrintService
 
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
@@ -83,7 +84,7 @@ class InvoiceService
         return $invoice;
     }
 
-    public function createInvoiceByOrder(Order $order, $price,?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null): Invoice
+    public function createInvoiceByOrder(Order $order, $price, ?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null): Invoice
     {
 
         if (!$source_wallet && !$destination_wallet)
@@ -160,6 +161,8 @@ class InvoiceService
 
 
             $order->setStatus($status);
+            $this->orderPrintService->printOrder($order);
+
             $this->manager->persist($order);
             $this->manager->flush();
         }
