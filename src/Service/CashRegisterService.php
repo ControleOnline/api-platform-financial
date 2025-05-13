@@ -3,6 +3,7 @@
 namespace ControleOnline\Service;
 
 use ControleOnline\Entity\Device;
+use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
@@ -16,8 +17,59 @@ class CashRegisterService
         private PrintService $printService,
         private ConfigService $configService,
         private InFlowService $inFlowService,
-        private DeviceService $deviceService
+        private DeviceService $deviceService,
+        private IntegrationService $integrationService
     ) {}
+
+    public function close(Device $device, People $provider)
+    {
+        $lastInvoice = $this->entityManager->getRepository(Invoice::class)->findOneBy(
+            [
+                'receiver' => $provider,
+                'device' => $device
+            ],
+            ['id' => 'DESC']
+        );
+
+        $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
+        $this->deviceService->addDeviceConfigs($provider, [
+            'cash-wallet-closed-id' => $lastInvoice->getId(),
+        ], $device->getDevice());
+
+        $filters = [
+            'device.device' => $device->getDevice(),
+            'receiver' => $provider->getId()
+        ];
+        $paymentData = $this->inFlowService->getPayments($filters);
+
+        foreach ($numbers as $number) {
+            $message = json_encode([
+                "action" => "sendMessage",
+                "origin" => "551131360353",
+                "message" => [
+                    "number" => $number,
+                    "message" => [$this->generateData($device, $provider), $paymentData]
+
+                ]
+            ]);
+            $this->integrationService->addIntegration($message, 'WhatsApp', $device, null, $provider);
+        }
+    }
+
+    public function open(Device $device, People $provider)
+    {
+        $lastInvoice = $this->entityManager->getRepository(Invoice::class)->findOneBy([
+            'receiver' => $provider,
+            'device' => $device
+        ]);
+
+        $this->deviceService->addDeviceConfigs($provider, [
+            'cash-wallet-open-id' => $lastInvoice->getId(),
+            'cash-wallet-closed-id' => 0,
+        ], $device->getDevice());
+    }
+
+
 
     public function generateData(Device $device, People $provider)
     {
@@ -65,7 +117,7 @@ class CashRegisterService
         return $query->getArrayResult();
     }
 
-    public function generatePrintData(Device $device, People $provider):Spool
+    public function generatePrintData(Device $device, People $provider): Spool
     {
         $products = $this->generateData($device, $provider);
 
@@ -131,6 +183,6 @@ class CashRegisterService
         );
         $this->printService->addLine("", "", "-");
 
-        return $this->printService->generatePrintData($device,$provider);
+        return $this->printService->generatePrintData($device, $provider);
     }
 }

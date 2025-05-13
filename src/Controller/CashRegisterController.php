@@ -25,6 +25,49 @@ class CashRegisterController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
+
+    #[Route('/close-cash-register', name: 'close-cash_register', methods: ['POST'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    public function closeCashRegister(Request $request): JsonResponse
+    {
+        try {
+            $deviceId = $request->query->get('device');
+            $providerId = $request->query->get('provider');
+
+            $provider = $this->manager->getRepository(People::class)->find($providerId);
+            $device = $this->manager->getRepository(Device::class)->findOneBy([
+                'device' =>  $deviceId,
+            ]);
+            $data = $this->cashRegister->close($device, $provider);
+
+            return new JsonResponse($data);
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
+        }
+    }
+    #[Route('/open-cash-register', name: 'open-cash_register', methods: ['POST'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    public function openCashRegister(Request $request): JsonResponse
+    {
+        try {
+            $deviceId = $request->query->get('device');
+            $providerId = $request->query->get('provider');
+
+            $provider = $this->manager->getRepository(People::class)->find($providerId);
+            $device = $this->manager->getRepository(Device::class)->findOneBy([
+                'device' =>  $deviceId,
+            ]);
+            $data = $this->cashRegister->open($device, $provider);
+
+            return new JsonResponse($data);
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
+        }
+    }
+
+
+
+
     #[Route('/cash-register', name: 'cash_register', methods: ['GET'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getCashRegister(Request $request): JsonResponse
