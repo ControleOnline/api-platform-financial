@@ -9,6 +9,7 @@ use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\DBAL\Types\Types;
 
 class CashRegisterService
 {
@@ -120,9 +121,9 @@ class CashRegisterService
         $rsm->addScalarResult('product_name', 'product_name');
         $rsm->addScalarResult('product_description', 'product_description');
         $rsm->addScalarResult('product_sku', 'product_sku');
-        $rsm->addScalarResult('quantity', 'quantity');
-        $rsm->addScalarResult('order_product_price', 'order_product_price');
-        $rsm->addScalarResult('order_product_total', 'order_product_total');
+        $rsm->addScalarResult('quantity', 'quantity', Types::FLOAT);
+        $rsm->addScalarResult('order_product_price', 'order_product_price', Types::FLOAT);
+        $rsm->addScalarResult('order_product_total', 'order_product_total', Types::FLOAT);
 
         $sql = '
             SELECT 
