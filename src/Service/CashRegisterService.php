@@ -39,7 +39,7 @@ class CashRegisterService
         $this->notify($device,  $provider);
     }
 
-    private function notify(Device $device, People $provider)
+    public function notify(Device $device, People $provider)
     {
         $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
 

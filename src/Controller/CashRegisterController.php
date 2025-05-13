@@ -100,6 +100,10 @@ class CashRegisterController extends AbstractController
                 'device' => $data['device']
             ]);
 
+            /**
+             * @todo Remover quando atualizar o cliente
+             */
+            $this->cashRegister->notify($device, $company);
             $printData = $this->cashRegister->generatePrintData($device, $company);
             return new JsonResponse($this->hydratorService->item(Spool::class, $printData->getId(), "spool_item:read"), Response::HTTP_OK);
         } catch (Exception $e) {
