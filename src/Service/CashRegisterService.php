@@ -32,10 +32,16 @@ class CashRegisterService
             ['id' => 'DESC']
         );
 
-        $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
         $this->deviceService->addDeviceConfigs($provider, [
             'cash-wallet-closed-id' => $lastInvoice->getId(),
         ], $device->getDevice());
+
+        $this->notify($device,  $provider);
+    }
+
+    private function notify(Device $device, People $provider)
+    {
+        $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
 
         $filters = [
             'device.device' => $device->getDevice(),
