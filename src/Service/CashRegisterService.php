@@ -48,13 +48,53 @@ class CashRegisterService
                 "origin" => "551131360353",
                 "message" => [
                     "number" => $number,
-                    "message" => [$this->generateData($device, $provider), $paymentData]
-
+                    "message" => $this->generateFormattedMessage($this->generateData($device, $provider), $paymentData)
                 ]
             ]);
             $this->integrationService->addIntegration($message, 'WhatsApp', $device, null, $provider);
         }
     }
+
+    public function generateFormattedMessage(array $products, array $paymentData): string
+    {
+        $message = "*📦 FECHAMENTO DE CAIXA*\n";
+        $message .= date('d/m/Y H:i') . "\n\n";
+
+        $totalGeral = 0;
+        $message .= "*Produtos vendidos:*\n";
+
+        foreach ($products as $product) {
+            $nome = $product['product_name'];
+            $desc = $product['product_description'];
+            $qtd = $product['quantity'];
+            $total = number_format($product['order_product_total'], 2, ',', '.');
+            $message .= "- {$qtd}x {$nome}" . ($desc ? " ({$desc})" : "") . ": R$ {$total}\n";
+            $totalGeral += $product['order_product_total'];
+        }
+
+        $message .= "\n*Total em produtos:* R$ " . number_format($totalGeral, 2, ',', '.') . "\n\n";
+
+        $message .= "*Pagamentos:*\n";
+        $pagamentoTotal = 0;
+
+        foreach ($paymentData['wallet'] as $wallet) {
+            $message .= strtoupper($wallet['wallet']) . ":\n";
+
+            foreach ($wallet['payment'] as $payment) {
+                $tipo = $payment['payment'];
+                $valor = number_format($payment['inflow'], 2, ',', '.');
+                $message .= "- {$tipo}: R$ {$valor}\n";
+                $pagamentoTotal += $payment['inflow'];
+            }
+
+            $message .= "Subtotal: R$ " . number_format($wallet['total'], 2, ',', '.') . "\n\n";
+        }
+
+        $message .= "*Total recebido:* R$ " . number_format($pagamentoTotal, 2, ',', '.');
+
+        return $message;
+    }
+
 
     public function open(Device $device, People $provider)
     {
