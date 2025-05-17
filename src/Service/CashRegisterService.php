@@ -53,10 +53,8 @@ class CashRegisterService
             $message = json_encode([
                 "action" => "sendMessage",
                 "origin" => "551131360353",
-                "message" => [
-                    "number" => $number,
-                    "message" => $this->generateFormattedMessage($this->generateData($device, $provider), $paymentData)
-                ]
+                "destination" => $number,
+                "message" => $this->generateFormattedMessage($this->generateData($device, $provider), $paymentData)
             ]);
             $this->integrationService->addIntegration($message, 'WhatsApp', $device, null, $provider);
         }
