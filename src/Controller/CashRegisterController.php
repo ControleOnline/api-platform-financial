@@ -137,4 +137,32 @@ class CashRegisterController extends AbstractController
             ]);
         }
     }
+
+
+    #[Route('/monthly_statements', name: 'monthly_statements', methods: ['GET'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    public function getMonthlyStatements(Request $request): Response
+    {
+        try {
+            $year = $request->get('year', null);
+            $month = $request->get('month', null);
+            $people = $request->get('people', null);
+            $result = $this->manager->getRepository(Invoice::class)->getMonthlyDRE($this->manager->getRepository(People::class)->find($people), $year, $month);
+
+            return new JsonResponse($this->hydratorService->result($result));
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'response' => [
+                    'data'    => [],
+                    'count'   => 0,
+                    'error'   => [
+                        'message' => $e->getMessage(),
+                        'line'   => $e->getLine(),
+                        'file' => $e->getFile()
+                    ],
+                    'success' => false,
+                ],
+            ]);
+        }
+    }
 }

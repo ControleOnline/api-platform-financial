@@ -24,6 +24,34 @@ class InvoiceRepository extends ServiceEntityRepository
         parent::__construct($registry, Invoice::class);
     }
 
+    public function getMonthlyDRE(People $people, int $year, int $month): array
+    {
+        // Define o intervalo de datas com base no ano e mês
+        $startDate = sprintf('%d-%02d-01', $year, $month); // Primeiro dia do mês
+        $endDate = (new \DateTime(sprintf('%d-%02d-01', $year, $month)))->modify('last day of this month')->format('Y-m-d'); // Último dia do mês
+
+        $sql = "SELECT 
+                SUM(I.price) AS TOTAL,
+                PT.payment_type 
+            FROM `invoice` I
+            INNER JOIN payment_type PT ON PT.id = I.payment_type_id
+            WHERE I.receiver_id = :people_id
+            AND I.invoice_date BETWEEN :start_date AND :end_date
+            GROUP BY PT.payment_type";
+
+        $conn = $this->getEntityManager()->getConnection();
+        $filters = [
+            'people_id' => $people->getId(),
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ];
+
+        $result = $conn->executeQuery($sql, $filters)->fetchAllAssociative();
+
+        return $result;
+    }
+
+
     public function getDRE(People $people, int $year, ?int $month = null): array
     {
         $sql = "SELECT
