@@ -31,7 +31,7 @@ class PaylistController extends AbstractController
                 throw new Exception('Document not found');
 
             $status = $this->manager->getRepository(Status::class)->findBy([
-                'realStatus' => 'pending',
+                'realStatus' => ['pending','open'],
                 'context' => 'invoice',
             ]);
             $people_document = $this->manager->getRepository(Document::class)->findOneBy([
