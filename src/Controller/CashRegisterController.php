@@ -39,9 +39,6 @@ class CashRegisterController extends AbstractController
                 'device' =>  $deviceId,
             ]);
             $data = $this->cashRegister->close($device, $provider);
-            /**
-             * @todo Remover quando atualizar o cliente
-             */
             $this->cashRegister->notify($device, $provider);
             return new JsonResponse($data);
         } catch (Exception $e) {
