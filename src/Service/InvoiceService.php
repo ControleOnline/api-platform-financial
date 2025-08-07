@@ -90,7 +90,7 @@ class InvoiceService
         if (!$source_wallet && !$destination_wallet)
             throw new Exception("Need a source or destination Wallet", 301);
         $status = $this->statusService->discoveryStatus(
-            'open',
+            'pending',
             'waiting payment',
             'invoice'
         );

@@ -39,7 +39,10 @@ class CashRegisterController extends AbstractController
                 'device' =>  $deviceId,
             ]);
             $data = $this->cashRegister->close($device, $provider);
-
+            /**
+             * @todo Remover quando atualizar o cliente
+             */
+            $this->cashRegister->notify($device, $provider);
             return new JsonResponse($data);
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
@@ -99,11 +102,6 @@ class CashRegisterController extends AbstractController
             $device = $this->manager->getRepository(Device::class)->findOneBy([
                 'device' => $data['device']
             ]);
-
-            /**
-             * @todo Remover quando atualizar o cliente
-             */
-            $this->cashRegister->notify($device, $company);
             $printData = $this->cashRegister->generatePrintData($device, $company);
             return new JsonResponse($this->hydratorService->item(Spool::class, $printData->getId(), "spool_item:read"), Response::HTTP_OK);
         } catch (Exception $e) {
