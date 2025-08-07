@@ -26,6 +26,25 @@ class CashRegisterController extends AbstractController
     ) {}
 
 
+    #[Route('/cash-register/notify', name: 'notify-cash_register', methods: ['POST'])]
+    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    public function notifyCashRegister(Request $request): JsonResponse
+    {
+        try {
+            $deviceId = $request->query->get('device');
+            $providerId = $request->query->get('provider');
+
+            $provider = $this->manager->getRepository(People::class)->find($providerId);
+            $device = $this->manager->getRepository(Device::class)->findOneBy([
+                'device' =>  $deviceId,
+            ]);
+            $this->cashRegister->notify($device, $provider);
+            return new JsonResponse(['success' => true]);
+        } catch (Exception $e) {
+            return new JsonResponse($this->hydratorService->error($e));
+        }
+    }
+
     #[Route('/cash-register/close', name: 'close-cash_register', methods: ['POST'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function closeCashRegister(Request $request): JsonResponse
