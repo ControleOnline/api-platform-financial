@@ -20,27 +20,22 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new GetCollection(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
-            validationContext: ['groups' => ['card:read']],
             controller: CardCollectionController::class
         ),
         new Get(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
-            validationContext: ['groups' => ['card:read']],
             controller: CardController::class
         ),
         new Post(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
-            validationContext: ['groups' => ['card:read']],
             controller: CardCreateController::class
         ),
         new Put(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
-            validationContext: ['groups' => ['card:read']],
             controller: CardUpdateController::class
         ),
         new Delete(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
-            validationContext: ['groups' => ['card:read']],
             controller: CardDeleteController::class
         ),
     ],
