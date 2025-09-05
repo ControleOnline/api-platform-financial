@@ -18,29 +18,35 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(                        
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",            
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            validationContext: ['groups' => ['card:read']],
             controller: CardCollectionController::class
         ),
-        new Get(                        
+        new Get(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            validationContext: ['groups' => ['card:read']],
             controller: CardController::class
         ),
-        new Post(                        
+        new Post(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            validationContext: ['groups' => ['card:read']],
             controller: CardCreateController::class
         ),
-        new Put(            
+        new Put(
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            validationContext: ['groups' => ['card:read']],
             controller: CardUpdateController::class
         ),
         new Delete(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            validationContext: ['groups' => ['card:read']],
             controller: CardDeleteController::class
         ),
     ],
     security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
     normalizationContext: ['groups' => ['card:read']],
-    denormalizationContext: ['groups' => ['card:read']]
+    denormalizationContext: ['groups' => ['card:write']]
 )]
 
 #[ORM\Table(name: "card")]
@@ -64,29 +70,29 @@ class Card
     #[Groups(['card:read'])]
     private $name;
 
-    #[ORM\Column(type: "blob")]    
+    #[ORM\Column(type: "blob")]
     private $document;
 
     #[ORM\Column(type: "blob")]
     #[Groups(['card:read'])]
     private $number_group_1;
 
-    #[ORM\Column(type: "blob")]    
+    #[ORM\Column(type: "blob")]
     private $number_group_2;
 
-    #[ORM\Column(type: "blob")]    
+    #[ORM\Column(type: "blob")]
     private $number_group_3;
 
     #[ORM\Column(type: "blob")]
     #[Groups(['card:read'])]
     private $number_group_4;
 
-    #[ORM\Column(type: "blob")]    
+    #[ORM\Column(type: "blob")]
     private $ccv;
 
-    #[ORM\Column(name: "expiration_date", type: "blob")]    
+    #[ORM\Column(name: "expiration_date", type: "blob")]
     private $expiration_date;
-    
+
     public function getId(): ?int
     {
         return $this->id;
