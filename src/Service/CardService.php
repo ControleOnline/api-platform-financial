@@ -76,16 +76,16 @@ class CardService
 
         $sql = 'SELECT 
                 id,
-                AES_DECRYPT(name,            :tenancy_secret) AS name,
+                AES_DECRYPT(C.name,            :tenancy_secret) AS name,
                 type,
-                AES_DECRYPT(document,        :tenancy_secret) AS document,
-                AES_DECRYPT(number_group_1,  :tenancy_secret) AS number_group_1,
-                AES_DECRYPT(number_group_2,  :tenancy_secret) AS number_group_2,
-                AES_DECRYPT(number_group_3,  :tenancy_secret) AS number_group_3,
-                AES_DECRYPT(number_group_4,  :tenancy_secret) AS number_group_4,
-                AES_DECRYPT(expiration_date, :tenancy_secret) AS expiration_date,
-                AES_DECRYPT(ccv,             :tenancy_secret) AS ccv                
-            FROM card
+                AES_DECRYPT(C.document,        :tenancy_secret) AS document,
+                AES_DECRYPT(C.number_group_1,  :tenancy_secret) AS number_group_1,
+                AES_DECRYPT(C.number_group_2,  :tenancy_secret) AS number_group_2,
+                AES_DECRYPT(C.number_group_3,  :tenancy_secret) AS number_group_3,
+                AES_DECRYPT(C.number_group_4,  :tenancy_secret) AS number_group_4,
+                AES_DECRYPT(C.expiration_date, :tenancy_secret) AS expiration_date,
+                AES_DECRYPT(C.ccv,             :tenancy_secret) AS ccv                
+            FROM card C
             LEFT JOIN people_link PL ON PL.company_id = C.people_id AND PL.link_type IN ("employee","family")
             WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
             AND id = :card_id
@@ -116,18 +116,18 @@ class CardService
             $sql = 'UPDATE card C
                     LEFT JOIN people_link PL ON PL.company_id = C.people_id AND PL.link_type IN ("employee","family")
                     SET
-                        name            = AES_ENCRYPT(:name, :tenancy_secret),
-                        type            = :type,
-                        people_id       = :people_id,
-                        document        = AES_ENCRYPT(:document, :tenancy_secret),
-                        number_group_1  = AES_ENCRYPT(:g1, :tenancy_secret),
-                        number_group_2  = AES_ENCRYPT(:g2, :tenancy_secret),
-                        number_group_3  = AES_ENCRYPT(:g3, :tenancy_secret),
-                        number_group_4  = AES_ENCRYPT(:g4, :tenancy_secret),
-                        expiration_date = AES_ENCRYPT(:exp, :tenancy_secret),
-                        ccv             = AES_ENCRYPT(:ccv, :tenancy_secret)
+                        C.name            = AES_ENCRYPT(:name, :tenancy_secret),
+                        C.type            = :type,
+                        C.people_id       = :people_id,
+                        C.document        = AES_ENCRYPT(:document, :tenancy_secret),
+                        C.number_group_1  = AES_ENCRYPT(:g1, :tenancy_secret),
+                        C.number_group_2  = AES_ENCRYPT(:g2, :tenancy_secret),
+                        C.number_group_3  = AES_ENCRYPT(:g3, :tenancy_secret),
+                        C.number_group_4  = AES_ENCRYPT(:g4, :tenancy_secret),
+                        C.expiration_date = AES_ENCRYPT(:exp, :tenancy_secret),
+                        C.ccv             = AES_ENCRYPT(:ccv, :tenancy_secret)
                     WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
-                    AND id = :id
+                    AND C.id = :id
             ';
             $conn->executeStatement($sql, [
                 'tenancy_secret' => $_ENV['TENANCY_SECRET'],
