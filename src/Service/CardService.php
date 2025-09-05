@@ -4,9 +4,7 @@ namespace ControleOnline\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface as Security;
-use ControleOnline\Entity\People;
 use ControleOnline\Entity\Card;
-use ControleOnline\Entity\CardType;
 use Doctrine\DBAL\Types\Types;
 
 class CardService
@@ -26,8 +24,8 @@ class CardService
 
         $sql = 'SELECT 
                 C.id,
-                AES_DECRYPT(C.name,           :tenancy_secret) AS name,
                 C.type,
+                AES_DECRYPT(C.name,           :tenancy_secret) AS name,                
                 AES_DECRYPT(C.number_group_1, :tenancy_secret) AS number_group_1,
                 AES_DECRYPT(C.number_group_4, :tenancy_secret) AS number_group_4
             FROM card C
@@ -65,7 +63,8 @@ class CardService
         $card->setNumberGroup2($row['number_group_2']);
         $card->setNumberGroup3($row['number_group_3']);
         $card->setNumberGroup4($row['number_group_4']);
-        $card->setExpirationDate($row['expiration_date']);
+        $card->setExpirationMonth($row['expiration_month']);
+        $card->setExpirationYear($row['expiration_year']);
         $card->setCcv($row['ccv']);
         return $card;
     }
@@ -75,20 +74,21 @@ class CardService
         $conn = $this->manager->getConnection();
 
         $sql = 'SELECT 
-                id,
-                AES_DECRYPT(C.name,            :tenancy_secret) AS name,
-                type,
+                C.id,
+                C.type,
+                AES_DECRYPT(C.name,            :tenancy_secret) AS name,                
                 AES_DECRYPT(C.document,        :tenancy_secret) AS document,
                 AES_DECRYPT(C.number_group_1,  :tenancy_secret) AS number_group_1,
                 AES_DECRYPT(C.number_group_2,  :tenancy_secret) AS number_group_2,
                 AES_DECRYPT(C.number_group_3,  :tenancy_secret) AS number_group_3,
                 AES_DECRYPT(C.number_group_4,  :tenancy_secret) AS number_group_4,
-                AES_DECRYPT(C.expiration_date, :tenancy_secret) AS expiration_date,
+                AES_DECRYPT(C.expiration_month, :tenancy_secret) AS expiration_month,
+                AES_DECRYPT(C.expiration_year, :tenancy_secret) AS expiration_year,
                 AES_DECRYPT(C.ccv,             :tenancy_secret) AS ccv                
             FROM card C
             LEFT JOIN people_link PL ON PL.company_id = C.people_id AND PL.link_type IN ("employee","family")
             WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
-            AND id = :card_id
+            AND C.id = :card_id
         ';
 
         $row = $conn->executeQuery(
@@ -124,7 +124,8 @@ class CardService
                         C.number_group_2  = AES_ENCRYPT(:g2, :tenancy_secret),
                         C.number_group_3  = AES_ENCRYPT(:g3, :tenancy_secret),
                         C.number_group_4  = AES_ENCRYPT(:g4, :tenancy_secret),
-                        C.expiration_date = AES_ENCRYPT(:exp, :tenancy_secret),
+                        C.expiration_month = AES_ENCRYPT(:expm, :tenancy_secret),
+                        C.expiration_year = AES_ENCRYPT(:expy, :tenancy_secret),
                         C.ccv             = AES_ENCRYPT(:ccv, :tenancy_secret)
                     WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
                     AND C.id = :id
@@ -140,7 +141,8 @@ class CardService
                 'g2' => $card->getNumberGroup2(),
                 'g3' => $card->getNumberGroup3(),
                 'g4' => $card->getNumberGroup4(),
-                'exp' => $card->getExpirationDate(),
+                'expm' => $card->getExpirationMonth(),
+                'expy' => $card->getExpirationYear(),
                 'ccv' => $card->getCcv(),
             ]);
         } else {
@@ -148,7 +150,7 @@ class CardService
                 INSERT INTO card (
                     people_id, name, type, document, number_group_1,
                     number_group_2, number_group_3, number_group_4,
-                    expiration_date, ccv
+                    expiration_month,expiration_year, ccv
                 )
                 SELECT 
                     :people_id,
@@ -159,7 +161,8 @@ class CardService
                     AES_ENCRYPT(:g2, :tenancy_secret),
                     AES_ENCRYPT(:g3, :tenancy_secret),
                     AES_ENCRYPT(:g4, :tenancy_secret),
-                    AES_ENCRYPT(:exp, :tenancy_secret),
+                    AES_ENCRYPT(:expm, :tenancy_secret),
+                    AES_ENCRYPT(:expy, :tenancy_secret),
                     AES_ENCRYPT(:ccv, :tenancy_secret)
                 FROM people_link PL
                 WHERE (PL.company_id = :people_id OR PL.people_id = :people_id)
@@ -175,7 +178,8 @@ class CardService
                 'g2' => $card->getNumberGroup2(),
                 'g3' => $card->getNumberGroup3(),
                 'g4' => $card->getNumberGroup4(),
-                'exp' => $card->getExpirationDate(),
+                'expm' => $card->getExpirationMonth(),
+                'expy' => $card->getExpirationYear(),
                 'ccv' => $card->getCcv(),
             ]);
 

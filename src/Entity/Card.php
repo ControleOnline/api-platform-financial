@@ -87,8 +87,11 @@ class Card
     #[ORM\Column(type: "blob")]
     private $ccv;
 
-    #[ORM\Column(name: "expiration_date", type: "blob")]
-    private $expiration_date;
+    #[ORM\Column(name: "expiration_month", type: "blob")]
+    private $expiration_month;
+
+    #[ORM\Column(name: "expiration_year", type: "blob")]
+    private $expiration_year;
 
     public function getId(): ?int
     {
@@ -200,14 +203,32 @@ class Card
         return $this;
     }
 
-    public function getExpirationDate()
+    public function getExpirationMonth()
     {
-        return $this->expiration_date;
+        return $this->expiration_month;
     }
 
-    public function setExpirationDate($expiration_date): self
+    public function setExpirationMonth($expiration_month): self
     {
-        $this->expiration_date = $expiration_date;
+        $this->expiration_month = $expiration_month;
+        return $this;
+    }
+
+    /**
+     * Get the value of expiration_year
+     */
+    public function getExpirationYear()
+    {
+        return $this->expiration_year;
+    }
+
+    /**
+     * Set the value of expiration_year
+     */
+    public function setExpirationYear($expiration_year): self
+    {
+        $this->expiration_year = $expiration_year;
+
         return $this;
     }
 }

@@ -31,7 +31,8 @@ class CardUpdateController extends AbstractController
             if (isset($data['number_group_3'])) $card->setNumberGroup3($data['number_group_3']);
             if (isset($data['number_group_4'])) $card->setNumberGroup4($data['number_group_4']);
             if (isset($data['ccv'])) $card->setCcv($data['ccv']);
-            if (isset($data['expiration_date'])) $card->setExpirationDate($data['expiration_date']);
+            if (isset($data['expiration_month'])) $card->setExpirationMonth($data['expiration_month']);
+            if (isset($data['expiration_year'])) $card->setExpirationYear($data['expiration_year']);            
 
             $updatedCard = $this->cardService->saveCard($card);
                         
