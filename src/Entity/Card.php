@@ -13,6 +13,7 @@ use ControleOnline\Controller\Card\CardController;
 use ControleOnline\Controller\Card\CardCreateController;
 use ControleOnline\Controller\Card\CardDeleteController;
 use ControleOnline\Controller\Card\CardUpdateController;
+use ControleOnline\Repository\CardRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -45,6 +46,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 
 #[ORM\Table(name: "card")]
+#[ORM\Entity(repositoryClass: CardRepository::class)]
 class Card
 {
     #[ORM\Id]
