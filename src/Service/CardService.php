@@ -31,7 +31,7 @@ class CardService
                 AES_DECRYPT(C.number_group_4, :tenancy_secret) AS number_group_4
             FROM card C
             LEFT JOIN people_link PL ON PL.company_id = C.people_id AND PL.link_type IN ("employee","family")
-            WHERE (people_id = :people_id OR PL.people_id = :people_id)
+            WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
         ';
 
         $rows = $conn->executeQuery(
@@ -86,7 +86,7 @@ class CardService
                 AES_DECRYPT(ccv,             :tenancy_secret) AS ccv                
             FROM card
             LEFT JOIN people_link PL ON PL.company_id = C.people_id AND PL.link_type IN ("employee","family")
-            WHERE (people_id = :people_id OR PL.people_id = :people_id)
+            WHERE (C.people_id = :people_id OR PL.people_id = :people_id)
             AND id = :card_id
         ';
 
@@ -161,7 +161,7 @@ class CardService
                     AES_ENCRYPT(:exp, :tenancy_secret),
                     AES_ENCRYPT(:ccv, :tenancy_secret)
                 FROM people_link PL
-                WHERE PL.company_id = :people_id OR PL.people_id = :people_id
+                WHERE (PL.company_id = :people_id OR PL.people_id = :people_id)
                 AND PL.link_type IN ("employee","family")
             ';
             $conn->executeStatement($sql, [
