@@ -21,7 +21,7 @@ class CardController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    #[Route('/cards', name: 'cards', methods: ['GET'])]
+    #[Route('/people/cards', name: 'cards', methods: ['GET'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function cards(Request $request): JsonResponse
     {
@@ -35,7 +35,7 @@ class CardController extends AbstractController
         }
     }
 
-    #[Route('/cards/{id}', name: 'get_card', methods: ['GET'])]
+    #[Route('/people/cards/{id}', name: 'get_card', methods: ['GET'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function getCard(int $id): JsonResponse
     {
@@ -51,7 +51,7 @@ class CardController extends AbstractController
         }
     }
 
-    #[Route('/cards', name: 'create_card', methods: ['POST'])]
+    #[Route('/people/cards', name: 'create_card', methods: ['POST'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function createCard(Request $request): JsonResponse
     {
@@ -65,7 +65,7 @@ class CardController extends AbstractController
         }
     }
 
-    #[Route('/cards/{id}', name: 'update_card', methods: ['PUT'])]
+    #[Route('/people/cards/{id}', name: 'update_card', methods: ['PUT'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function updateCard(int $id, Request $request): JsonResponse
     {
@@ -84,7 +84,7 @@ class CardController extends AbstractController
         }
     }
 
-    #[Route('/cards/{id}', name: 'delete_card', methods: ['DELETE'])]
+    #[Route('/people/cards/{id}', name: 'delete_card', methods: ['DELETE'])]
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function deleteCard(int $id): JsonResponse
     {
