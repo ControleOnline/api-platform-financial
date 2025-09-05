@@ -4,7 +4,12 @@ namespace ControleOnline\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(    
+    normalizationContext: ['groups' => ['card:read']],
+    denormalizationContext: ['groups' => ['card:read']]
+)]
 #[ORM\Entity(readOnly: true)]
 #[ORM\Table(name: "card")]
 class Card
@@ -12,36 +17,47 @@ class Card
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
+    #[Groups(['card:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: "integer")]
+    #[Groups(['card:read'])]
     private int $people_id;
 
     #[ORM\Column(type: "string")]
+    #[Groups(['card:read'])]
     private string $type;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $name;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $document;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $number_group_1;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $number_group_2;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $number_group_3;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $number_group_4;
 
     #[ORM\Column(type: "blob")]
+    #[Groups(['card:read'])]
     private $ccv;
 
     #[ORM\Column(name: "expiration_date", type: "blob")]
+    #[Groups(['card:read'])]
     private $expiration_date;
     /**
      * Get the value of id

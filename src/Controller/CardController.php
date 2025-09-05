@@ -2,6 +2,7 @@
 
 namespace ControleOnline\Controller;
 
+use ControleOnline\Entity\Card;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,11 +26,9 @@ class CardController extends AbstractController
     #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
     public function cards(Request $request): JsonResponse
     {
-        try {
-            
-            $cardResume = $this->cardService->findCardResumeByPeople();
-            
-            return new JsonResponse($cardResume);
+        try {            
+            $cardResume = $this->cardService->findCardResumeByPeople();                        
+            return new JsonResponse($this->hydratorService->collectionData($cardResume, Card::class, 'card:read'));
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
@@ -45,7 +44,7 @@ class CardController extends AbstractController
                 return new JsonResponse(['error' => 'Card not found'], Response::HTTP_NOT_FOUND);
             }
             
-            return new JsonResponse($card);
+            return new JsonResponse($this->hydratorService->collectionData($card, Card::class, 'card:read'));
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
@@ -57,9 +56,10 @@ class CardController extends AbstractController
     {
         try {
             $data = json_decode($request->getContent(), true);    
-            $savedCard = $this->cardService->saveCard($this->cardService->toObject($data));
+            $savedCard = $this->cardService->saveCard($this->cardService->toObject($data));            
+
+            return new JsonResponse($this->hydratorService->collectionData($savedCard, Card::class, 'card:read'));
             
-            return new JsonResponse($savedCard, Response::HTTP_CREATED);
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
@@ -78,7 +78,7 @@ class CardController extends AbstractController
             $data = json_decode($request->getContent(), true);           
             $updatedCard = $this->cardService->saveCard($this->cardService->toObject($data));
             
-            return new JsonResponse($updatedCard);
+            return new JsonResponse($this->hydratorService->collectionData($updatedCard, Card::class, 'card:read'));
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
