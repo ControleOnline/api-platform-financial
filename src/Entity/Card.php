@@ -17,8 +17,8 @@ class Card
     #[ORM\Column(type: "integer")]
     private int $people_id;
 
-    #[ORM\Column(type: "string", enumType: CardType::class)]
-    private CardType $type;
+    #[ORM\Column(type: "string")]
+    private string $type;
 
     #[ORM\Column(type: "blob")]
     private $name;
@@ -82,7 +82,7 @@ class Card
     /**
      * Get the value of type
      */
-    public function getType(): CardType
+    public function getType(): string
     {
         return $this->type;
     }
@@ -90,7 +90,7 @@ class Card
     /**
      * Set the value of type
      */
-    public function setType(CardType $type): self
+    public function setType(string $type): self
     {
         $this->type = $type;
 

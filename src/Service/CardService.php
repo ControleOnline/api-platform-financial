@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface as Security;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Card;
+use ControleOnline\Entity\CardType;
 use Doctrine\DBAL\Types\Types;
 
 class CardService
