@@ -22,7 +22,8 @@ class CardCreateController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             $savedCard = $this->cardService->saveCard($this->cardService->toObject($data));
-            return new JsonResponse($this->hydratorService->collectionData($savedCard, Card::class, 'card:read'));
+            
+            return new JsonResponse($this->hydratorService->item(Card::class, $savedCard->getId(), 'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }

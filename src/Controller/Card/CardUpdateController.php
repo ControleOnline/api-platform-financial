@@ -34,8 +34,8 @@ class CardUpdateController extends AbstractController
             if (isset($data['expiration_date'])) $card->setExpirationDate($data['expiration_date']);
 
             $updatedCard = $this->cardService->saveCard($card);
-
-            return new JsonResponse($this->hydratorService->collectionData($updatedCard, Card::class, 'card:read'));
+                        
+            return new JsonResponse($this->hydratorService->item(Card::class, $updatedCard->getId(), 'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }

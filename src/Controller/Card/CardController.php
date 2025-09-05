@@ -14,10 +14,10 @@ class CardController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    public function __invoke(Card $card, ): JsonResponse
+    public function __invoke(Card $card,): JsonResponse
     {
         try {
-            return new JsonResponse($this->hydratorService->collectionData($card, Card::class, 'card:read'));
+            return new JsonResponse($this->hydratorService->item(Card::class, $card->getId(), 'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
