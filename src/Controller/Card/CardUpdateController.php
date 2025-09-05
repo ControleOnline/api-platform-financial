@@ -2,7 +2,7 @@
 
 namespace ControleOnline\Controller\Card;
 
-use ApiPlatform\Metadata\Operation;
+
 use ControleOnline\Entity\Card;
 use ControleOnline\Service\CardService;
 use ControleOnline\Service\HydratorService;
@@ -17,7 +17,7 @@ class CardUpdateController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    public function __invoke(Card $card, Request $request, Operation $operation): JsonResponse
+    public function __invoke(Card $card, Request $request, ): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);

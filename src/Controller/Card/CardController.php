@@ -2,7 +2,7 @@
 
 namespace ControleOnline\Controller\Card;
 
-use ApiPlatform\Metadata\Operation;
+
 use ControleOnline\Entity\Card;
 use ControleOnline\Service\HydratorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,7 +14,7 @@ class CardController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    public function __invoke(Card $card, Operation $operation): JsonResponse
+    public function __invoke(Card $card, ): JsonResponse
     {
         try {
             return new JsonResponse($this->hydratorService->collectionData($card, Card::class, 'card:read'));

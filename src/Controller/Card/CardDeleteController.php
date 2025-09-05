@@ -2,7 +2,7 @@
 
 namespace ControleOnline\Controller\Card;
 
-use ApiPlatform\Metadata\Operation;
+
 use ControleOnline\Entity\Card;
 use ControleOnline\Service\CardService;
 use ControleOnline\Service\HydratorService;
@@ -17,7 +17,7 @@ class CardDeleteController extends AbstractController
         private HydratorService $hydratorService
     ) {}
 
-    public function __invoke(Card $card, Operation $operation): JsonResponse
+    public function __invoke(Card $card, ): JsonResponse
     {
         try {
             $result = $this->cardService->deleteCard($card->getId());
