@@ -8,7 +8,7 @@ use ControleOnline\Service\HydratorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CardController extends AbstractController
+class CardController 
 {
     public function __construct(
         private HydratorService $hydratorService

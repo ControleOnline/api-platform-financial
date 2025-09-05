@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CardCollectionController extends AbstractController
+class CardCollectionController 
 {
     public function __construct(
         private CardService $cardService,
