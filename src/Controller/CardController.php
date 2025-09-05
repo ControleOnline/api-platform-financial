@@ -13,7 +13,7 @@ use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\Security;
 
-class CashRegisterController extends AbstractController
+class CardController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $manager,
