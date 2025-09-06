@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CardCollectionController 
+class CardCollectionController
 {
     public function __construct(
         private CardService $cardService,
@@ -19,9 +19,9 @@ class CardCollectionController
 
     public function __invoke(Request $request): JsonResponse
     {
-        try {            
+        try {
             $cardResume = $this->cardService->findCardResumeByPeople();
-            return new JsonResponse($this->hydratorService->collection(Card::class, 'card:read'));
+            return new JsonResponse($this->hydratorService->collectionData($cardResume, Card::class, 'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }

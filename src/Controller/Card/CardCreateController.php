@@ -23,7 +23,8 @@ class CardCreateController
             $data = json_decode($request->getContent(), true);
             $savedCard = $this->cardService->saveCard($this->cardService->toObject($data));
             
-            return new JsonResponse($this->hydratorService->item(Card::class, $savedCard->getId(), 'card:read'));
+            
+            return new JsonResponse($this->hydratorService->data($savedCard,  'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }

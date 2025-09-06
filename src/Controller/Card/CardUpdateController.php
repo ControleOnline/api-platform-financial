@@ -36,7 +36,8 @@ class CardUpdateController
 
             $updatedCard = $this->cardService->saveCard($card);
                         
-            return new JsonResponse($this->hydratorService->item(Card::class, $updatedCard->getId(), 'card:read'));
+            
+            return new JsonResponse($this->hydratorService->data($updatedCard,  'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
