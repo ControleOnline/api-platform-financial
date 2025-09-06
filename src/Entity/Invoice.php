@@ -14,6 +14,8 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ControleOnline\Controller\Asaas\AsaasCardController;
+use ControleOnline\Controller\Asaas\AsaasPixController;
 use ControleOnline\Controller\GetBankInterDataAction;
 use ControleOnline\Controller\GetBankItauDataAction;
 use ControleOnline\Controller\PaylistController;
@@ -56,7 +58,7 @@ use stdClass;
         new GetCollection(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
         ),
-     
+
         new Post(
             security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
             validationContext: ['groups' => ['invoice:write']],
@@ -104,6 +106,21 @@ use stdClass;
             uriTemplate: '/invoice/{id}/split',
             controller: SplitInvoiceAction::class
         ),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']],
+            controller: AsaasPixController::class,
+            uriTemplate: '/asaas/{id}/pix',
+        ),
+        new Post(
+            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            validationContext: ['groups' => ['invoice:write']],
+            denormalizationContext: ['groups' => ['invoice:write']],
+            controller: AsaasCardController::class,
+            uriTemplate: '/asaas/{id}/card',
+        ),
+
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['invoice:read']],
