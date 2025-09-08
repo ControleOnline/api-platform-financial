@@ -19,7 +19,8 @@ class CashRegisterService
         private ConfigService $configService,
         private InFlowService $inFlowService,
         private DeviceService $deviceService,
-        private IntegrationService $integrationService
+        private IntegrationService $integrationService,
+        private WhatsAppService $whatsAppService
     ) {}
 
     public function close(Device $device, People $provider)
@@ -49,10 +50,16 @@ class CashRegisterService
         ];
         $paymentData = $this->inFlowService->getPayments($filters);
 
+        $connection = $this->whatsAppService->searchConnectionFromPeople($provider, 'support');
+        if (!$connection) return;
+
+        $phone = $connection->getPhone();
+        $origin = $phone->getDdi() . $phone->getDdd() . $phone->getPhone();
+
         foreach ($numbers as $number) {
             $message = json_encode([
                 "action" => "sendMessage",
-                "origin" => "551131360353",
+                "origin" => $origin,
                 "destination" => $number,
                 "message" => $this->generateFormattedMessage($this->generateData($device, $provider), $paymentData)
             ]);
