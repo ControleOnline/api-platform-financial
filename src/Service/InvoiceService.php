@@ -99,7 +99,14 @@ class InvoiceService
 
     protected function createOrderInvoice(Order $order, Invoice $invoice, $price = 0): OrderInvoice
     {
-        $orderInvoice = new OrderInvoice();
+
+        $orderInvoice = $this->manager->getRepository(OrderInvoice::class)->findOneBy([
+            'invoice' => $invoice,
+            'order' =>  $order
+        ]);
+
+        if (!$orderInvoice)
+            $orderInvoice = new OrderInvoice();
         $orderInvoice->setOrder($order);
         $orderInvoice->setInvoice($invoice);
         $orderInvoice->setRealPrice($price);
