@@ -149,18 +149,18 @@ class InvoiceService
     public function payOrder(Order $order)
     {
         $order = $this->manager->getRepository(Order::class)->find($order->getId());
-        $orderStatus = $order->getStatus()->getStatus();
-        if ($orderStatus != 'waiting payment') return;
+        $orderStatus = $order->getStatus()->getRealStatus();
+        if ($orderStatus == 'canceled') return;
         $paidValue = 0;
         foreach ($order->getInvoice() as $orderInvoice) {
             $invoice = $orderInvoice->getInvoice();
-            if ($invoice->getstatus()->getstatus() == 'paid')
+            if ($invoice->getstatus()->getRealStatus() == 'closed')
                 $paidValue += $invoice->getPrice();
         }
 
         if ($paidValue > 0 && $paidValue >= $order->getPrice()) {
 
-            $status = $this->statusService->discoveryStatus(
+            $status = $this->statusService->discoveryRealStatus(
                 'open',
                 'paid',
                 'order'
