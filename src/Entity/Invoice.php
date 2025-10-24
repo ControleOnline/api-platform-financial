@@ -126,6 +126,10 @@ use stdClass;
     normalizationContext: ['groups' => ['invoice:read']],
     denormalizationContext: ['groups' => ['invoice:write']]
 )]
+
+#[ApiFilter(OrderFilter::class, properties: ['product', 'price', 'description'])]
+#[ApiFilter(RandomOrderFilter::class)]
+
 #[ORM\Table(name: 'invoice')]
 #[ORM\EntityListeners([LogListener::class])]
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
