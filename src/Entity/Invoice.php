@@ -24,6 +24,7 @@ use ControleOnline\DataProvider\InvoiceDataProvider;
 use ControleOnline\Listener\LogListener;
 use ControleOnline\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use ControleOnline\Filter\RandomOrderFilter;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
