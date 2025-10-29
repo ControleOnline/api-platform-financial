@@ -50,7 +50,7 @@ class CashRegisterService
         ];
         $paymentData = $this->inFlowService->getPayments($filters);
 
-        $connection = $this->whatsAppService->searchConnectionFromPeople($provider, 'support');
+        $connection = $this->whatsAppService->searchConnectionFromPeople($provider, 'support', true);
         if (!$connection) return;
 
         $phone = $connection->getPhone();
