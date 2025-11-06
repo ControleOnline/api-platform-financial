@@ -21,7 +21,7 @@ use ControleOnline\Controller\GetBankItauDataAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\SplitInvoiceAction;
 use ControleOnline\DataProvider\InvoiceDataProvider;
-use ControleOnline\Listener\LogListener;
+
 use ControleOnline\Repository\InvoiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use ControleOnline\Filter\RandomOrderFilter;
