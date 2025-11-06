@@ -132,7 +132,7 @@ use stdClass;
 #[ApiFilter(RandomOrderFilter::class)]
 
 #[ORM\Table(name: 'invoice')]
-#[ORM\EntityListeners([LogListener::class])]
+
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 class Invoice
 {
