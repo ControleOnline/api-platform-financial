@@ -199,7 +199,7 @@ class Invoice
     private $category = null;
 
     #[ORM\Column(type: 'json')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write'])]
+    #[Groups(['invoice_details:read', 'invoice:write', 'order_invoice:write'])]
     private $otherInformations;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['sourceWallet' => 'exact'])]
