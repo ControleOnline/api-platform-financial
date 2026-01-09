@@ -144,7 +144,7 @@ class Invoice
     private $id;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
-    #[ORM\OneToMany(targetEntity: OrderInvoice::class, mappedBy: 'invoice')]
+    #[ORM\OneToMany(targetEntity: OrderInvoice::class, mappedBy: 'invoice', cascade: ['persist'])]
     private $order;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact'])]
