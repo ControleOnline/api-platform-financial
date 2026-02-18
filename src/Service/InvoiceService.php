@@ -162,8 +162,8 @@ class InvoiceService
 
             $status = $this->statusService->discoveryRealStatus(
                 'open',
-                'paid',
-                'order'
+                'order',
+                'paid'
             );
 
 
