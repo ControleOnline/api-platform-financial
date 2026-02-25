@@ -197,5 +197,15 @@ class InvoiceService
             $queryBuilder->andWhere(sprintf('%s.receiver IN(:receiver)', $rootAlias));
             $queryBuilder->setParameter('receiver', preg_replace("/[^0-9]/", "", $receiver));
         }
+
+        $ownTransfers = $this->request->query->get('ownTransfers', null);
+        if (in_array($ownTransfers, ['1', 1, true, 'true'], true)) {
+            $queryBuilder->andWhere(sprintf('%s.payer = %s.receiver', $rootAlias, $rootAlias));
+        }
+
+        $excludeOwnTransfers = $this->request->query->get('excludeOwnTransfers', null);
+        if (in_array($excludeOwnTransfers, ['1', 1, true, 'true'], true)) {
+            $queryBuilder->andWhere(sprintf('(%s.payer IS NULL OR %s.receiver IS NULL OR %s.payer <> %s.receiver)', $rootAlias, $rootAlias, $rootAlias, $rootAlias));
+        }
     }
 }
