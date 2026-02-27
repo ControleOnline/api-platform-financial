@@ -48,9 +48,9 @@ class WalletService
 
     public function  discoverPaymentType(People $company, array $paymentType)
     {
-        $paymentType = $this->manager->getRepository(Wallet::class)->findOneBy([
+        $paymentType = $this->manager->getRepository(PaymentType::class)->findOneBy([
             'people' => $company,
-            'name' => $paymentType['paymentType']
+            'paymentType' => $paymentType['paymentType']
         ]);
 
         if (!$paymentType) {
