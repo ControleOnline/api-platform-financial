@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ControleOnline\Attribute\CollectionSummary;
 use ControleOnline\Controller\Asaas\AsaasCardController;
 use ControleOnline\Controller\Asaas\AsaasPixController;
 use ControleOnline\Controller\GetBankInterDataAction;
@@ -188,6 +189,7 @@ class Invoice
     private $notified = false;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
+    #[CollectionSummary(['sum'])]
     #[ORM\Column(name: 'price', type: 'float', nullable: true)]
     #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write'])]
     private $price;
