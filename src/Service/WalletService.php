@@ -46,19 +46,26 @@ class WalletService
 
     }
 
-    public function  discoverPaymentType(People $company, array $paymentType)
+    public function discoverPaymentType(People $company, array $paymentTypeData): PaymentType
     {
+        $paymentTypeName = $paymentTypeData['paymentType'] ?? $paymentTypeData['name'] ?? null;
+
+        if (!$paymentTypeName) {
+            throw new \InvalidArgumentException('Payment type name is required.');
+        }
+
         $paymentType = $this->manager->getRepository(PaymentType::class)->findOneBy([
             'people' => $company,
-            'paymentType' => $paymentType['paymentType']
+            'paymentType' => $paymentTypeName
         ]);
 
         if (!$paymentType) {
             $paymentType = new PaymentType();
-            $paymentType->setFrequency($paymentType['frequency']);
-            $paymentType->setInstallments($paymentType['installments']);
             $paymentType->setPeople($company);
-            $paymentType->setPaymentType($paymentType['name']);
+            $paymentType->setPaymentType($paymentTypeName);
+            $paymentType->setFrequency($paymentTypeData['frequency'] ?? 'single');
+            $paymentType->setInstallments($paymentTypeData['installments'] ?? 'single');
+
             $this->manager->persist($paymentType);
             $this->manager->flush();
         }
