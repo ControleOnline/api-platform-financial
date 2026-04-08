@@ -29,7 +29,7 @@ class InvoiceDataProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         $currentUser = $this->security->getToken()->getUser();
-        if (!$currentUser && !$this->security->isGranted('ROLE_ADMIN')) {
+        if (!$currentUser) {
             throw new \Exception('You should not pass!!!');
         }
         $filters = $context['filters'] ?? [];
