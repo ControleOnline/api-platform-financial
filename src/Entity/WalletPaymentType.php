@@ -30,7 +30,8 @@ use ControleOnline\Entity\PaymentType;
     'id' => 'exact',
     'wallet' => 'exact',
     'paymentType' => 'exact',
-    'paymentCode' => 'exact'
+    'paymentCode' => 'exact',
+    'wallet.people' => 'exact',
 ])]
 class WalletPaymentType
 {
