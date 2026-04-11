@@ -168,7 +168,6 @@ class InvoiceService
 
 
             $order->setStatus($status);
-            $this->orderPrintService->printOrder($order);
 
             $this->manager->persist($order);
             $this->manager->flush();
