@@ -239,6 +239,8 @@ class CashRegisterService
         );
         $this->printService->addLine("", "", "-");
 
-        return $this->printService->generatePrintData($device, $provider);
+        return $this->printService->generatePrintData($device, $provider, [
+            'type' => $this->pdvDeviceType,
+        ]);
     }
 }
