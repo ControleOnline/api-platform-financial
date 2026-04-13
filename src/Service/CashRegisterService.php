@@ -13,6 +13,8 @@ use Doctrine\DBAL\Types\Types;
 
 class CashRegisterService
 {
+    private string $pdvDeviceType = 'PDV';
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PrintService $printService,
@@ -35,7 +37,7 @@ class CashRegisterService
 
         $this->deviceService->addDeviceConfigs($provider, [
             'cash-wallet-closed-id' => $lastInvoice->getId(),
-        ], $device->getDevice());
+        ], $device->getDevice(), $this->pdvDeviceType);
 
         $this->notify($device,  $provider);
     }
@@ -118,7 +120,7 @@ class CashRegisterService
         $this->deviceService->addDeviceConfigs($provider, [
             'cash-wallet-open-id' => $lastInvoice->getId(),
             'cash-wallet-closed-id' => 0,
-        ], $device->getDevice());
+        ], $device->getDevice(), $this->pdvDeviceType);
     }
 
 
@@ -126,7 +128,9 @@ class CashRegisterService
     public function generateData(Device $device, People $provider)
     {
 
-        $deviceConfig = $this->deviceService->discoveryDeviceConfig($device, $provider)->getConfigs(true);
+        $deviceConfig = $this->deviceService
+            ->findDeviceConfig($device, $provider, $this->pdvDeviceType)
+            ?->getConfigs(true) ?? [];
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('product_name', 'product_name');

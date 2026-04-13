@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class InFlowService
 {
+    private string $pdvDeviceType = 'PDV';
     private $qb;
     private $filters = [];
 
@@ -53,10 +54,11 @@ class InFlowService
         $people = $this->entityManager->getRepository(People::class)->find($this->filters['receiver']);
 
         if ($device && $people)
-            $deviceConfig = $this->deviceService->discoveryDeviceConfig(
+            $deviceConfig = $this->deviceService->findDeviceConfig(
                 $device,
-                $people
-            )->getConfigs(true);
+                $people,
+                $this->pdvDeviceType
+            )?->getConfigs(true);
 
         $rsm = new ResultSetMapping();
         $rsm->addScalarResult('totalPrice', 'totalPrice');
