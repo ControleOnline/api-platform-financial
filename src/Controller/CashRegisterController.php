@@ -2,8 +2,6 @@
 
 namespace ControleOnline\Controller;
 
-use ControleOnline\Entity\Device;
-use ControleOnline\Entity\People;
 use ControleOnline\Service\CashRegisterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,14 +29,10 @@ class CashRegisterController extends AbstractController
     public function notifyCashRegister(Request $request): JsonResponse
     {
         try {
-            $deviceId = $request->query->get('device');
-            $providerId = $request->query->get('provider');
-
-            $provider = $this->manager->getRepository(People::class)->find($providerId);
-            $device = $this->manager->getRepository(Device::class)->findOneBy([
-                'device' =>  $deviceId,
-            ]);
-            $this->cashRegister->notify($device, $provider);
+            $this->cashRegister->notifyFromReferences(
+                $request->query->get('device'),
+                $request->query->get('provider')
+            );
             return new JsonResponse(['success' => true]);
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
@@ -50,15 +44,10 @@ class CashRegisterController extends AbstractController
     public function closeCashRegister(Request $request): JsonResponse
     {
         try {
-            $deviceId = $request->query->get('device');
-            $providerId = $request->query->get('provider');
-
-            $provider = $this->manager->getRepository(People::class)->find($providerId);
-            $device = $this->manager->getRepository(Device::class)->findOneBy([
-                'device' =>  $deviceId,
-            ]);
-            
-            $data = $this->cashRegister->close($device, $provider);
+            $data = $this->cashRegister->closeFromReferences(
+                $request->query->get('device'),
+                $request->query->get('provider')
+            );
             
             return new JsonResponse($data);
         } catch (Exception $e) {
@@ -70,14 +59,10 @@ class CashRegisterController extends AbstractController
     public function openCashRegister(Request $request): JsonResponse
     {
         try {
-            $deviceId = $request->query->get('device');
-            $providerId = $request->query->get('provider');
-
-            $provider = $this->manager->getRepository(People::class)->find($providerId);
-            $device = $this->manager->getRepository(Device::class)->findOneBy([
-                'device' =>  $deviceId,
-            ]);
-            $data = $this->cashRegister->open($device, $provider);
+            $data = $this->cashRegister->openFromReferences(
+                $request->query->get('device'),
+                $request->query->get('provider')
+            );
 
             return new JsonResponse($data);
         } catch (Exception $e) {
@@ -93,14 +78,10 @@ class CashRegisterController extends AbstractController
     public function getCashRegister(Request $request): JsonResponse
     {
         try {
-            $deviceId = $request->query->get('device');
-            $providerId = $request->query->get('provider');
-
-            $provider = $this->manager->getRepository(People::class)->find($providerId);
-            $device = $this->manager->getRepository(Device::class)->findOneBy([
-                'device' =>  $deviceId,
-            ]);
-            $data = $this->cashRegister->generateData($device, $provider);
+            $data = $this->cashRegister->generateDataFromReferences(
+                $request->query->get('device'),
+                $request->query->get('provider')
+            );
 
             return new JsonResponse($data);
         } catch (Exception $e) {
@@ -113,14 +94,12 @@ class CashRegisterController extends AbstractController
     public function printCashRegister(Request $request): JsonResponse
     {
         try {
-
-            $data = json_decode($request->getContent(), true);
-            $company = $this->manager->getRepository(People::class)->find($data['people']);
-            $device = $this->manager->getRepository(Device::class)->findOneBy([
-                'device' => $data['device']
-            ]);
-            $printData = $this->cashRegister->generatePrintData($device, $company);
-            $this->cashRegister->notify($device, $company);
+            $printData = $this->cashRegister->generatePrintDataFromContent(
+                $request->getContent()
+            );
+            $this->cashRegister->notifyFromContent(
+                $request->getContent()
+            );
             return new JsonResponse($this->hydratorService->item(Spool::class, $printData->getId(), "spool_item:read"), Response::HTTP_OK);
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));

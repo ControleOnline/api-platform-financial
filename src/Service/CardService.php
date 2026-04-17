@@ -55,18 +55,69 @@ class CardService
     public function toObject($row): Card
     {
         $card = new Card();
-        $card->setId((int) $row['id']);
-        $card->setName($row['name']);
-        $card->setType($row['type']);
-        $card->setDocument($row['document']);
-        $card->setNumberGroup1($row['number_group_1']);
-        $card->setNumberGroup2($row['number_group_2']);
-        $card->setNumberGroup3($row['number_group_3']);
-        $card->setNumberGroup4($row['number_group_4']);
-        $card->setExpirationMonth($row['expiration_month']);
-        $card->setExpirationYear($row['expiration_year']);
-        $card->setCcv($row['ccv']);
+        if (isset($row['id'])) {
+            $card->setId((int) $row['id']);
+        }
+
+        if (isset($row['people_id'])) {
+            $card->setPeopleId((int) $row['people_id']);
+        }
+
+        if (array_key_exists('name', $row)) {
+            $card->setName($row['name']);
+        }
+
+        if (array_key_exists('type', $row)) {
+            $card->setType($row['type']);
+        }
+
+        if (array_key_exists('document', $row)) {
+            $card->setDocument($row['document']);
+        }
+
+        if (array_key_exists('number_group_1', $row)) {
+            $card->setNumberGroup1($row['number_group_1']);
+        }
+
+        if (array_key_exists('number_group_2', $row)) {
+            $card->setNumberGroup2($row['number_group_2']);
+        }
+
+        if (array_key_exists('number_group_3', $row)) {
+            $card->setNumberGroup3($row['number_group_3']);
+        }
+
+        if (array_key_exists('number_group_4', $row)) {
+            $card->setNumberGroup4($row['number_group_4']);
+        }
+
+        if (array_key_exists('expiration_month', $row)) {
+            $card->setExpirationMonth($row['expiration_month']);
+        }
+
+        if (array_key_exists('expiration_year', $row)) {
+            $card->setExpirationYear($row['expiration_year']);
+        }
+
+        if (array_key_exists('ccv', $row)) {
+            $card->setCcv($row['ccv']);
+        }
+
         return $card;
+    }
+
+    public function createCardFromContent(?string $content): Card
+    {
+        return $this->saveCard(
+            $this->hydrateCard(new Card(), $this->decodePayload($content))
+        );
+    }
+
+    public function updateCardFromContent(Card $card, ?string $content): Card
+    {
+        return $this->saveCard(
+            $this->hydrateCard($card, $this->decodePayload($content))
+        );
     }
 
     public function findCardById(int $card_id): ?Card
@@ -208,5 +259,65 @@ class CardService
         ]);
 
         return $result > 0;
+    }
+
+    private function hydrateCard(Card $card, array $data): Card
+    {
+        if (isset($data['people_id'])) {
+            $card->setPeopleId((int) $data['people_id']);
+        }
+
+        if (isset($data['type'])) {
+            $card->setType($data['type']);
+        }
+
+        if (isset($data['name'])) {
+            $card->setName($data['name']);
+        }
+
+        if (isset($data['document'])) {
+            $card->setDocument($data['document']);
+        }
+
+        if (isset($data['number_group_1'])) {
+            $card->setNumberGroup1($data['number_group_1']);
+        }
+
+        if (isset($data['number_group_2'])) {
+            $card->setNumberGroup2($data['number_group_2']);
+        }
+
+        if (isset($data['number_group_3'])) {
+            $card->setNumberGroup3($data['number_group_3']);
+        }
+
+        if (isset($data['number_group_4'])) {
+            $card->setNumberGroup4($data['number_group_4']);
+        }
+
+        if (isset($data['ccv'])) {
+            $card->setCcv($data['ccv']);
+        }
+
+        if (isset($data['expiration_month'])) {
+            $card->setExpirationMonth($data['expiration_month']);
+        }
+
+        if (isset($data['expiration_year'])) {
+            $card->setExpirationYear($data['expiration_year']);
+        }
+
+        return $card;
+    }
+
+    private function decodePayload(?string $content): array
+    {
+        if (!is_string($content) || trim($content) === '') {
+            return [];
+        }
+
+        $decoded = json_decode($content, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 }

@@ -8,11 +8,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
-use ControleOnline\Entity\Status;
 use ControleOnline\Entity\People;
-use ControleOnline\Entity\Order;
 use App\Library\Itau\ItauClient;
-use ControleOnline\Service\StatusService;
+use ControleOnline\Service\InvoiceService;
 
 class GetBankItauDataAction
 {
@@ -20,7 +18,7 @@ class GetBankItauDataAction
 
     public function __construct(
         private EntityManagerInterface $manager,
-        private StatusService $statusService
+        private InvoiceService $invoiceService
     ) {}
 
     public function __invoke(Invoice $data, Request $request, string $operation): JsonResponse
@@ -135,41 +133,11 @@ class GetBankItauDataAction
         $payinfo['status']     = $invoice->getStatus()->getStatus();
         $payinfo['invoiceRealStatus'] = $invoice->getStatus()->getRealStatus();
 
-
-        // mark order as paid
-        if ($payment->isPromissePaid()) {
-
-            $status = $this->statusService->discoveryStatus(
-                'open',
-                'waiting retrieve',
-                'invoice'
-            );
-
-            foreach ($invoice->getOrder() as $orders) {
-                $o = $orders->getOrder();
-                if ($o->getStatus()->getStatus() == 'waiting payment') {
-                    $o->setStatus($status);
-                    $o->setNotified(0);
-                    $this->manager->persist($o);
-                    $this->manager->flush();
-                }
-            }
-        }
-
-        // mark invoice as paid
-
-        if ($payment->isPaid()) {
-            $status = $this->statusService->discoveryStatus(
-                'closed',
-                'paid',
-                'invoice'
-            );
-
-            $invoice->setStatus($status);
-
-            $this->manager->persist($invoice);
-            $this->manager->flush();
-        }
+        $this->invoiceService->syncItauPaymentStatus(
+            $invoice,
+            $payment->isPromissePaid(),
+            $payment->isPaid()
+        );
 
         return $payinfo;
     }

@@ -3,12 +3,10 @@
 namespace ControleOnline\Controller\Card;
 
 
-use ControleOnline\Entity\Card;
 use ControleOnline\Service\CardService;
 use ControleOnline\Service\HydratorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class CardCreateController 
 {
@@ -20,10 +18,10 @@ class CardCreateController
     public function __invoke(Request $request,): JsonResponse
     {
         try {
-            $data = json_decode($request->getContent(), true);
-            $savedCard = $this->cardService->saveCard($this->cardService->toObject($data));
-            
-            
+            $savedCard = $this->cardService->createCardFromContent(
+                $request->getContent()
+            );
+
             return new JsonResponse($this->hydratorService->data($savedCard,  'card:read'));
         } catch (\Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));

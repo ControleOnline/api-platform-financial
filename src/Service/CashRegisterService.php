@@ -22,7 +22,8 @@ class CashRegisterService
         private InFlowService $inFlowService,
         private DeviceService $deviceService,
         private IntegrationService $integrationService,
-        private WhatsAppService $whatsAppService
+        private WhatsAppService $whatsAppService,
+        private RequestPayloadService $requestPayloadService
     ) {}
 
     public function close(Device $device, People $provider)
@@ -242,5 +243,65 @@ class CashRegisterService
         return $this->printService->generatePrintData($device, $provider, [
             'type' => $this->pdvDeviceType,
         ]);
+    }
+
+    public function resolveDeviceAndProvider(
+        mixed $deviceReference,
+        mixed $providerReference
+    ): array {
+        $provider = $this->entityManager->getRepository(People::class)->find($providerReference);
+        $device = $this->entityManager->getRepository(Device::class)->findOneBy([
+            'device' => (string) $deviceReference,
+        ]);
+
+        return [$device, $provider];
+    }
+
+    public function notifyFromReferences(mixed $deviceReference, mixed $providerReference): void
+    {
+        [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->notify($device, $provider);
+    }
+
+    public function closeFromReferences(mixed $deviceReference, mixed $providerReference)
+    {
+        [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+
+        return $this->close($device, $provider);
+    }
+
+    public function openFromReferences(mixed $deviceReference, mixed $providerReference)
+    {
+        [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+
+        return $this->open($device, $provider);
+    }
+
+    public function generateDataFromReferences(mixed $deviceReference, mixed $providerReference)
+    {
+        [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+
+        return $this->generateData($device, $provider);
+    }
+
+    public function generatePrintDataFromContent(?string $content): Spool
+    {
+        $payload = $this->requestPayloadService->decodeJsonContent($content);
+        [$device, $provider] = $this->resolveDeviceAndProvider(
+            $payload['device'] ?? '',
+            $payload['people'] ?? null
+        );
+
+        return $this->generatePrintData($device, $provider);
+    }
+
+    public function notifyFromContent(?string $content): void
+    {
+        $payload = $this->requestPayloadService->decodeJsonContent($content);
+
+        $this->notifyFromReferences(
+            $payload['device'] ?? '',
+            $payload['people'] ?? null
+        );
     }
 }

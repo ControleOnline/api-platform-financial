@@ -49,6 +49,38 @@ class InvoiceService
         return $invoice;
     }
 
+    public function syncItauPaymentStatus(Invoice $invoice, bool $promisePaid, bool $paid): void
+    {
+        if ($promisePaid) {
+            $status = $this->statusService->discoveryStatus(
+                'open',
+                'waiting retrieve',
+                'invoice'
+            );
+
+            $hasOrderUpdates = false;
+            foreach ($invoice->getOrder() as $orders) {
+                $order = $orders->getOrder();
+                if ($order->getStatus()->getStatus() !== 'waiting payment') {
+                    continue;
+                }
+
+                $order->setStatus($status);
+                $order->setNotified(0);
+                $this->manager->persist($order);
+                $hasOrderUpdates = true;
+            }
+
+            if ($hasOrderUpdates) {
+                $this->manager->flush();
+            }
+        }
+
+        if ($paid) {
+            $this->setPayed($invoice);
+        }
+    }
+
     public function createInvoice(
         ?Order $order = null,
         ?People $payer = null,

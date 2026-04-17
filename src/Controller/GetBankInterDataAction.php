@@ -59,9 +59,6 @@ class GetBankInterDataAction
             $ret['response']['error'] = '';
             $ret['response']['success'] = true;
         } catch (BancoInterException $e) {
-            //$error = json_decode($e->reply->body);
-            //$error = (is_array($error) ? $error : (is_object($error) ? (is_array($error->message) ? json_encode($error->message) : $error->message) : $error['message']));
-            //$error = $error ?: $e->reply->body;
             $error = $e;
             $ret['response']['data'] = [];
             $ret['response']['count'] = 0;
