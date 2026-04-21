@@ -14,6 +14,8 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ControleOnline\Entity\Status;
 use ControleOnline\Entity\Wallet;
+use ControleOnline\Service\OrderService;
+use ControleOnline\Service\OrderProductQueueService;
 use DateTime;
 use Exception;
 
@@ -30,7 +32,9 @@ class InvoiceService
         private RequestStack $requestStack,
         private BraspagService $braspagService,
         private StatusService $statusService,
-        private OrderPrintService $orderPrintService
+        private OrderPrintService $orderPrintService,
+        private OrderService $orderService,
+        private OrderProductQueueService $orderProductQueueService
 
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
@@ -199,10 +203,12 @@ class InvoiceService
             );
 
 
+            $this->orderService->convertDraftOrderToSale($order);
             $order->setStatus($status);
 
             $this->manager->persist($order);
             $this->manager->flush();
+            $this->orderProductQueueService->syncByOrderStatus($order);
         }
     }
 
