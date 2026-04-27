@@ -122,6 +122,7 @@ class InvoiceService
 
     public function createInvoiceByOrder(Order $order, $price, ?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null): Invoice
     {
+        $financialOrder = $this->orderService->resolveFinancialOrder($order);
 
         if (!$source_wallet && !$destination_wallet)
             throw new Exception("Need a source or destination Wallet", 301);
@@ -130,7 +131,19 @@ class InvoiceService
             'waiting payment',
             'invoice'
         );
-        return $this->createInvoice($order, $order->getPayer() ?: $order->getClient(), $order->getProvider(), $price, $status, $dueDate,  $source_wallet, $destination_wallet, $portion, $installments, $installment_id);
+        return $this->createInvoice(
+            $financialOrder,
+            $financialOrder->getPayer() ?: $financialOrder->getClient(),
+            $financialOrder->getProvider(),
+            $price,
+            $status,
+            $dueDate,
+            $source_wallet,
+            $destination_wallet,
+            $portion,
+            $installments,
+            $installment_id
+        );
     }
 
     protected function createOrderInvoice(Order $order, Invoice $invoice, $price = 0): OrderInvoice
@@ -159,7 +172,8 @@ class InvoiceService
         $payload = json_decode($this->request->getContent());
         if (isset($payload->order)) {
             $order = $this->manager->getRepository(Order::class)->find(preg_replace('/\D/', '', $payload->order));
-            $this->createOrderInvoice($order, $invoice,  $order->getPrice());
+            $financialOrder = $this->orderService->resolveFinancialOrder($order);
+            $this->createOrderInvoice($financialOrder, $invoice,  $invoice->getPrice());
         }
         //$this->braspagService->split($invoice);
         $this->refreshWalletValue($invoice);
@@ -185,16 +199,17 @@ class InvoiceService
     public function payOrder(Order $order)
     {
         $order = $this->manager->getRepository(Order::class)->find($order->getId());
-        $orderStatus = $order->getStatus()->getRealStatus();
+        $financialOrder = $this->orderService->resolveFinancialOrder($order);
+        $orderStatus = $financialOrder->getStatus()->getRealStatus();
         if ($orderStatus == 'canceled') return;
         $paidValue = 0;
-        foreach ($order->getInvoice() as $orderInvoice) {
+        foreach ($financialOrder->getInvoice() as $orderInvoice) {
             $invoice = $orderInvoice->getInvoice();
             if ($invoice->getstatus()->getRealStatus() == 'closed')
                 $paidValue += $invoice->getPrice();
         }
 
-        if ($paidValue > 0 && $paidValue >= $order->getPrice()) {
+        if ($paidValue > 0 && $paidValue >= $financialOrder->getPrice()) {
 
             $status = $this->statusService->discoveryRealStatus(
                 'open',
@@ -203,12 +218,34 @@ class InvoiceService
             );
 
 
-            $this->orderService->convertDraftOrderToSale($order);
-            $order->setStatus($status);
-
-            $this->manager->persist($order);
+            $this->markOrderTreeAsPaid($financialOrder, $status);
             $this->manager->flush();
-            $this->orderProductQueueService->syncByOrderStatus($order);
+            $this->orderProductQueueService->syncByOrderStatus($financialOrder);
+        }
+    }
+
+    private function markOrderTreeAsPaid(Order $order, Status $status, array &$visitedOrderIds = []): void
+    {
+        if (!$order->getId() || isset($visitedOrderIds[$order->getId()])) {
+            return;
+        }
+
+        $visitedOrderIds[$order->getId()] = true;
+        $this->orderService->convertDraftOrderToSale($order);
+        $order->setStatus($status);
+        $this->manager->persist($order);
+        $this->orderProductQueueService->syncByOrderStatus($order);
+
+        $linkedOrders = $this->manager->getRepository(Order::class)->findBy([
+            'mainOrderId' => $order->getId(),
+        ]);
+
+        foreach ($linkedOrders as $linkedOrder) {
+            if (!$linkedOrder instanceof Order) {
+                continue;
+            }
+
+            $this->markOrderTreeAsPaid($linkedOrder, $status, $visitedOrderIds);
         }
     }
 
