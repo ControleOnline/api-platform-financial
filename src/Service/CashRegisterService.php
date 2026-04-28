@@ -28,16 +28,8 @@ class CashRegisterService
 
     public function close(Device $device, People $provider)
     {
-        $lastInvoice = $this->entityManager->getRepository(Invoice::class)->findOneBy(
-            [
-                'receiver' => $provider,
-                'device' => $device
-            ],
-            ['id' => 'DESC']
-        );
-
         $this->deviceService->addDeviceConfigs($provider, [
-            'cash-wallet-closed-id' => $lastInvoice->getId(),
+            'cash-wallet-closed-id' => $this->resolveLastInvoiceId($device, $provider),
         ], $device->getDevice(), $this->pdvDeviceType);
 
         $this->notify($device,  $provider);
@@ -113,15 +105,24 @@ class CashRegisterService
 
     public function open(Device $device, People $provider)
     {
-        $lastInvoice = $this->entityManager->getRepository(Invoice::class)->findOneBy([
-            'receiver' => $provider,
-            'device' => $device
-        ]);
-
+        // O primeiro ciclo do caixa pode nao ter invoice anterior para servir de marco inicial.
         $this->deviceService->addDeviceConfigs($provider, [
-            'cash-wallet-open-id' => $lastInvoice->getId(),
+            'cash-wallet-open-id' => $this->resolveLastInvoiceId($device, $provider),
             'cash-wallet-closed-id' => 0,
         ], $device->getDevice(), $this->pdvDeviceType);
+    }
+
+    private function resolveLastInvoiceId(Device $device, People $provider): int
+    {
+        $lastInvoice = $this->entityManager->getRepository(Invoice::class)->findOneBy(
+            [
+                'receiver' => $provider,
+                'device' => $device
+            ],
+            ['id' => 'DESC']
+        );
+
+        return $lastInvoice?->getId() ?? 0;
     }
 
 
