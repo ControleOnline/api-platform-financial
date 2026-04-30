@@ -20,11 +20,11 @@ use ControleOnline\Entity\WalletPaymentType;
 #[ORM\Entity]
 #[ApiResource(
     operations: [
-        new GetCollection(security: "is_granted('ROLE_CLIENT')"),
-        new Get(security: "is_granted('ROLE_CLIENT')"),
-        new Post(security: "is_granted('ROLE_CLIENT')"),
-        new Put(security: "is_granted('ROLE_CLIENT')"),
-        new Delete(security: "is_granted('ROLE_CLIENT')")
+        new GetCollection(security: "is_granted('ROLE_HUMAN')"),
+        new Get(security: "is_granted('ROLE_HUMAN')"),
+        new Post(security: "is_granted('ROLE_HUMAN')"),
+        new Put(security: "is_granted('ROLE_HUMAN')"),
+        new Delete(security: "is_granted('ROLE_HUMAN')")
     ],
     normalizationContext: ['groups' => ['wallet:read']],
     denormalizationContext: ['groups' => ['wallet:write']]

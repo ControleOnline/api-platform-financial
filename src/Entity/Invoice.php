@@ -36,17 +36,17 @@ use stdClass;
 #[ApiResource(
     operations: [
         new Get(
-            security: 'is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             normalizationContext: ['groups' => ['invoice_details:read']],
         ),
         new GetCollection(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             uriTemplate: '/invoice/inflow',
             provider: InvoiceDataProvider::class,
             normalizationContext: ['groups' => ['invoice:read']],
         ),
         new Get(
-            security: 'is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             uriTemplate: '/invoice/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: GetBankItauDataAction::class
@@ -58,22 +58,22 @@ use stdClass;
             description: 'Retrieve invoices based on document and company.'
         ),
         new GetCollection(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
         ),
 
         new Post(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']],
             uriTemplate: '/invoices',
         ),
         new Put(
-            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']]
         ),
         new Delete(
-            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']]
         ),
@@ -84,39 +84,39 @@ use stdClass;
             controller: GetBankInterDataAction::class
         ),
         new Get(
-            security: 'is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             uriTemplate: '/finance/receive/{id}/bank/itau/{operation}',
             requirements: ['operation' => '^(itauhash|payment)+$'],
             controller: GetBankItauDataAction::class
         ),
         new Get(
-            security: 'is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             uriTemplate: '/finance/receive/{id}/bank/inter/{operation}',
             requirements: ['operation' => '^(download|payment)+$'],
             controller: GetBankInterDataAction::class
         ),
         new Put(
-            security: 'is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             uriTemplate: '/finance/receive/{id}/update-notified',
             validationContext: ['groups' => ['invoice_receive_notified_validation']],
             denormalizationContext: ['groups' => ['invoice_receive_notified_edit']]
         ),
         new Put(
-            security: 'is_granted(\'ROLE_ADMIN\') or (is_granted(\'ROLE_CLIENT\'))',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']],
             uriTemplate: '/invoice/{id}/split',
             controller: SplitInvoiceAction::class
         ),
         new Post(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']],
             controller: AsaasPixController::class,
             uriTemplate: '/asaas/{id}/pix',
         ),
         new Post(
-            security: 'is_granted(\'ROLE_ADMIN\') or is_granted(\'ROLE_CLIENT\')',
+            security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']],
             controller: AsaasCardController::class,

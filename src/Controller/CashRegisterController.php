@@ -25,7 +25,7 @@ class CashRegisterController extends AbstractController
 
 
     #[Route('/cash-register/notify', name: 'notify-cash_register', methods: ['POST'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function notifyCashRegister(Request $request): JsonResponse
     {
         try {
@@ -40,7 +40,7 @@ class CashRegisterController extends AbstractController
     }
 
     #[Route('/cash-register/close', name: 'close-cash_register', methods: ['POST'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function closeCashRegister(Request $request): JsonResponse
     {
         try {
@@ -55,7 +55,7 @@ class CashRegisterController extends AbstractController
         }
     }
     #[Route('/cash-register/open', name: 'open-cash_register', methods: ['POST'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function openCashRegister(Request $request): JsonResponse
     {
         try {
@@ -74,7 +74,7 @@ class CashRegisterController extends AbstractController
 
 
     #[Route('/cash-register', name: 'cash_register', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function getCashRegister(Request $request): JsonResponse
     {
         try {
@@ -90,7 +90,7 @@ class CashRegisterController extends AbstractController
     }
 
     #[Route('/cash-register/print', name: 'print_cash_register', methods: ['POST'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function printCashRegister(Request $request): JsonResponse
     {
         try {
@@ -107,7 +107,7 @@ class CashRegisterController extends AbstractController
     }
 
     #[Route('/income_statements', name: 'invoice_inflow', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function getIncomeStatements(Request $request): Response
     {
         try {
@@ -135,7 +135,7 @@ class CashRegisterController extends AbstractController
 
 
     #[Route('/monthly_statements', name: 'monthly_statements', methods: ['GET'])]
-    #[Security("is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')")]
+    #[Security("is_granted('ROLE_HUMAN')")]
     public function getMonthlyStatements(Request $request): Response
     {
         try {

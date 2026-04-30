@@ -20,27 +20,27 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             controller: CardCollectionController::class
         ),
         new Get(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             controller: CardController::class
         ),
         new Post(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             controller: CardCreateController::class
         ),
         new Put(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             controller: CardUpdateController::class
         ),
         new Delete(
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+            security: "is_granted('ROLE_HUMAN')",
             controller: CardDeleteController::class
         ),
     ],
-    security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_CLIENT')",
+    security: "is_granted('ROLE_HUMAN')",
     normalizationContext: ['groups' => ['card:read']],
     denormalizationContext: ['groups' => ['card:write']]
 )]
