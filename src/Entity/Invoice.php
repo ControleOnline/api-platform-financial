@@ -194,6 +194,10 @@ class Invoice
     #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write'])]
     private $price;
 
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
+    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write'])]
+    private $description = null;
+
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
     #[ORM\ManyToOne(targetEntity: Category::class)]
@@ -288,6 +292,18 @@ class Invoice
     public function getPrice()
     {
         return $this->price;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $normalizedDescription = trim((string) ($description ?? ''));
+        $this->description = $normalizedDescription !== '' ? $normalizedDescription : null;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
     public function getInvoiceDate()

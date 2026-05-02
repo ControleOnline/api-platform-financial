@@ -96,7 +96,8 @@ class InvoiceService
         ?Wallet $destination_wallet = null,
         $portion = 1,
         $installments = 1,
-        $installment_id =  null
+        $installment_id =  null,
+        ?string $description = null
     ): Invoice {
 
         $paymentType = $this->manager->getRepository(PaymentType::class)->find(1);
@@ -113,6 +114,7 @@ class InvoiceService
         $invoice->setInstallmentId($installment_id);
         $invoice->setStatus($status);
         $invoice->setPaymentType($paymentType);
+        $invoice->setDescription($description);
         $this->manager->persist($invoice);
         if ($order)
             $this->createOrderInvoice($order, $invoice, $price);
@@ -120,7 +122,7 @@ class InvoiceService
         return $invoice;
     }
 
-    public function createInvoiceByOrder(Order $order, $price, ?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null): Invoice
+    public function createInvoiceByOrder(Order $order, $price, ?Status $status = null, DateTime $dueDate, ?Wallet $source_wallet = null, ?Wallet $destination_wallet = null, $portion = 1, $installments = 1, $installment_id =  null, ?string $description = null): Invoice
     {
         $financialOrder = $this->orderService->resolveFinancialOrder($order);
 
@@ -142,7 +144,8 @@ class InvoiceService
             $destination_wallet,
             $portion,
             $installments,
-            $installment_id
+            $installment_id,
+            $description
         );
     }
 
