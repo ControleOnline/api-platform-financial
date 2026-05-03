@@ -36,6 +36,7 @@ use stdClass;
 #[ApiResource(
     operations: [
         new Get(
+            uriTemplate: '/invoices/{id}',
             security: 'is_granted(\'ROLE_HUMAN\')',
             normalizationContext: ['groups' => ['invoice_details:read']],
         ),
@@ -58,6 +59,7 @@ use stdClass;
             description: 'Retrieve invoices based on document and company.'
         ),
         new GetCollection(
+            uriTemplate: '/invoices',
             security: 'is_granted(\'ROLE_HUMAN\')',
         ),
 
@@ -68,11 +70,13 @@ use stdClass;
             uriTemplate: '/invoices',
         ),
         new Put(
+            uriTemplate: '/invoices/{id}',
             security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']]
         ),
         new Delete(
+            uriTemplate: '/invoices/{id}',
             security: 'is_granted(\'ROLE_HUMAN\')',
             validationContext: ['groups' => ['invoice:write']],
             denormalizationContext: ['groups' => ['invoice:write']]
