@@ -7,6 +7,7 @@ use ControleOnline\Entity\PaymentType;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Wallet;
 use ControleOnline\Entity\WalletPaymentType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
  AS Security;
@@ -26,18 +27,40 @@ class WalletService
     }
 
     public function discoverWalletPaymentType(Wallet $wallet, PaymentType $paymentType, $paymentCode = null) {
+        $normalizedPaymentCode = is_string($paymentCode) ? trim($paymentCode) : $paymentCode;
+        if ($normalizedPaymentCode === '') {
+            $normalizedPaymentCode = null;
+        }
 
         $walletPaymentType = $this->manager->getRepository(WalletPaymentType::class)->findOneBy([
             'wallet' => $wallet,
             'paymentType' => $paymentType,
-            'paymentCode' => $paymentCode 
         ]);
 
         if (!$walletPaymentType) {
             $walletPaymentType = new WalletPaymentType();
             $walletPaymentType->setPaymentType($paymentType);
             $walletPaymentType->setWallet($wallet);
-            $walletPaymentType->setPaymentCode($paymentCode);
+            $walletPaymentType->setPaymentCode($normalizedPaymentCode);
+
+            try {
+                $this->manager->persist($walletPaymentType);
+                $this->manager->flush();
+            } catch (UniqueConstraintViolationException) {
+                $this->manager->clear(WalletPaymentType::class);
+                $walletPaymentType = $this->manager->getRepository(WalletPaymentType::class)->findOneBy([
+                    'wallet' => $wallet,
+                    'paymentType' => $paymentType,
+                ]);
+            }
+        }
+
+        if (
+            $walletPaymentType instanceof WalletPaymentType
+            && $normalizedPaymentCode !== null
+            && !$walletPaymentType->getPaymentCode()
+        ) {
+            $walletPaymentType->setPaymentCode($normalizedPaymentCode);
             $this->manager->persist($walletPaymentType);
             $this->manager->flush();
         }

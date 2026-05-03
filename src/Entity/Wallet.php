@@ -39,7 +39,7 @@ class Wallet
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write'])]
+    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write', 'order_invoice_invoice:read'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
@@ -48,7 +48,7 @@ class Wallet
     private $people;
 
     #[ORM\Column(type: 'string', length: 50)]
-    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write'])]
+    #[Groups(['invoice:read', 'wallet_payment_type:read', 'invoice_details:read', 'wallet:read', 'wallet:write', 'order_invoice_invoice:read'])]
     private $wallet;
 
     #[ORM\Column(type: 'integer')]
