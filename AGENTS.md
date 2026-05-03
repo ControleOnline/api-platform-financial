@@ -10,3 +10,5 @@
 - O fluxo operacional de pedido continua pertencendo a `orders`, mesmo quando gera invoice.
 - `financial` e o dono do dominio financeiro compartilhado.
 - Quando `Invoice` precisar ser expandida dentro de outro recurso leve, como `OrderInvoice`, use um group especifico e enxuto para esse embed. Nao acople colecoes operacionais ao group amplo `invoice:read`.
+- `Invoice.paymentType` descreve o meio de pagamento real da cobranca, como `Credito`, `Debito`, `Pix` ou `Dinheiro`. Descricao operacional, taxa, desconto e motivo contabil ficam em `description`/metadata, nunca no meio de pagamento.
+- `Invoice.invoiceType` classifica a natureza financeira em ingles. Os tipos canonicos atuais sao `invoice`, `payment`, `discount` e `tax`, com default `invoice`.

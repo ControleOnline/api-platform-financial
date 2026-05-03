@@ -137,6 +137,17 @@ use stdClass;
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 class Invoice
 {
+    public const TYPE_INVOICE = 'invoice';
+    public const TYPE_PAYMENT = 'payment';
+    public const TYPE_DISCOUNT = 'discount';
+    public const TYPE_TAX = 'tax';
+    public const TYPES = [
+        self::TYPE_INVOICE,
+        self::TYPE_PAYMENT,
+        self::TYPE_DISCOUNT,
+        self::TYPE_TAX,
+    ];
+
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['id' => 'exact'])]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
@@ -197,6 +208,12 @@ class Invoice
     #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $description = null;
+
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoiceType' => 'exact'])]
+    #[ORM\Column(name: 'invoice_type', type: 'string', length: 32, options: ['default' => self::TYPE_INVOICE])]
+    #[Assert\Choice(choices: self::TYPES)]
+    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    private $invoiceType = self::TYPE_INVOICE;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
@@ -304,6 +321,22 @@ class Invoice
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getInvoiceType(): string
+    {
+        return $this->invoiceType ?: self::TYPE_INVOICE;
+    }
+
+    public function setInvoiceType(?string $invoiceType): self
+    {
+        $normalizedInvoiceType = strtolower(trim((string) ($invoiceType ?? '')));
+
+        $this->invoiceType = in_array($normalizedInvoiceType, self::TYPES, true)
+            ? $normalizedInvoiceType
+            : self::TYPE_INVOICE;
+
+        return $this;
     }
 
     public function getInvoiceDate()
