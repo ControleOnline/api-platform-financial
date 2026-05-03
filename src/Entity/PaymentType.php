@@ -40,7 +40,7 @@ class PaymentType
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write'])]
+    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write', 'order_invoice_invoice:read'])]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: People::class)]
@@ -49,15 +49,15 @@ class PaymentType
     private $people;
 
     #[ORM\Column(type: 'string', length: 50)]
-    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write'])]
+    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write', 'order_invoice_invoice:read'])]
     private $paymentType;
 
     #[ORM\Column(type: 'string', columnDefinition: "ENUM('monthly', 'daily', 'weekly', 'single')")]
-    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write'])]
+    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write', 'order_invoice_invoice:read'])]
     private $frequency;
 
     #[ORM\Column(type: 'string', columnDefinition: "ENUM('single', 'split')")]
-    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write'])]
+    #[Groups(['invoice:read', 'wallet:read', 'wallet_payment_type:read', 'invoice_details:read', 'payment_type:read', 'payment_type:write', 'order_invoice_invoice:read'])]
     private $installments;
 
     #[ORM\OneToMany(targetEntity: WalletPaymentType::class, mappedBy: 'paymentType')]
