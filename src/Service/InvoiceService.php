@@ -85,6 +85,61 @@ class InvoiceService
         }
     }
 
+    /**
+     * @return Invoice[]
+     */
+    public function cancelSingleOrderInvoicesForCanceledOrder(Order $order, Status $canceledStatus): array
+    {
+        if (!$this->isCanceledStatus($order->getStatus())) {
+            return [];
+        }
+
+        $canceledInvoices = [];
+        $targetOrderId = (int) ($order->getId() ?? 0);
+
+        foreach ($order->getInvoice() as $orderInvoice) {
+            if (!$orderInvoice instanceof OrderInvoice) {
+                continue;
+            }
+
+            $invoice = $orderInvoice->getInvoice();
+            if (!$invoice instanceof Invoice) {
+                continue;
+            }
+
+            $invoiceOrders = $invoice->getOrder();
+            if (!method_exists($invoiceOrders, 'count') || $invoiceOrders->count() !== 1) {
+                continue;
+            }
+
+            $singleLink = method_exists($invoiceOrders, 'first')
+                ? $invoiceOrders->first()
+                : null;
+
+            if (!$singleLink instanceof OrderInvoice) {
+                continue;
+            }
+
+            $linkedOrder = $singleLink->getOrder();
+            if (!$linkedOrder instanceof Order) {
+                continue;
+            }
+
+            if ($targetOrderId > 0 && (int) ($linkedOrder->getId() ?? 0) !== $targetOrderId) {
+                continue;
+            }
+
+            if ($this->isCanceledStatus($invoice->getStatus())) {
+                continue;
+            }
+
+            $invoice->setStatus($canceledStatus);
+            $canceledInvoices[] = $invoice;
+        }
+
+        return $canceledInvoices;
+    }
+
     public function createInvoice(
         ?Order $order = null,
         ?People $payer = null,
@@ -284,5 +339,18 @@ class InvoiceService
         if (in_array($excludeOwnTransfers, ['1', 1, true, 'true'], true)) {
             $queryBuilder->andWhere(sprintf('(%s.payer IS NULL OR %s.receiver IS NULL OR %s.payer <> %s.receiver)', $rootAlias, $rootAlias, $rootAlias, $rootAlias));
         }
+    }
+
+    private function isCanceledStatus(?Status $status): bool
+    {
+        if (!$status instanceof Status) {
+            return false;
+        }
+
+        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
+        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
+
+        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
+            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
     }
 }
