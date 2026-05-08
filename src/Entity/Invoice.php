@@ -24,6 +24,7 @@ use ControleOnline\Controller\SplitInvoiceAction;
 use ControleOnline\DataProvider\InvoiceDataProvider;
 
 use ControleOnline\Repository\InvoiceRepository;
+use ControleOnline\Service\InvoiceFinancialSummaryResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use ControleOnline\Filter\RandomOrderFilter;
 use Doctrine\Common\Collections\Collection;
@@ -208,6 +209,9 @@ class Invoice
     #[ORM\Column(name: 'price', type: 'float', nullable: true)]
     #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $price;
+
+    #[CollectionSummary(name: 'financial', groups: ['invoice:read'], resolver: InvoiceFinancialSummaryResolver::class)]
+    private $financialSummary = null;
 
     #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
