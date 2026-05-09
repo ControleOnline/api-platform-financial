@@ -13,3 +13,4 @@
 - `Invoice.paymentType` descreve o meio de pagamento real da cobranca, como `Credito`, `Debito`, `Pix` ou `Dinheiro`. Descricao operacional, taxa, desconto e motivo contabil ficam em `description`/metadata, nunca no meio de pagamento.
 - `Invoice.invoiceType` classifica a natureza financeira em ingles. Os tipos canonicos atuais sao `invoice`, `payment`, `discount` e `tax`, com default `invoice`.
 - Totais financeiros de collections de `Invoice` devem sair do `summary` do backend. Para aberto/pago, use resolver de `CollectionSummary`; nao deixe o frontend calcular esses valores pela pagina carregada.
+- As listagens de `Invoice` consumidas por `DefaultTable` React precisam expor `search`, `order` e filtros no backend com `CustomOrFilter`, `OrderFilter` e `DateFilter` alinhados ao store.

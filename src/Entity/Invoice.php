@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ControleOnline\Attribute\CollectionSummary;
+use ControleOnline\Filter\CustomOrFilter;
 use ControleOnline\Controller\Asaas\AsaasCardController;
 use ControleOnline\Controller\Asaas\AsaasPixController;
 use ControleOnline\Controller\GetBankInterDataAction;
@@ -131,10 +132,44 @@ use stdClass;
     ],
     formats: ['jsonld', 'json', 'html', 'jsonhal', 'csv' => ['text/csv']],
     normalizationContext: ['groups' => ['invoice:read']],
-    denormalizationContext: ['groups' => ['invoice:write']]
+    denormalizationContext: ['groups' => ['invoice:write']],
+    order: ['dueDate' => 'DESC', 'id' => 'DESC']
 )]
 
-#[ApiFilter(OrderFilter::class, properties: ['product', 'price', 'description'])]
+#[ApiFilter(OrderFilter::class, properties: [
+    'id',
+    'payer.name',
+    'payer.alias',
+    'receiver.name',
+    'receiver.alias',
+    'category.name',
+    'status.status',
+    'status.realStatus',
+    'dueDate',
+    'sourceWallet.wallet',
+    'destinationWallet.wallet',
+    'paymentType.paymentType',
+    'invoiceType',
+    'installments',
+    'price',
+    'description',
+    'notified'
+])]
+#[ApiFilter(CustomOrFilter::class, properties: [
+    'id',
+    'description',
+    'invoiceType',
+    'payer.name',
+    'payer.alias',
+    'receiver.name',
+    'receiver.alias',
+    'category.name',
+    'status.status',
+    'status.realStatus',
+    'sourceWallet.wallet',
+    'destinationWallet.wallet',
+    'paymentType.paymentType'
+])]
 #[ApiFilter(RandomOrderFilter::class)]
 
 #[ORM\Table(name: 'invoice')]
