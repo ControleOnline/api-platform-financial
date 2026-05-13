@@ -465,7 +465,21 @@ class Invoice
 
     public function getOtherInformations($decode = false)
     {
-        return $decode ? (object) json_decode((is_array($this->otherInformations) ? json_encode($this->otherInformations) : $this->otherInformations)) : $this->otherInformations;
+        if (!$decode) {
+            return $this->otherInformations;
+        }
+
+        $rawOtherInformations = is_array($this->otherInformations)
+            ? json_encode($this->otherInformations)
+            : $this->otherInformations;
+
+        if ($rawOtherInformations === null || $rawOtherInformations === '') {
+            return new stdClass();
+        }
+
+        $decodedOtherInformations = json_decode($rawOtherInformations);
+
+        return $decodedOtherInformations instanceof stdClass ? $decodedOtherInformations : new stdClass();
     }
 
     public function addOtherInformations($key, $value)
