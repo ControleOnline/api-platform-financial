@@ -7,9 +7,10 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\DBAL\Types\Types;
+use InvalidArgumentException;
 
 class CashRegisterService
 {
@@ -246,14 +247,47 @@ class CashRegisterService
         ]);
     }
 
+    private function normalizeReference(mixed $reference): mixed
+    {
+        if (!is_string($reference)) {
+            return $reference;
+        }
+
+        $reference = trim($reference);
+
+        return $reference === '' ? null : $reference;
+    }
+
+    private function requireResolvedContext(?Device $device, ?People $provider): void
+    {
+        if (!$device && !$provider) {
+            throw new InvalidArgumentException('Device and provider are required.');
+        }
+
+        if (!$device) {
+            throw new InvalidArgumentException('Device is required.');
+        }
+
+        if (!$provider) {
+            throw new InvalidArgumentException('Provider is required.');
+        }
+    }
+
     public function resolveDeviceAndProvider(
         mixed $deviceReference,
         mixed $providerReference
     ): array {
-        $provider = $this->entityManager->getRepository(People::class)->find($providerReference);
-        $device = $this->entityManager->getRepository(Device::class)->findOneBy([
-            'device' => (string) $deviceReference,
-        ]);
+        $providerReference = $this->normalizeReference($providerReference);
+        $deviceReference = $this->normalizeReference($deviceReference);
+
+        $provider = $providerReference === null
+            ? null
+            : $this->entityManager->getRepository(People::class)->find($providerReference);
+        $device = $deviceReference === null
+            ? null
+            : $this->entityManager->getRepository(Device::class)->findOneBy([
+                'device' => (string) $deviceReference,
+            ]);
 
         return [$device, $provider];
     }
@@ -261,12 +295,14 @@ class CashRegisterService
     public function notifyFromReferences(mixed $deviceReference, mixed $providerReference): void
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
         $this->notify($device, $provider);
     }
 
     public function closeFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
 
         return $this->close($device, $provider);
     }
@@ -274,6 +310,7 @@ class CashRegisterService
     public function openFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
 
         return $this->open($device, $provider);
     }
@@ -281,6 +318,10 @@ class CashRegisterService
     public function generateDataFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+
+        if (!$device || !$provider) {
+            return [];
+        }
 
         return $this->generateData($device, $provider);
     }
@@ -292,6 +333,7 @@ class CashRegisterService
             $payload['device'] ?? '',
             $payload['people'] ?? null
         );
+        $this->requireResolvedContext($device, $provider);
 
         return $this->generatePrintData($device, $provider);
     }
