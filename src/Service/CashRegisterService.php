@@ -8,10 +8,11 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
+use ControleOnline\Service\Client\WebsocketClient;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\DBAL\Types\Types;
-use ControleOnline\Service\Client\WebsocketClient;
+use InvalidArgumentException;
 
 class CashRegisterService
 {
