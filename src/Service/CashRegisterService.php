@@ -3,12 +3,10 @@
 namespace ControleOnline\Service;
 
 use ControleOnline\Entity\Device;
-use ControleOnline\Entity\DeviceConfig;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
-use ControleOnline\Service\Client\WebsocketClient;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -26,50 +24,27 @@ class CashRegisterService
         private DeviceService $deviceService,
         private IntegrationService $integrationService,
         private WhatsAppService $whatsAppService,
-        private RequestPayloadService $requestPayloadService,
-        private WebsocketClient $websocketClient
+        private RequestPayloadService $requestPayloadService
     ) {}
 
     public function close(Device $device, People $provider)
     {
-        $products = $this->generateData($device, $provider);
+        $this->deviceService->addDeviceConfigs($provider, [
+            'cash-wallet-closed-id' => $this->resolveLastInvoiceId($device, $provider),
+        ], $device->getDevice(), $this->pdvDeviceType);
+
+        $this->notify($device,  $provider);
+    }
+
+    public function notify(Device $device, People $provider)
+    {
+        $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
+
         $filters = [
             'device.device' => $device->getDevice(),
             'receiver' => $provider->getId()
         ];
         $paymentData = $this->inFlowService->getPayments($filters);
-
-        $this->deviceService->addDeviceConfigs($provider, [
-            'cash-wallet-closed-id' => $this->resolveLastInvoiceId($device, $provider),
-        ], $device->getDevice(), $this->pdvDeviceType);
-
-        $this->notify($device,  $provider, $products, $paymentData);
-        $this->broadcastCompanyWebsocketEvents($provider, [[
-            'store' => 'orders',
-            'event' => 'cash.closed',
-            'company' => $provider->getId(),
-            'provider' => $provider->getId(),
-            'device' => $device->getDevice(),
-            'status' => 'closed',
-            'realStatus' => 'closed',
-            'notificationHeader' => 'Fechamento de caixa',
-            'notificationSubheader' => $provider->getAlias() ?: $provider->getName() ?: 'Caixa',
-            'notificationBody' => $this->generateFormattedMessage($products, $paymentData),
-            'message' => 'Fechamento de caixa concluído',
-            'sentAt' => date(DATE_ATOM),
-            'alertSound' => true,
-        ]]);
-    }
-
-    public function notify(Device $device, People $provider, ?array $products = null, ?array $paymentData = null)
-    {
-        $numbers = $this->configService->getConfig($provider, 'cash-register-notifications', true);
-
-        $products ??= $this->generateData($device, $provider);
-        $paymentData ??= $this->inFlowService->getPayments([
-            'device.device' => $device->getDevice(),
-            'receiver' => $provider->getId()
-        ]);
 
         $connection = $this->whatsAppService->searchConnectionFromPeople($provider, 'support', true);
         if (!$connection) return;
@@ -126,39 +101,6 @@ class CashRegisterService
         $message .= "*Total recebido:* R$ " . number_format($pagamentoTotal, 2, ',', '.');
 
         return $message;
-    }
-
-    private function broadcastCompanyWebsocketEvents(People $company, array $events): void
-    {
-        $deviceConfigs = $this->entityManager->getRepository(DeviceConfig::class)->findBy([
-            'people' => $company,
-        ]);
-
-        if (empty($deviceConfigs)) {
-            return;
-        }
-
-        $payload = json_encode($events, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if ($payload === false) {
-            return;
-        }
-
-        $sentDevices = [];
-        foreach ($deviceConfigs as $deviceConfig) {
-            if (!$deviceConfig instanceof DeviceConfig) {
-                continue;
-            }
-
-            $device = $deviceConfig->getDevice();
-            $deviceId = $device->getId();
-
-            if (isset($sentDevices[$deviceId])) {
-                continue;
-            }
-
-            $sentDevices[$deviceId] = true;
-            $this->websocketClient->push($device, $payload);
-        }
     }
 
 
@@ -305,14 +247,47 @@ class CashRegisterService
         ]);
     }
 
+    private function normalizeReference(mixed $reference): mixed
+    {
+        if (!is_string($reference)) {
+            return $reference;
+        }
+
+        $reference = trim($reference);
+
+        return $reference === '' ? null : $reference;
+    }
+
+    private function requireResolvedContext(?Device $device, ?People $provider): void
+    {
+        if (!$device && !$provider) {
+            throw new InvalidArgumentException('Device and provider are required.');
+        }
+
+        if (!$device) {
+            throw new InvalidArgumentException('Device is required.');
+        }
+
+        if (!$provider) {
+            throw new InvalidArgumentException('Provider is required.');
+        }
+    }
+
     public function resolveDeviceAndProvider(
         mixed $deviceReference,
         mixed $providerReference
     ): array {
-        $provider = $this->entityManager->getRepository(People::class)->find($providerReference);
-        $device = $this->entityManager->getRepository(Device::class)->findOneBy([
-            'device' => (string) $deviceReference,
-        ]);
+        $providerReference = $this->normalizeReference($providerReference);
+        $deviceReference = $this->normalizeReference($deviceReference);
+
+        $provider = $providerReference === null
+            ? null
+            : $this->entityManager->getRepository(People::class)->find($providerReference);
+        $device = $deviceReference === null
+            ? null
+            : $this->entityManager->getRepository(Device::class)->findOneBy([
+                'device' => (string) $deviceReference,
+            ]);
 
         return [$device, $provider];
     }
@@ -320,12 +295,14 @@ class CashRegisterService
     public function notifyFromReferences(mixed $deviceReference, mixed $providerReference): void
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
         $this->notify($device, $provider);
     }
 
     public function closeFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
 
         return $this->close($device, $provider);
     }
@@ -333,6 +310,7 @@ class CashRegisterService
     public function openFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+        $this->requireResolvedContext($device, $provider);
 
         return $this->open($device, $provider);
     }
@@ -340,6 +318,10 @@ class CashRegisterService
     public function generateDataFromReferences(mixed $deviceReference, mixed $providerReference)
     {
         [$device, $provider] = $this->resolveDeviceAndProvider($deviceReference, $providerReference);
+
+        if (!$device || !$provider) {
+            return [];
+        }
 
         return $this->generateData($device, $provider);
     }
@@ -351,6 +333,7 @@ class CashRegisterService
             $payload['device'] ?? '',
             $payload['people'] ?? null
         );
+        $this->requireResolvedContext($device, $provider);
 
         return $this->generatePrintData($device, $provider);
     }
