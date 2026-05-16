@@ -15,4 +15,4 @@
 - Totais financeiros de collections de `Invoice` devem sair do `summary` do backend. Para aberto/pago, use resolver de `CollectionSummary`; nao deixe o frontend calcular esses valores pela pagina carregada.
 - As listagens de `Invoice` consumidas por `DefaultTable` React precisam expor `search`, `order` e filtros no backend com `CustomOrFilter`, `OrderFilter` e `DateFilter` alinhados ao store.
 - O financeiro de marketplace de `Food99` deve ser montado a partir do snapshot do pedido e nao por recalculo em outro service, para que o backfill reproduza exatamente o mesmo contrato.
-- Em `Food99`, `receiver = 99 Food` e `wallet = 99 Food` sao obrigatorios nas invoices de repasse e cobranca; nomes `iFood` nao podem entrar no dominio financeiro da empresa.
+- Em `Food99`, `receiver = 99 Food` continua obrigatorio nas invoices de repasse e cobranca da plataforma, mas a `wallet` da loja no repasse semanal vem apenas de `store_settlement_wallet_id` configurado na integracao; nomes `iFood` nao podem entrar no dominio financeiro da empresa.
