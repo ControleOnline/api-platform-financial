@@ -197,13 +197,15 @@ class CardService
                 'ccv' => $card->getCcv(),
             ]);
         } else {
+            $this->guardCanManagePeopleCard($card->getPeopleId());
+
             $sql = '
                 INSERT INTO card (
                     people_id, name, type, document, number_group_1,
                     number_group_2, number_group_3, number_group_4,
                     expiration_month,expiration_year, ccv
                 )
-                SELECT 
+                VALUES (
                     :people_id,
                     AES_ENCRYPT(:name, :tenancy_secret),
                     :type,
@@ -215,9 +217,7 @@ class CardService
                     AES_ENCRYPT(:expm, :tenancy_secret),
                     AES_ENCRYPT(:expy, :tenancy_secret),
                     AES_ENCRYPT(:ccv, :tenancy_secret)
-                FROM people_link PL
-                WHERE (PL.company_id = :people_id OR PL.people_id = :people_id)
-                AND PL.link_type IN ("employee","family")
+                )
             ';
             $conn->executeStatement($sql, [
                 'tenancy_secret' => $_ENV['TENANCY_SECRET'],
@@ -319,5 +319,32 @@ class CardService
         $decoded = json_decode($content, true);
 
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function guardCanManagePeopleCard(int $peopleId): void
+    {
+        if ($peopleId === $this->currentPeople->getId()) {
+            return;
+        }
+
+        $allowed = (int) $this->manager->getConnection()->executeQuery(
+            'SELECT COUNT(1)
+               FROM people_link
+              WHERE company_id = :people_id
+                AND people_id = :current_people_id
+                AND link_type IN ("employee", "family")',
+            [
+                'people_id' => $peopleId,
+                'current_people_id' => $this->currentPeople->getId(),
+            ],
+            [
+                'people_id' => Types::INTEGER,
+                'current_people_id' => Types::INTEGER,
+            ]
+        )->fetchOne();
+
+        if ($allowed <= 0) {
+            throw new \InvalidArgumentException('Card owner not allowed');
+        }
     }
 }
