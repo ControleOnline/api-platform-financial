@@ -4,6 +4,7 @@ namespace ControleOnline\Tests\Service;
 
 use ControleOnline\Entity\Device;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Integration;
 use ControleOnline\Entity\People;
 use ControleOnline\Service\CashRegisterService;
 use ControleOnline\Service\ConfigService;
@@ -16,7 +17,6 @@ use ControleOnline\Service\WhatsAppService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class CashRegisterServiceTest extends TestCase
 {
@@ -66,7 +66,26 @@ class CashRegisterServiceTest extends TestCase
                 'PDV'
             );
 
-        $service = $this->createService($entityManager, $deviceService);
+        $integrationService = $this->createMock(IntegrationService::class);
+        $integrationService
+            ->expects(self::once())
+            ->method('addIntegration')
+            ->with(
+                self::callback(static function (string $payload): bool {
+                    $decoded = json_decode($payload, true);
+
+                    return is_array($decoded)
+                        && ($decoded['event'] ?? null) === 'cash.open'
+                        && ($decoded['openedAtLabel'] ?? '') !== '';
+                }),
+                'PushNotification',
+                null,
+                null,
+                $provider
+            )
+            ->willReturn(new Integration());
+
+        $service = $this->createService($entityManager, $deviceService, $integrationService);
         $service->open($device, $provider);
     }
 
@@ -113,13 +132,20 @@ class CashRegisterServiceTest extends TestCase
                 'PDV'
             );
 
-        $service = $this->createService($entityManager, $deviceService);
+        $integrationService = $this->createMock(IntegrationService::class);
+        $integrationService
+            ->expects(self::once())
+            ->method('addIntegration')
+            ->willReturn(new Integration());
+
+        $service = $this->createService($entityManager, $deviceService, $integrationService);
         $service->open($device, $provider);
     }
 
     private function createService(
         EntityManagerInterface $entityManager,
-        DeviceService $deviceService
+        DeviceService $deviceService,
+        ?IntegrationService $integrationService = null
     ): CashRegisterService {
         return new CashRegisterService(
             $entityManager,
@@ -127,10 +153,9 @@ class CashRegisterServiceTest extends TestCase
             $this->createMock(ConfigService::class),
             $this->createMock(InFlowService::class),
             $deviceService,
-            $this->createMock(IntegrationService::class),
+            $integrationService ?? $this->createMock(IntegrationService::class),
             $this->createMock(WhatsAppService::class),
-            $this->createMock(RequestPayloadService::class),
-            $this->createMock(MessageBusInterface::class)
+            $this->createMock(RequestPayloadService::class)
         );
     }
 }

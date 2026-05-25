@@ -7,12 +7,12 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
-use ControleOnline\Message\SendManagerEventPushMessage;
+use ControleOnline\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CashRegisterService
 {
@@ -27,7 +27,7 @@ class CashRegisterService
         private IntegrationService $integrationService,
         private WhatsAppService $whatsAppService,
         private RequestPayloadService $requestPayloadService,
-        private MessageBusInterface $messageBus
+        private ?TokenStorageInterface $security = null
     ) {}
 
     public function close(Device $device, People $provider)
@@ -37,9 +37,9 @@ class CashRegisterService
         ], $device->getDevice(), $this->pdvDeviceType);
 
         $this->notify($device,  $provider);
-        $this->messageBus->dispatch(new SendManagerEventPushMessage(
-            (int) $provider->getId(),
-            [
+        $this->integrationService->addIntegration(
+            json_encode(
+                [
                 'store' => 'orders',
                 'event' => 'cash.closed',
                 'company' => (string) $provider->getId(),
@@ -57,8 +57,14 @@ class CashRegisterService
                 'message' => 'Fechamento de caixa concluido.',
                 'sentAt' => date(DATE_ATOM),
                 'alertSound' => true,
-            ]
-        ));
+                ],
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+            ) ?: '{}',
+            'PushNotification',
+            null,
+            $this->resolveCurrentUser(),
+            $provider
+        );
     }
 
     public function notify(Device $device, People $provider)
@@ -136,6 +142,72 @@ class CashRegisterService
             'cash-wallet-open-id' => $this->resolveLastInvoiceId($device, $provider),
             'cash-wallet-closed-id' => 0,
         ], $device->getDevice(), $this->pdvDeviceType);
+
+        $openedAt = new \DateTimeImmutable('now');
+        $operatorLabel = $this->resolveCurrentUserLabel();
+        $openedAtLabel = $openedAt->format('d/m/Y H:i');
+        $deviceLabel = trim((string) ($device->getAlias() ?: $device->getDevice()));
+
+        $this->integrationService->addIntegration(
+            json_encode(
+                [
+                    'store' => 'orders',
+                    'event' => 'cash.open',
+                    'company' => (string) $provider->getId(),
+                    'provider' => (string) $provider->getId(),
+                    'providerName' => trim((string) ($provider->getName() ?: $provider->getAlias() ?: 'Loja')),
+                    'device' => $device->getDevice(),
+                    'deviceId' => (string) $device->getId(),
+                    'deviceAlias' => $deviceLabel,
+                    'operator' => $operatorLabel,
+                    'openedAt' => $openedAt->format(DATE_ATOM),
+                    'openedAtLabel' => $openedAtLabel,
+                    'notificationHeader' => 'Caixa aberto',
+                    'notificationSubheader' => sprintf(
+                        '%s abriu o caixa às %s.',
+                        $operatorLabel,
+                        $openedAtLabel
+                    ),
+                    'notificationStatusLabel' => 'Aberto',
+                    'message' => sprintf(
+                        'Caixa %s aberto por %s às %s.',
+                        $deviceLabel ?: $device->getDevice(),
+                        $operatorLabel,
+                        $openedAtLabel
+                    ),
+                    'sentAt' => $openedAt->format(DATE_ATOM),
+                    'alertSound' => true,
+                ],
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+            ) ?: '{}',
+            'PushNotification',
+            null,
+            $this->resolveCurrentUser(),
+            $provider
+        );
+    }
+
+    private function resolveCurrentUser(): ?User
+    {
+        $user = $this->security?->getToken()?->getUser();
+
+        return $user instanceof User ? $user : null;
+    }
+
+    private function resolveCurrentUserLabel(): string
+    {
+        $user = $this->resolveCurrentUser();
+        if (!$user instanceof User) {
+            return 'Usuario autenticado';
+        }
+
+        $people = $user->getPeople();
+        $label = trim((string) ($people->getName() ?: $people->getAlias() ?: ''));
+        if ($label !== '') {
+            return $label;
+        }
+
+        return trim((string) $user->getUsername()) ?: 'Usuario autenticado';
     }
 
     private function resolveLastInvoiceId(Device $device, People $provider): int

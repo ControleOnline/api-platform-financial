@@ -16,3 +16,4 @@
 - As listagens de `Invoice` consumidas por `DefaultTable` React precisam expor `search`, `order` e filtros no backend com `CustomOrFilter`, `OrderFilter` e `DateFilter` alinhados ao store.
 - O financeiro de marketplace de `Food99` deve ser montado a partir do snapshot do pedido e nao por recalculo em outro service, para que o backfill reproduza exatamente o mesmo contrato.
 - Em `Food99`, `receiver = 99 Food` continua obrigatorio nas invoices de repasse e cobranca da plataforma, mas a `wallet` da loja no repasse semanal vem apenas de `store_settlement_wallet_id` configurado na integracao; nomes `iFood` nao podem entrar no dominio financeiro da empresa.
+- Abertura e fechamento de caixa devem gerar alerta humano do `MANAGER` como `PushNotification` na fila de integracao, nao como websocket. `cash.open` deve informar operador e horario da abertura.
