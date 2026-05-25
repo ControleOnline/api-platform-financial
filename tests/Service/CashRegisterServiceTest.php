@@ -14,8 +14,9 @@ use ControleOnline\Service\PrintService;
 use ControleOnline\Service\RequestPayloadService;
 use ControleOnline\Service\WhatsAppService;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class CashRegisterServiceTest extends TestCase
 {
@@ -28,7 +29,10 @@ class CashRegisterServiceTest extends TestCase
         $invoice = $this->createConfiguredMock(Invoice::class, [
             'getId' => 42,
         ]);
-        $repository = $this->createMock(ObjectRepository::class);
+        $repository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findOneBy'])
+            ->getMock();
         $repository
             ->expects(self::once())
             ->method('findOneBy')
@@ -72,7 +76,10 @@ class CashRegisterServiceTest extends TestCase
         $device = $this->createConfiguredMock(Device::class, [
             'getDevice' => 'pdv-1',
         ]);
-        $repository = $this->createMock(ObjectRepository::class);
+        $repository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['findOneBy'])
+            ->getMock();
         $repository
             ->expects(self::once())
             ->method('findOneBy')
@@ -122,7 +129,8 @@ class CashRegisterServiceTest extends TestCase
             $deviceService,
             $this->createMock(IntegrationService::class),
             $this->createMock(WhatsAppService::class),
-            $this->createMock(RequestPayloadService::class)
+            $this->createMock(RequestPayloadService::class),
+            $this->createMock(MessageBusInterface::class)
         );
     }
 }

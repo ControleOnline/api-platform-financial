@@ -7,10 +7,12 @@ use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\OrderProduct;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
+use ControleOnline\Message\SendManagerEventPushMessage;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
 use InvalidArgumentException;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class CashRegisterService
 {
@@ -24,7 +26,8 @@ class CashRegisterService
         private DeviceService $deviceService,
         private IntegrationService $integrationService,
         private WhatsAppService $whatsAppService,
-        private RequestPayloadService $requestPayloadService
+        private RequestPayloadService $requestPayloadService,
+        private MessageBusInterface $messageBus
     ) {}
 
     public function close(Device $device, People $provider)
@@ -34,6 +37,28 @@ class CashRegisterService
         ], $device->getDevice(), $this->pdvDeviceType);
 
         $this->notify($device,  $provider);
+        $this->messageBus->dispatch(new SendManagerEventPushMessage(
+            (int) $provider->getId(),
+            [
+                'store' => 'orders',
+                'event' => 'cash.closed',
+                'company' => (string) $provider->getId(),
+                'provider' => (string) $provider->getId(),
+                'providerName' => trim((string) ($provider->getName() ?: $provider->getAlias() ?: 'Loja')),
+                'device' => $device->getDevice(),
+                'deviceId' => (string) $device->getId(),
+                'deviceAlias' => trim((string) ($device->getAlias() ?: $device->getDevice())),
+                'notificationHeader' => 'Caixa fechado',
+                'notificationSubheader' => sprintf(
+                    '%s concluiu o fechamento de caixa.',
+                    trim((string) ($device->getAlias() ?: $device->getDevice()))
+                ),
+                'notificationStatusLabel' => 'Fechado',
+                'message' => 'Fechamento de caixa concluido.',
+                'sentAt' => date(DATE_ATOM),
+                'alertSound' => true,
+            ]
+        ));
     }
 
     public function notify(Device $device, People $provider)
