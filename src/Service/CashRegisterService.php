@@ -37,7 +37,7 @@ class CashRegisterService
         ], $device->getDevice(), $this->pdvDeviceType);
 
         $this->notify($device,  $provider);
-        $this->integrationService->addIntegration(
+        $this->integrationService->addManagerPushIntegrations(
             json_encode(
                 [
                 'store' => 'orders',
@@ -60,10 +60,8 @@ class CashRegisterService
                 ],
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             ) ?: '{}',
-            'PushNotification',
-            null,
-            $this->resolveCurrentUser(),
-            $provider
+            $provider,
+            $this->resolveCurrentUser()
         );
     }
 
@@ -148,7 +146,7 @@ class CashRegisterService
         $openedAtLabel = $openedAt->format('d/m/Y H:i');
         $deviceLabel = trim((string) ($device->getAlias() ?: $device->getDevice()));
 
-        $this->integrationService->addIntegration(
+        $this->integrationService->addManagerPushIntegrations(
             json_encode(
                 [
                     'store' => 'orders',
@@ -180,10 +178,8 @@ class CashRegisterService
                 ],
                 JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
             ) ?: '{}',
-            'PushNotification',
-            null,
-            $this->resolveCurrentUser(),
-            $provider
+            $provider,
+            $this->resolveCurrentUser()
         );
     }
 

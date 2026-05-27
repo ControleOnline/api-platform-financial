@@ -4,7 +4,6 @@ namespace ControleOnline\Tests\Service;
 
 use ControleOnline\Entity\Device;
 use ControleOnline\Entity\Invoice;
-use ControleOnline\Entity\Integration;
 use ControleOnline\Entity\People;
 use ControleOnline\Service\CashRegisterService;
 use ControleOnline\Service\ConfigService;
@@ -69,7 +68,7 @@ class CashRegisterServiceTest extends TestCase
         $integrationService = $this->createMock(IntegrationService::class);
         $integrationService
             ->expects(self::once())
-            ->method('addIntegration')
+            ->method('addManagerPushIntegrations')
             ->with(
                 self::callback(static function (string $payload): bool {
                     $decoded = json_decode($payload, true);
@@ -78,12 +77,9 @@ class CashRegisterServiceTest extends TestCase
                         && ($decoded['event'] ?? null) === 'cash.open'
                         && ($decoded['openedAtLabel'] ?? '') !== '';
                 }),
-                'PushNotification',
-                null,
-                null,
                 $provider
             )
-            ->willReturn(new Integration());
+            ->willReturn(1);
 
         $service = $this->createService($entityManager, $deviceService, $integrationService);
         $service->open($device, $provider);
@@ -135,8 +131,8 @@ class CashRegisterServiceTest extends TestCase
         $integrationService = $this->createMock(IntegrationService::class);
         $integrationService
             ->expects(self::once())
-            ->method('addIntegration')
-            ->willReturn(new Integration());
+            ->method('addManagerPushIntegrations')
+            ->willReturn(0);
 
         $service = $this->createService($entityManager, $deviceService, $integrationService);
         $service->open($device, $provider);
