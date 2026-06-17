@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use ControleOnline\Service\HydratorService;
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\People;
 use ControleOnline\Entity\Spool;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
