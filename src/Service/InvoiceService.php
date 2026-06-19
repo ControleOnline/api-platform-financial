@@ -268,29 +268,34 @@ class InvoiceService
         }
 
         if ($paidValue > 0 && $paidValue >= $financialOrder->getPrice()) {
-
-            $status = $this->statusService->discoveryRealStatus(
-                'open',
-                'order',
-                'paid'
-            );
-
-
-            $this->markOrderTreeAsPaid($financialOrder, $status);
+            $visitedOrderIds = [];
+            $convertedSaleOrders = [];
+            $this->markOrderTreeAsPaid($financialOrder, $visitedOrderIds, $convertedSaleOrders);
             $this->manager->flush();
-            $this->orderProductQueueService->syncByOrderStatus($financialOrder);
+
+            foreach ($convertedSaleOrders as $convertedSaleOrder) {
+                $this->orderService->dispatchOrderCreated($convertedSaleOrder);
+            }
         }
     }
 
-    private function markOrderTreeAsPaid(Order $order, Status $status, array &$visitedOrderIds = []): void
+    private function markOrderTreeAsPaid(
+        Order $order,
+        array &$visitedOrderIds = [],
+        array &$convertedSaleOrders = []
+    ): void
     {
         if (!$order->getId() || isset($visitedOrderIds[$order->getId()])) {
             return;
         }
 
         $visitedOrderIds[$order->getId()] = true;
-        $this->orderService->convertDraftOrderToSale($order);
-        $order->setStatus($status);
+        if ($this->orderService->convertDraftOrderToSale($order)) {
+            $convertedSaleOrders[$order->getId()] = $order;
+        }
+
+        // Payment alone only closes the order when no delivery or production work is still pending.
+        $order->setStatus($this->orderService->resolvePostPaymentStatus($order));
         $this->manager->persist($order);
         $this->orderProductQueueService->syncByOrderStatus($order);
 
@@ -303,7 +308,7 @@ class InvoiceService
                 continue;
             }
 
-            $this->markOrderTreeAsPaid($linkedOrder, $status, $visitedOrderIds);
+            $this->markOrderTreeAsPaid($linkedOrder, $visitedOrderIds, $convertedSaleOrders);
         }
     }
 
