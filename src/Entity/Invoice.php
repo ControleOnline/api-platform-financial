@@ -23,6 +23,7 @@ use ControleOnline\Controller\GetBankItauDataAction;
 use ControleOnline\Controller\PaylistController;
 use ControleOnline\Controller\SplitInvoiceAction;
 use ControleOnline\DataProvider\InvoiceDataProvider;
+use ControleOnline\State\HydratedReadProvider;
 
 use ControleOnline\Repository\InvoiceRepository;
 use ControleOnline\Service\InvoiceFinancialSummaryResolver;
@@ -40,6 +41,7 @@ use stdClass;
         new Get(
             uriTemplate: '/invoices/{id}',
             security: 'is_granted(\'ROLE_HUMAN\')',
+            provider: HydratedReadProvider::class,
             normalizationContext: ['groups' => ['invoice_details:read']],
         ),
         new GetCollection(
@@ -63,6 +65,7 @@ use stdClass;
         new GetCollection(
             uriTemplate: '/invoices',
             security: 'is_granted(\'ROLE_HUMAN\')',
+            provider: HydratedReadProvider::class,
         ),
 
         new Post(
