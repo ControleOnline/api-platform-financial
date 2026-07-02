@@ -315,24 +315,33 @@ class InvoiceService
     public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
     {
 
+        $companies = array_map(
+            static fn (People $company): int => (int) $company->getId(),
+            $this->peopleService->getMyCompanies()
+        );
+
+        if ($companies === []) {
+            $queryBuilder->andWhere('1 = 0');
+            return;
+        }
+
         if ($order = $this->request->query->get('orderId', null)) {
             $queryBuilder->join(sprintf('%s.order', $rootAlias), 'OrderInvoice');
             $queryBuilder->andWhere(sprintf('OrderInvoice.order IN(:order)', $rootAlias, $rootAlias));
             $queryBuilder->setParameter('order', $order);
         }
 
-        $companies   = $this->peopleService->getMyCompanies();
-        $queryBuilder->andWhere(sprintf('%s.payer IN(:companies) OR %s.receiver IN(:companies)', $rootAlias, $rootAlias));
+        $queryBuilder->andWhere(sprintf('(%s.payer IN(:companies) OR %s.receiver IN(:companies))', $rootAlias, $rootAlias));
         $queryBuilder->setParameter('companies', $companies);
 
         if ($payer = $this->request->query->get('payer', null)) {
             $queryBuilder->andWhere(sprintf('%s.payer IN(:payer)', $rootAlias));
-            $queryBuilder->setParameter('payer', preg_replace("/[^0-9]/", "", $payer));
+            $queryBuilder->setParameter('payer', (int) preg_replace("/[^0-9]/", "", $payer));
         }
 
         if ($receiver = $this->request->query->get('receiver', null)) {
             $queryBuilder->andWhere(sprintf('%s.receiver IN(:receiver)', $rootAlias));
-            $queryBuilder->setParameter('receiver', preg_replace("/[^0-9]/", "", $receiver));
+            $queryBuilder->setParameter('receiver', (int) preg_replace("/[^0-9]/", "", $receiver));
         }
 
         $ownTransfers = $this->request->query->get('ownTransfers', null);
