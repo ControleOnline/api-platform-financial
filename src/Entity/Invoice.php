@@ -66,6 +66,7 @@ use stdClass;
             uriTemplate: '/invoices',
             security: 'is_granted(\'ROLE_HUMAN\')',
             provider: HydratedReadProvider::class,
+            normalizationContext: ['groups' => ['invoice_list:read']],
         ),
 
         new Post(
@@ -195,7 +196,7 @@ class Invoice
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'order_invoice_invoice:read'])]
     private $id;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['order.order' => 'exact'])]
@@ -205,66 +206,66 @@ class Invoice
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['status' => 'exact', 'status.realStatus' => 'exact'])]
     #[ORM\JoinColumn(name: 'status_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: Status::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $status;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['payer' => 'exact'])]
     #[ORM\JoinColumn(name: 'payer_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: People::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $payer;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['receiver' => 'exact'])]
     #[ORM\JoinColumn(name: 'receiver_id', referencedColumnName: 'id')]
     #[ORM\ManyToOne(targetEntity: People::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $receiver;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
     #[ORM\Column(name: 'invoice_date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $invoice_date;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['alter_date' => 'exact'])]
     #[ORM\Column(name: 'alter_date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME on update CURRENT_TIMESTAMP')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $alter_date;
 
     #[ApiFilter(OrderFilter::class, properties: ['dueDate' => 'DESC', 'id' => 'DESC'])]
     #[ApiFilter(filterClass: DateFilter::class, properties: ['dueDate'])]
     #[ORM\Column(name: 'due_date', type: 'datetime', nullable: false, columnDefinition: 'DATE')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $dueDate;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['notified' => 'exact'])]
     #[ORM\Column(name: 'notified', type: 'boolean', nullable: false)]
     #[Assert\Type(type: 'bool')]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'invoice_pay_notified_edit', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'invoice_pay_notified_edit', 'order_invoice_invoice:read'])]
     private $notified = false;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['price' => 'exact'])]
     #[CollectionSummary(['sum'])]
     #[ORM\Column(name: 'price', type: 'float', nullable: true)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $price;
 
-    #[CollectionSummary(name: 'financial', groups: ['invoice:read'], resolver: InvoiceFinancialSummaryResolver::class)]
+    #[CollectionSummary(name: 'financial', groups: ['invoice:read', 'invoice_list:read'], resolver: InvoiceFinancialSummaryResolver::class)]
     private $financialSummary = null;
 
     #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $description = null;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoiceType' => 'exact'])]
     #[ORM\Column(name: 'invoice_type', type: 'string', length: 32, options: ['default' => self::TYPE_INVOICE])]
     #[Assert\Choice(choices: self::TYPES)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $invoiceType = self::TYPE_INVOICE;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['category' => 'exact'])]
     #[ORM\JoinColumn(name: 'category_id', referencedColumnName: 'id', nullable: true)]
     #[ORM\ManyToOne(targetEntity: Category::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $category = null;
 
     #[ORM\Column(type: 'json')]
@@ -274,31 +275,31 @@ class Invoice
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['sourceWallet' => 'exact'])]
     #[ORM\JoinColumn(nullable: true)]
     #[ORM\ManyToOne(targetEntity: Wallet::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $sourceWallet;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['destinationWallet' => 'exact'])]
     #[ORM\JoinColumn(nullable: true)]
     #[ORM\ManyToOne(targetEntity: Wallet::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $destinationWallet;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(targetEntity: PaymentType::class)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $paymentType;
 
     #[ORM\Column(name: 'portion_number', type: 'integer', nullable: false)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $portion;
 
     #[ORM\Column(name: 'installments', type: 'integer', nullable: false)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $installments;
 
     #[ORM\Column(name: 'installment_id', type: 'integer', nullable: true)]
-    #[Groups(['invoice:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
+    #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $installment_id;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['user' => 'exact'])]
