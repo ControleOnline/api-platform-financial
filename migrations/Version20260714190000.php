@@ -117,15 +117,6 @@ final class Version20260714190000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('SET FOREIGN_KEY_CHECKS=0');
-        $this->addSql('DROP VIEW IF EXISTS `vw_products_by_day`');
-        $this->addSql('DROP VIEW IF EXISTS `vw_orders_by_hour`');
-        $this->addSql('DROP VIEW IF EXISTS `vw_invoice_monthly_report`');
-        $this->addSql('DROP TABLE IF EXISTS `wallet_payment_type`');
-        $this->addSql('DROP TABLE IF EXISTS `wallet`');
-        $this->addSql('DROP TABLE IF EXISTS `payment_type`');
-        $this->addSql('DROP TABLE IF EXISTS `invoice`');
-        $this->addSql('DROP TABLE IF EXISTS `card`');
-        $this->addSql('SET FOREIGN_KEY_CHECKS=1');
+        return;
     }
 }
