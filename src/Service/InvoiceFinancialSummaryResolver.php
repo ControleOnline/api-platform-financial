@@ -30,11 +30,11 @@ class InvoiceFinancialSummaryResolver implements CollectionSummaryResolverInterf
             ->select(
                 sprintf('COALESCE(SUM(%s.price), 0) AS totalAmount', $summaryAlias),
                 sprintf(
-                    "COALESCE(SUM(CASE WHEN summary_status.realStatus = :paidStatus THEN %s.price ELSE 0 END), 0) AS paidAmount",
+                    "COALESCE(SUM(CASE WHEN summary_status.status = :paidStatus THEN %s.price ELSE 0 END), 0) AS paidAmount",
                     $summaryAlias
                 ),
                 sprintf(
-                    "COALESCE(SUM(CASE WHEN summary_status.realStatus = :paidStatus THEN 0 ELSE %s.price END), 0) AS openAmount",
+                    "COALESCE(SUM(CASE WHEN summary_status.status = :paidStatus THEN 0 ELSE %s.price END), 0) AS openAmount",
                     $summaryAlias
                 )
             )
