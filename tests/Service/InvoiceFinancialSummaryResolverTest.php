@@ -19,21 +19,16 @@ final class InvoiceFinancialSummaryResolverTest extends TestCase
         $selectedExpressions = [];
         $parameters = [];
 
-        $summaryQuery = $this->createMock(Query::class);
+        $summaryQuery = $this->createStub(Query::class);
         $summaryQuery
             ->method('getOneOrNullResult')
-            ->with(Query::HYDRATE_ARRAY)
             ->willReturn([
                 'totalAmount' => '100.50',
                 'paidAmount' => '80.25',
                 'openAmount' => '20.25',
             ]);
 
-        $summaryQueryBuilder = $this
-            ->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['select', 'from', 'leftJoin', 'andWhere', 'expr', 'setParameter', 'getQuery'])
-            ->getMock();
+        $summaryQueryBuilder = $this->createStub(QueryBuilder::class);
         $summaryQueryBuilder
             ->method('select')
             ->willReturnCallback(function (...$expressions) use (&$selectedExpressions, $summaryQueryBuilder) {
@@ -54,11 +49,7 @@ final class InvoiceFinancialSummaryResolverTest extends TestCase
             });
         $summaryQueryBuilder->method('getQuery')->willReturn($summaryQuery);
 
-        $filteredIdsQueryBuilder = $this
-            ->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getDQL', 'getParameters'])
-            ->getMock();
+        $filteredIdsQueryBuilder = $this->createStub(QueryBuilder::class);
         $filteredIdsQueryBuilder
             ->method('getDQL')
             ->willReturn('SELECT filtered_invoice.id FROM '.Invoice::class.' filtered_invoice');
@@ -66,7 +57,7 @@ final class InvoiceFinancialSummaryResolverTest extends TestCase
             ->method('getParameters')
             ->willReturn(new ArrayCollection());
 
-        $manager = $this->createMock(EntityManagerInterface::class);
+        $manager = $this->createStub(EntityManagerInterface::class);
         $manager
             ->method('createQueryBuilder')
             ->willReturn($summaryQueryBuilder);
