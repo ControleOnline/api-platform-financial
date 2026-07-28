@@ -1,0 +1,3 @@
+controleonline_financial:
+    resource: ../../src/Controller/
+    type: attribute
