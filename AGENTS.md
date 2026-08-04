@@ -1,8 +1,6 @@
-## Financial
-- `payOrder` precisa promover `cart` para `sale` antes de resolver o estado final do pedido.
-- O fechamento depois do pagamento deve escolher `closed` quando nao houver entrega ou fila pendente e `preparando` quando ainda houver trabalho a executar.
-- `order.created` e os pushes de criacao pertencem ao momento em que o pedido vira `sale`; `cart` nao deve disparar esse evento.
+## Ponto de entrada
 
-## Qualidade de código
-
-- A barra comum de modularizacao, testes, smoke tests e limite de tamanho de componentes vive em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- A documentação funcional e de regras deste modulo vive na wiki do proprio repositório e na wiki principal da API.
+- Regras transversais de qualidade, modularizacao e limites de componente vivem em `https://github.com/ControleOnline/agents-mcp/blob/master/skills/shared/code-quality.md`.
+- Quando houver detalhe especifico de implementacao, prefira comentar no codigo em ingles perto da regra.
+- Este arquivo deve ficar curto e servir apenas como ponte para as fontes oficiais.
