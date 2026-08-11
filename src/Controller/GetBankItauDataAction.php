@@ -9,7 +9,7 @@ use ApiPlatform\Core\Exception\ItemNotFoundException;
 use ControleOnline\Entity\Config;
 use ControleOnline\Entity\Invoice;
 use ControleOnline\Entity\People;
-use App\Library\Itau\ItauClient;
+use ControleOnline\Library\Itau\ItauClient;
 use ControleOnline\Service\InvoiceService;
 
 class GetBankItauDataAction
@@ -89,7 +89,7 @@ class GetBankItauDataAction
         $obsAd2          = '';
         $obsAd3          = '';
 
-        $itaucripto      = new \App\Library\Itau\Itaucripto();
+        $itaucripto      = new \ControleOnline\Library\Itau\Itaucripto();
 
         return $itaucripto->geraDados(
             $codEmp,
