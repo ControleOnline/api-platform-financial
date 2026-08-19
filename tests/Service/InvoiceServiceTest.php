@@ -361,6 +361,69 @@ class InvoiceServiceTest extends TestCase
         self::assertSame($preparingStatus, $order->getStatus());
     }
 
+    public function testApplyInvoiceStatusBlocksRegressionFromPaidToWaitingPayment(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $waitingStatus = $this->createStatus('waiting payment', 'pending', 'invoice');
+        $invoice->setStatus($paidStatus);
+
+        $service->applyInvoiceStatus($invoice, $waitingStatus);
+
+        self::assertSame($paidStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusBlocksRegressionFromClosedToWaitingRetrieve(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $closedStatus = $this->createStatus('closed', 'closed', 'invoice');
+        $waitingRetrieve = $this->createStatus('waiting retrieve', 'open', 'invoice');
+        $invoice->setStatus($closedStatus);
+
+        $service->applyInvoiceStatus($invoice, $waitingRetrieve);
+
+        self::assertSame($closedStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusAllowsCancelFromPaid(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $canceledStatus = $this->createStatus('canceled', 'canceled', 'invoice');
+        $invoice->setStatus($paidStatus);
+
+        $service->applyInvoiceStatus($invoice, $canceledStatus);
+
+        self::assertSame($canceledStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusAllowsTransitionFromWaitingToPaid(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $waitingStatus = $this->createStatus('waiting payment', 'pending', 'invoice');
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $invoice->setStatus($waitingStatus);
+
+        $service->applyInvoiceStatus($invoice, $paidStatus);
+
+        self::assertSame($paidStatus, $invoice->getStatus());
+    }
+
+    public function testIsInvoicePaidOrClosed(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $invoice->setStatus($this->createStatus('paid', 'closed', 'invoice'));
+        self::assertTrue($service->isInvoicePaidOrClosed($invoice));
+
+        $invoice->setStatus($this->createStatus('waiting payment', 'pending', 'invoice'));
+        self::assertFalse($service->isInvoicePaidOrClosed($invoice));
+    }
+
     private function createServiceWithoutConstructor(): InvoiceService
     {
         return (new \ReflectionClass(InvoiceService::class))->newInstanceWithoutConstructor();

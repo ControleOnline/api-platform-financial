@@ -40,6 +40,18 @@ class InvoiceService
         $this->request = $this->requestStack->getCurrentRequest();
     }
 
+    /**
+     * Terminal / paid invoice realStatus values that must not regress to waiting payment.
+     * Legitimate exits (cancel, chargeback, refund) use distinct realStatus values.
+     */
+    private const PAID_INVOICE_REAL_STATUSES = ['paid', 'closed'];
+
+    private const WAITING_PAYMENT_LIKE_REAL_STATUSES = [
+        'waiting payment',
+        'waiting retrieve',
+        'pending',
+    ];
+
     public function setPayed(Invoice $invoice)
     {
         $status = $this->statusService->discoveryStatus(
@@ -47,15 +59,59 @@ class InvoiceService
             'paid',
             'invoice'
         );
-        $invoice->setStatus($status);
+        $this->applyInvoiceStatus($invoice, $status);
         $this->manager->persist($invoice);
         $this->manager->flush();
         return $invoice;
     }
 
+    /**
+     * Apply invoice status with guard against regressing a paid/closed invoice
+     * back to waiting-payment-like states (stale callbacks, out-of-order events).
+     *
+     * Cancel / refund / chargeback transitions remain allowed because they use
+     * distinct realStatus values outside WAITING_PAYMENT_LIKE_REAL_STATUSES.
+     */
+    public function applyInvoiceStatus(Invoice $invoice, Status $newStatus): void
+    {
+        $current = $invoice->getStatus();
+        $currentReal = $this->normalizeStatusValue($current?->getRealStatus());
+        $newReal = $this->normalizeStatusValue($newStatus->getRealStatus());
+
+        if (
+            $currentReal !== null
+            && in_array($currentReal, self::PAID_INVOICE_REAL_STATUSES, true)
+            && in_array($newReal, self::WAITING_PAYMENT_LIKE_REAL_STATUSES, true)
+        ) {
+            // Ignore obsolete update; keep terminal paid/closed state.
+            return;
+        }
+
+        $invoice->setStatus($newStatus);
+    }
+
+    public function isInvoicePaidOrClosed(Invoice $invoice): bool
+    {
+        $real = $this->normalizeStatusValue($invoice->getStatus()?->getRealStatus());
+        return $real !== null && in_array($real, self::PAID_INVOICE_REAL_STATUSES, true);
+    }
+
+    private function normalizeStatusValue(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return strtolower(trim($value));
+    }
+
     public function syncItauPaymentStatus(Invoice $invoice, bool $promisePaid, bool $paid): void
     {
-        if ($promisePaid) {
+        // Paid/closed invoice must not be moved back by delayed promise/paid flags.
+        if ($this->isInvoicePaidOrClosed($invoice) && !$paid) {
+            return;
+        }
+
+        if ($promisePaid && !$this->isInvoicePaidOrClosed($invoice)) {
             $status = $this->statusService->discoveryStatus(
                 'open',
                 'waiting retrieve',
