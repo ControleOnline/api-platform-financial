@@ -8,45 +8,70 @@ use ControleOnline\Entity\Status;
 use ControleOnline\Service\HydratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
-
+/**
+ * Public paylist by document (CPF/CNPJ) and optional receiver company.
+ * Security: PUBLIC_ACCESS on /paylist (Invoice ApiResource).
+ * Returns only open/pending/overdue invoices for that payer+receiver pair.
+ */
 class PaylistController extends AbstractController
 {
     public function __construct(
         protected EntityManagerInterface $manager,
         private HydratorService $hydratorService
-
-    ) {}
+    ) {
+    }
 
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $document = $request->get('document', null);
+            $rawDocument = $request->get('document', null);
             $receiver = $request->get('company', null);
-            if (!$document)
+
+            if (!$rawDocument) {
                 throw new Exception('Document not found');
+            }
+
+            $document = preg_replace('/\D+/', '', (string) $rawDocument);
+            if ($document === '') {
+                throw new Exception('Document not found');
+            }
 
             $status = $this->manager->getRepository(Status::class)->findBy([
-                'realStatus' => ['pending','open'],
+                'realStatus' => ['pending', 'open', 'overdue'],
                 'context' => 'invoice',
             ]);
-            $people_document = $this->manager->getRepository(Document::class)->findOneBy([
+
+            $peopleDocument = $this->manager->getRepository(Document::class)->findOneBy([
                 'document' => $document,
             ]);
-            if (!$people_document)
+
+            if (!$peopleDocument && $document !== (string) $rawDocument) {
+                $peopleDocument = $this->manager->getRepository(Document::class)->findOneBy([
+                    'document' => (string) $rawDocument,
+                ]);
+            }
+
+            if (!$peopleDocument) {
                 throw new Exception('Document not found');
+            }
 
-            $result = $this->manager->getRepository(Invoice::class)->findBy([
-                'receiver' => $receiver,
-                'payer' => $people_document->getPeople(),
+            $criteria = [
+                'payer' => $peopleDocument->getPeople(),
                 'status' => $status,
-            ]);
+            ];
+            if ($receiver) {
+                $criteria['receiver'] = $receiver;
+            }
 
-            return new JsonResponse($this->hydratorService->collectionData($result, Invoice::class, 'invoice:read'));
+            $result = $this->manager->getRepository(Invoice::class)->findBy($criteria);
+
+            return new JsonResponse(
+                $this->hydratorService->collectionData($result, Invoice::class, 'invoice:read')
+            );
         } catch (Exception $e) {
             return new JsonResponse($this->hydratorService->error($e));
         }
