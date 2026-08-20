@@ -469,6 +469,7 @@ class InvoiceServiceTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push(Request::create('/invoices'));
 
+        $markService = new \ControleOnline\Service\MarkOverdueInvoicesService($entityManager, $statusService);
         $service = new InvoiceService(
             $entityManager,
             $this->createMock(TokenStorageInterface::class),
@@ -478,7 +479,10 @@ class InvoiceServiceTest extends TestCase
             $statusService,
             $this->createMock(OrderPrintService::class),
             $this->createMock(OrderService::class),
-            $this->createMock(OrderProductQueueService::class)
+            $this->createMock(OrderProductQueueService::class),
+            null,
+            $markService,
+            null
         );
 
         $result = $service->markOverdueInvoices(new \DateTimeImmutable('today'));
