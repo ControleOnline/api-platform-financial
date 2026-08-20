@@ -34,7 +34,8 @@ class InvoiceService
         private StatusService $statusService,
         private OrderPrintService $orderPrintService,
         private OrderService $orderService,
-        private OrderProductQueueService $orderProductQueueService
+        private OrderProductQueueService $orderProductQueueService,
+        private mixed $periodicReceivableDispatcher = null,
 
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
@@ -291,6 +292,25 @@ class InvoiceService
         }
         //$this->braspagService->split($invoice);
         $this->refreshWalletValue($invoice);
+        // api-platform-people#14: aggregate commission/royalties when services are wired
+        $this->dispatchPeriodicReceivables($invoice);
+    }
+
+    /**
+     * Optional hook for PeriodicReceivableDispatcher (api-platform-people#14).
+     * Fail-open: missing wiring or exceptions must not break invoice creation.
+     */
+    private function dispatchPeriodicReceivables(Invoice $invoice): void
+    {
+        $dispatcher = $this->periodicReceivableDispatcher;
+        if ($dispatcher === null || !is_object($dispatcher) || !method_exists($dispatcher, 'dispatch')) {
+            return;
+        }
+        try {
+            $dispatcher->dispatch($invoice);
+        } catch (\Throwable $e) {
+            // Fail-open — log only when a logger becomes available on this service
+        }
     }
     private function refreshWalletValue(Invoice $invoice)
     {
