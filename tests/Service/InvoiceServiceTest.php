@@ -361,6 +361,140 @@ class InvoiceServiceTest extends TestCase
         self::assertSame($preparingStatus, $order->getStatus());
     }
 
+    public function testApplyInvoiceStatusBlocksRegressionFromPaidToWaitingPayment(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $waitingStatus = $this->createStatus('waiting payment', 'pending', 'invoice');
+        $invoice->setStatus($paidStatus);
+
+        $service->applyInvoiceStatus($invoice, $waitingStatus);
+
+        self::assertSame($paidStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusBlocksRegressionFromClosedToWaitingRetrieve(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $closedStatus = $this->createStatus('closed', 'closed', 'invoice');
+        $waitingRetrieve = $this->createStatus('waiting retrieve', 'open', 'invoice');
+        $invoice->setStatus($closedStatus);
+
+        $service->applyInvoiceStatus($invoice, $waitingRetrieve);
+
+        self::assertSame($closedStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusAllowsCancelFromPaid(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $canceledStatus = $this->createStatus('canceled', 'canceled', 'invoice');
+        $invoice->setStatus($paidStatus);
+
+        $service->applyInvoiceStatus($invoice, $canceledStatus);
+
+        self::assertSame($canceledStatus, $invoice->getStatus());
+    }
+
+    public function testApplyInvoiceStatusAllowsTransitionFromWaitingToPaid(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $waitingStatus = $this->createStatus('waiting payment', 'pending', 'invoice');
+        $paidStatus = $this->createStatus('paid', 'closed', 'invoice');
+        $invoice->setStatus($waitingStatus);
+
+        $service->applyInvoiceStatus($invoice, $paidStatus);
+
+        self::assertSame($paidStatus, $invoice->getStatus());
+    }
+
+    public function testIsInvoicePaidOrClosed(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+        $invoice = new Invoice();
+        $invoice->setStatus($this->createStatus('paid', 'closed', 'invoice'));
+        self::assertTrue($service->isInvoicePaidOrClosed($invoice));
+
+        $invoice->setStatus($this->createStatus('waiting payment', 'pending', 'invoice'));
+        self::assertFalse($service->isInvoicePaidOrClosed($invoice));
+    }
+
+
+    public function testMarkOverdueInvoicesUpdatesEligibleAndIsIdempotentOnExcludedStatuses(): void
+    {
+        $overdueStatus = $this->createStatus('overdue', 'em atraso', 'invoice');
+        $pendingInvoice = new Invoice();
+        $pendingInvoice->setStatus($this->createStatus('pending', 'waiting payment', 'invoice'));
+        $pendingInvoice->setDueDate(new \DateTime('-2 days'));
+
+        $paidInvoice = new Invoice();
+        $paidInvoice->setStatus($this->createStatus('closed', 'paid', 'invoice'));
+        $paidInvoice->setDueDate(new \DateTime('-2 days'));
+
+        $alreadyOverdue = new Invoice();
+        $alreadyOverdue->setStatus($overdueStatus);
+        $alreadyOverdue->setDueDate(new \DateTime('-5 days'));
+
+        $query = $this->createMock(\Doctrine\ORM\AbstractQuery::class);
+        $query->method('getResult')->willReturn([$pendingInvoice, $paidInvoice, $alreadyOverdue]);
+
+        $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['select', 'from', 'join', 'where', 'andWhere', 'setParameter', 'getQuery'])
+            ->getMock();
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        $qb->method('join')->willReturnSelf();
+        $qb->method('where')->willReturnSelf();
+        $qb->method('andWhere')->willReturnSelf();
+        $qb->method('setParameter')->willReturnSelf();
+        $qb->method('getQuery')->willReturn($query);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('createQueryBuilder')->willReturn($qb);
+        $entityManager->expects(self::atLeastOnce())->method('persist')->with($pendingInvoice);
+        $entityManager->expects(self::once())->method('flush');
+
+        $statusService = $this->createMock(StatusService::class);
+        $statusService->expects(self::once())
+            ->method('discoveryStatus')
+            ->with('overdue', 'em atraso', 'invoice')
+            ->willReturn($overdueStatus);
+
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create('/invoices'));
+
+        $markService = new \ControleOnline\Service\MarkOverdueInvoicesService($entityManager, $statusService);
+        $service = new InvoiceService(
+            $entityManager,
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(PeopleService::class),
+            $requestStack,
+            $this->createMock(BraspagService::class),
+            $statusService,
+            $this->createMock(OrderPrintService::class),
+            $this->createMock(OrderService::class),
+            $this->createMock(OrderProductQueueService::class),
+            null,
+            $markService,
+            null
+        );
+
+        $result = $service->markOverdueInvoices(new \DateTimeImmutable('today'));
+
+        self::assertSame(1, $result['updated']);
+        self::assertSame(2, $result['skipped']);
+        self::assertSame(0, $result['errors']);
+        self::assertSame($overdueStatus, $pendingInvoice->getStatus());
+        self::assertSame('closed', $paidInvoice->getStatus()->getRealStatus());
+        self::assertSame($overdueStatus, $alreadyOverdue->getStatus());
+    }
+
     private function createServiceWithoutConstructor(): InvoiceService
     {
         return (new \ReflectionClass(InvoiceService::class))->newInstanceWithoutConstructor();
