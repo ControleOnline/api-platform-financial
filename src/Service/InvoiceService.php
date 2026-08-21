@@ -7,6 +7,7 @@ use ControleOnline\Entity\Order;
 use ControleOnline\Entity\OrderInvoice;
 use ControleOnline\Entity\PaymentType;
 use ControleOnline\Entity\People;
+use ControleOnline\Entity\Document;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
 as Security;
@@ -34,11 +35,49 @@ class InvoiceService
         private StatusService $statusService,
         private OrderPrintService $orderPrintService,
         private OrderService $orderService,
-        private OrderProductQueueService $orderProductQueueService
-
+        private OrderProductQueueService $orderProductQueueService,
+        private mixed $periodicReceivableDispatcher = null,
+        private ?MarkOverdueInvoicesService $markOverdueInvoicesService = null,
+        private ?NotifyOverdueChargesService $notifyOverdueChargesService = null,
     ) {
         $this->request = $this->requestStack->getCurrentRequest();
     }
+
+    /**
+     * Delegate to MarkOverdueInvoicesService (api-community#63/#64 modularization).
+     * @return array{updated: int, skipped: int, errors: int}
+     */
+    public function markOverdueInvoices(?\DateTimeInterface $asOf = null): array
+    {
+        if ($this->markOverdueInvoicesService === null) {
+            throw new \RuntimeException('MarkOverdueInvoicesService is not configured');
+        }
+        return $this->markOverdueInvoicesService->markOverdueInvoices($asOf);
+    }
+
+    /**
+     * Delegate to NotifyOverdueChargesService (api-community#64 modularization).
+     * @return array{groups: int, email_ok: int, email_fail: int, whatsapp_ok: int, whatsapp_fail: int, invoices_marked: int, skipped: int}
+     */
+    public function notifyOverdueCharges(?\DateTimeInterface $asOf = null): array
+    {
+        if ($this->notifyOverdueChargesService === null) {
+            throw new \RuntimeException('NotifyOverdueChargesService is not configured');
+        }
+        return $this->notifyOverdueChargesService->notifyOverdueCharges($asOf);
+    }
+
+    /**
+     * Terminal / paid invoice realStatus values that must not regress to waiting payment.
+     * Legitimate exits (cancel, chargeback, refund) use distinct realStatus values.
+     */
+    private const PAID_INVOICE_REAL_STATUSES = ['paid', 'closed'];
+
+    private const WAITING_PAYMENT_LIKE_REAL_STATUSES = [
+        'waiting payment',
+        'waiting retrieve',
+        'pending',
+    ];
 
     public function setPayed(Invoice $invoice)
     {
@@ -47,15 +86,59 @@ class InvoiceService
             'paid',
             'invoice'
         );
-        $invoice->setStatus($status);
+        $this->applyInvoiceStatus($invoice, $status);
         $this->manager->persist($invoice);
         $this->manager->flush();
         return $invoice;
     }
 
+    /**
+     * Apply invoice status with guard against regressing a paid/closed invoice
+     * back to waiting-payment-like states (stale callbacks, out-of-order events).
+     *
+     * Cancel / refund / chargeback transitions remain allowed because they use
+     * distinct realStatus values outside WAITING_PAYMENT_LIKE_REAL_STATUSES.
+     */
+    public function applyInvoiceStatus(Invoice $invoice, Status $newStatus): void
+    {
+        $current = $invoice->getStatus();
+        $currentReal = $this->normalizeStatusValue($current?->getRealStatus());
+        $newReal = $this->normalizeStatusValue($newStatus->getRealStatus());
+
+        if (
+            $currentReal !== null
+            && in_array($currentReal, self::PAID_INVOICE_REAL_STATUSES, true)
+            && in_array($newReal, self::WAITING_PAYMENT_LIKE_REAL_STATUSES, true)
+        ) {
+            // Ignore obsolete update; keep terminal paid/closed state.
+            return;
+        }
+
+        $invoice->setStatus($newStatus);
+    }
+
+    public function isInvoicePaidOrClosed(Invoice $invoice): bool
+    {
+        $real = $this->normalizeStatusValue($invoice->getStatus()?->getRealStatus());
+        return $real !== null && in_array($real, self::PAID_INVOICE_REAL_STATUSES, true);
+    }
+
+    private function normalizeStatusValue(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return strtolower(trim($value));
+    }
+
     public function syncItauPaymentStatus(Invoice $invoice, bool $promisePaid, bool $paid): void
     {
-        if ($promisePaid) {
+        // Paid/closed invoice must not be moved back by delayed promise/paid flags.
+        if ($this->isInvoicePaidOrClosed($invoice) && !$paid) {
+            return;
+        }
+
+        if ($promisePaid && !$this->isInvoicePaidOrClosed($invoice)) {
             $status = $this->statusService->discoveryStatus(
                 'open',
                 'waiting retrieve',
@@ -235,6 +318,25 @@ class InvoiceService
         }
         //$this->braspagService->split($invoice);
         $this->refreshWalletValue($invoice);
+        // api-platform-people#14: aggregate commission/royalties when services are wired
+        $this->dispatchPeriodicReceivables($invoice);
+    }
+
+    /**
+     * Optional hook for PeriodicReceivableDispatcher (api-platform-people#14).
+     * Fail-open: missing wiring or exceptions must not break invoice creation.
+     */
+    private function dispatchPeriodicReceivables(Invoice $invoice): void
+    {
+        $dispatcher = $this->periodicReceivableDispatcher;
+        if ($dispatcher === null || !is_object($dispatcher) || !method_exists($dispatcher, 'dispatch')) {
+            return;
+        }
+        try {
+            $dispatcher->dispatch($invoice);
+        } catch (\Throwable $e) {
+            // Fail-open — log only when a logger becomes available on this service
+        }
     }
     private function refreshWalletValue(Invoice $invoice)
     {
@@ -355,16 +457,11 @@ class InvoiceService
         }
     }
 
-    private function isCanceledStatus(?Status $status): bool
-    {
-        if (!$status instanceof Status) {
-            return false;
-        }
 
-        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
-        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
-
-        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
-            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
-    }
+    /**
+     * Marks unpaid/non-canceled invoices past dueDate as overdue (em atraso).
+     * Idempotent: skips invoices already overdue/closed/canceled.
+     *
+     * @return array{updated: int, skipped: int, errors: int}
+     */
 }
