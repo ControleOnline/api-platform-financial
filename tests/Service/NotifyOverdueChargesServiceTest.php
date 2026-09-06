@@ -3,6 +3,7 @@
 namespace ControleOnline\Tests\Service;
 
 use ControleOnline\Entity\Invoice;
+use ControleOnline\Entity\Document;
 use ControleOnline\Entity\People;
 use ControleOnline\Entity\Status;
 use ControleOnline\Service\NotifyOverdueChargesService;
@@ -18,7 +19,9 @@ class NotifyOverdueChargesServiceTest extends TestCase
         $people->method('getId')->willReturn(10);
         $people->method('getName')->willReturn('Cliente Teste');
         $people->method('getAlias')->willReturn(null);
-        $people->method('getDocument')->willReturn(new \ArrayObject([]));
+        $document = $this->createMock(Document::class);
+        $document->method('getDocument')->willReturn('12345678901');
+        $people->method('getDocument')->willReturn(new \ArrayObject([$document]));
         $people->method('getEmail')->willReturn(new \ArrayObject([]));
         $people->method('getPhone')->willReturn(new \ArrayObject([]));
 
@@ -29,7 +32,7 @@ class NotifyOverdueChargesServiceTest extends TestCase
         $invoice->setPrice(100.0);
         $invoice->setPayer($people);
 
-        $query = $this->createMock(\Doctrine\ORM\AbstractQuery::class);
+        $query = $this->createMock(\Doctrine\ORM\Query::class);
         $query->method('getResult')->willReturn([$invoice]);
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
@@ -64,7 +67,7 @@ class NotifyOverdueChargesServiceTest extends TestCase
 
     public function testNotifyOverdueChargesSkipsWhenNoEligibleInvoices(): void
     {
-        $query = $this->createMock(\Doctrine\ORM\AbstractQuery::class);
+        $query = $this->createMock(\Doctrine\ORM\Query::class);
         $query->method('getResult')->willReturn([]);
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)

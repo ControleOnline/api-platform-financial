@@ -25,6 +25,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Symfony\Component\Serializer\SerializerInterface;
+use ControleOnline\Service\OrderCommercialContextService;
 
 class InvoiceServiceTest extends TestCase
 {
@@ -565,7 +566,7 @@ class InvoiceServiceTest extends TestCase
                 $this->createMock(MessageBusInterface::class),
                 $this->createMock(SerializerInterface::class),
                 $requestStack,
-                null,
+                $this->createMock(OrderCommercialContextService::class),
             ])
             ->getMock();
     }
