@@ -223,6 +223,17 @@ class InvoiceService
         return $canceledInvoices;
     }
 
+    private function isCanceledStatus(mixed $status): bool
+    {
+        if (!$status instanceof Status) {
+            return false;
+        }
+
+        $value = strtolower(trim((string) ($status->getRealStatus() ?: $status->getStatus())));
+
+        return in_array($value, ['cancelled', 'canceled', 'cancel', 'cancellation'], true);
+    }
+
     public function createInvoice(
         ?Order $order = null,
         ?People $payer = null,

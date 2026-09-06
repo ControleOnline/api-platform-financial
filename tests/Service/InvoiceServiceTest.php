@@ -23,6 +23,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class InvoiceServiceTest extends TestCase
 {
@@ -440,7 +442,7 @@ class InvoiceServiceTest extends TestCase
         $alreadyOverdue->setStatus($overdueStatus);
         $alreadyOverdue->setDueDate(new \DateTime('-5 days'));
 
-        $query = $this->createMock(\Doctrine\ORM\AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->method('getResult')->willReturn([$pendingInvoice, $paidInvoice, $alreadyOverdue]);
 
         $qb = $this->getMockBuilder(\Doctrine\ORM\QueryBuilder::class)
@@ -561,6 +563,7 @@ class InvoiceServiceTest extends TestCase
                 $orderProductQueueService,
                 $this->createMock(\ControleOnline\Service\Client\WebsocketClient::class),
                 $this->createMock(MessageBusInterface::class),
+                $this->createMock(SerializerInterface::class),
                 $requestStack,
                 null,
             ])
