@@ -35,6 +35,7 @@ final class Version20260906120000 extends AbstractMigration
         if ($this->columnExists('payment_type', 'people_id')) {
             $this->addSql('INSERT IGNORE INTO people_payment (people_id, payment_type_id)
                 SELECT people_id, id FROM payment_type WHERE people_id IS NOT NULL');
+            $this->addSql('ALTER TABLE payment_type MODIFY people_id INT NULL');
         }
     }
 
