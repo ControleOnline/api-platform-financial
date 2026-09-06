@@ -284,7 +284,7 @@ class Invoice
     #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $destinationWallet;
 
-    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact'])]
+    #[ApiFilter(filterClass: SearchFilter::class, properties: ['paymentType' => 'exact', 'paymentType.paymentType' => 'exact'])]
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(targetEntity: PaymentType::class)]
     #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
