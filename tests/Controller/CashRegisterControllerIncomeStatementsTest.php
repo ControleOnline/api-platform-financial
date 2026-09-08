@@ -66,7 +66,19 @@ class CashRegisterControllerIncomeStatementsTest extends TestCase
             'year' => '2026',
         ]);
 
-        self::assertFalse(method_exists($request, 'get'));
+        self::assertSame('123', $request->query->get('people'));
+        self::assertSame('2026', $request->query->get('year'));
+
+        $source = file_get_contents((new \\ReflectionClass(CashRegisterController::class))->getFileName());
+        self::assertDoesNotMatchRegularExpression(
+            '/\\$request->get\\(/',
+            $source,
+            'CashRegisterController must not call Request::get()'
+        );
+        self::assertMatchesRegularExpression(
+            '/\\$request->query->get\\(\\'year\\'\\)/',
+            $source
+        );
 
         $response = $controller->getIncomeStatements($request);
         $payload = json_decode($response->getContent(), true);
