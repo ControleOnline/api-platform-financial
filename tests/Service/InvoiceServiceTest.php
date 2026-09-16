@@ -413,6 +413,22 @@ class InvoiceServiceTest extends TestCase
         self::assertSame($paidStatus, $invoice->getStatus());
     }
 
+    public function testIsCanceledStatusKeepsCrossVersionListenerCompatibility(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+
+        self::assertTrue($service->isCanceledStatus(
+            $this->createStatus('open', 'canceled', 'order')
+        ));
+        self::assertTrue($service->isCanceledStatus(
+            $this->createStatus('cancelled', 'closed', 'order')
+        ));
+        self::assertFalse($service->isCanceledStatus(
+            $this->createStatus('open', 'closed', 'order')
+        ));
+        self::assertFalse($service->isCanceledStatus(null));
+    }
+
     public function testIsInvoicePaidOrClosed(): void
     {
         $service = $this->createServiceWithoutConstructor();
