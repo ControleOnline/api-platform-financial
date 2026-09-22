@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "rc": 1,
+  "branch": "rc/0.0.1-rc.1",
+  "baseMaster": "724f06443f37e4cccac1b8eb47367d4fe940ccc3",
+  "tasks": [832],
+  "repositories": {
+    "ControleOnline/api-platform-financial": "89edcfb28023e13c56caf4c6ea6b77211e24d1b2"
+  },
+  "frozen": true
+}
