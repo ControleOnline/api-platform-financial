@@ -2,6 +2,7 @@
 
 namespace ControleOnline\Service;
 
+use ControleOnline\Entity\Invoice;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
  AS Security;
@@ -17,18 +18,6 @@ class PaymentTypeService
 
     public function securityFilter(QueryBuilder $queryBuilder, $resourceClass = null, $applyTo = null, $rootAlias = null): void
     {
-        $rootAlias = $rootAlias ?: ($queryBuilder->getRootAliases()[0] ?? null);
-        if (!$rootAlias) {
-            $queryBuilder->andWhere('1 = 0');
-            return;
-        }
-
-        $peoplePaymentAlias = 'paymentTypePeoplePaymentSecurityFilter';
-        if (!in_array($peoplePaymentAlias, $queryBuilder->getAllAliases(), true)) {
-            $queryBuilder->leftJoin(sprintf('%s.peoplePayments', $rootAlias), $peoplePaymentAlias);
-        }
-
-        // Company scope: legacy payment_type.people_id OR people_payment.people_id
-        $this->PeopleService->checkCompany('people', $queryBuilder, $resourceClass, $applyTo, $peoplePaymentAlias);
+        $this->PeopleService->checkCompany('people', $queryBuilder, $resourceClass, $applyTo, $rootAlias);
     }
 }
