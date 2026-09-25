@@ -140,9 +140,9 @@ class CashRegisterController extends AbstractController
     public function getMonthlyStatements(Request $request): Response
     {
         try {
-            $year = $request->query->get('year');
-            $month = $request->query->get('month');
-            $people = $request->query->get('people');
+            $year = $request->get('year', null);
+            $month = $request->get('month', null);
+            $people = $request->get('people', null);
             $result = $this->manager->getRepository(Invoice::class)->getMonthlyDRE($this->manager->getRepository(People::class)->find($people), $year, $month);
 
             return new JsonResponse($this->hydratorService->result($result));
