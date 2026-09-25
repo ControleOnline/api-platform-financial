@@ -31,7 +31,7 @@ class CashRegisterControllerNoRequestGetTest extends TestCase
         );
         $this->assertSame(
             2,
-            substr_count($source, '$request->query->get(\'year\')')
+            substr_count($source, "\$request->query->get('year')")
         );
     }
 }
