@@ -464,4 +464,17 @@ class InvoiceService
      *
      * @return array{updated: int, skipped: int, errors: int}
      */
+    private function isCanceledStatus(mixed $status): bool
+    {
+        if (!$status instanceof Status) {
+            return false;
+        }
+
+        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
+        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
+
+        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
+            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
+    }
+
 }
