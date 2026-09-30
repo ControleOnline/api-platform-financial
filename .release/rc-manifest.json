@@ -1,14 +1,13 @@
 {
-  "version": "1.10.33",
-  "rc": 7,
-  "branch": "rc/1.10.33-rc.7",
-  "baseMaster": "724f06443f37e4cccac1b8eb47367d4fe940ccc3",
+  "version": "1.0.2",
+  "rc": 1,
+  "branch": "rc/1.0.2-rc.1",
+  "baseMaster": "0c25c4cda1b03eea6e81f7e7dfe3327ece70e93e",
   "tasks": [
-    909
+    167
   ],
   "repositories": {
-    "ControleOnline/api-platform-financial": "db91bbae45dc990946e6190462cc974eb75c6f9c"
+    "ControleOnline/api-platform-financial": "0aa339872e4578ce0d6eefa640a8cf03b3f1aa38"
   },
-  "frozen": true,
-  "notes": "hotfix InvoiceService::isCanceledStatus for order cancel"
+  "frozen": true
 }
