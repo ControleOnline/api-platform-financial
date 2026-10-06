@@ -109,4 +109,104 @@ class InvoiceServiceTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($entity, $id);
     }
+    public function testIsCanceledStatusKeepsCrossVersionListenerCompatibility(): void
+    {
+        $service = $this->createServiceWithoutConstructor();
+
+        self::assertTrue($service->isCanceledStatus(
+            $this->createStatus('open', 'canceled', 'order')
+        ));
+        self::assertTrue($service->isCanceledStatus(
+            $this->createStatus('cancelled', 'closed', 'order')
+        ));
+        self::assertFalse($service->isCanceledStatus(
+            $this->createStatus('open', 'closed', 'order')
+        ));
+        self::assertFalse($service->isCanceledStatus(null));
+    }
+    public function testPayOrderConvertsPaidCartToSaleAndClosesWhenNothingIsPending(): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $statusService = $this->createMock(StatusService::class);
+        $queueService = $this->createMock(OrderProductQueueService::class);
+        $closedStatus = $this->createStatus('open', 'paid', 'order');
+
+        $provider = $this->createMock(\ControleOnline\Entity\People::class);
+        $provider
+            ->method('getId')
+            ->willReturn(7);
+
+        $order = new Order();
+        $order->setProvider($provider);
+        $order->setStatus($this->createStatus('open', 'open', 'order'));
+        $order->setOrderType(OrderService::ORDER_TYPE_CART);
+        $order->setPrice(42.50);
+        $this->setEntityId(Order::class, $order, 501);
+
+        $invoice = new Invoice();
+        $invoice->setStatus($this->createStatus('closed', 'paid', 'invoice'));
+        $invoice->setPrice(42.50);
+        $this->linkOrderToInvoice($order, $invoice, 42.50);
+
+        $repository = $this->getMockBuilder(EntityRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['find', 'findBy'])
+            ->getMock();
+        $repository
+            ->expects(self::once())
+            ->method('find')
+            ->with(501)
+            ->willReturn($order);
+        $repository
+            ->expects(self::once())
+            ->method('findBy')
+            ->with(['mainOrderId' => 501])
+            ->willReturn([]);
+
+        $entityManager
+            ->expects(self::exactly(2))
+            ->method('getRepository')
+            ->with(Order::class)
+            ->willReturn($repository);
+        $entityManager
+            ->expects(self::once())
+            ->method('persist')
+            ->with($order);
+        $entityManager
+            ->expects(self::once())
+            ->method('flush');
+
+        $statusService
+            ->expects(self::once())
+            ->method('discoveryStatus')
+            ->with('open', 'paid', 'order')
+            ->willReturn($closedStatus);
+
+        $orderService = $this->buildOrderServiceForPayment(
+            $entityManager,
+            $statusService,
+            $queueService
+        );
+        $orderService
+            ->expects(self::once())
+            ->method('dispatchOrderCreated')
+            ->with($order);
+
+        $queueService
+            ->expects(self::once())
+            ->method('syncByOrderStatus')
+            ->with($order);
+
+        $service = $this->buildInvoiceServiceForPayment(
+            $entityManager,
+            $statusService,
+            $orderService,
+            $queueService
+        );
+
+        $service->payOrder($order);
+
+        self::assertSame(OrderService::ORDER_TYPE_SALE, $order->getOrderType());
+        self::assertSame($closedStatus, $order->getStatus());
+    }
 }
