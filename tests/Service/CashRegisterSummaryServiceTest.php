@@ -62,4 +62,24 @@ class CashRegisterSummaryServiceTest extends TestCase
         self::assertSame(130.5, $r['total']['balance']);
         self::assertSame(5, $r['total']['quantity']);
     }
+
+    public function testDevicesAreGroupedAndNoDeviceRowKeepsTheTotal(): void
+    {
+        $devices = CashRegisterSummaryService::formatDevices([
+            ['device_id' => '4', 'device' => 'abcdef123456', 'alias' => 'Balcao', 'inflow' => '80.25', 'withdrawal' => '10', 'quantity' => '3'],
+            ['device_id' => null, 'device' => null, 'alias' => null, 'inflow' => '19.75', 'withdrawal' => '0', 'quantity' => '1'],
+        ]);
+
+        self::assertSame('Balcao (123456)', $devices[0]['label']);
+        self::assertSame(70.25, $devices[0]['balance']);
+        self::assertNull($devices[1]['deviceId']);
+        self::assertNull($devices[1]['label']);
+        self::assertSame(90.0, round(array_sum(array_column($devices, 'balance')), 2));
+    }
+
+    public function testDeviceLabelFallsBackToIdentifier(): void
+    {
+        self::assertSame('123456', CashRegisterSummaryService::deviceLabel(1, '', 'abcdef123456'));
+        self::assertSame('7', CashRegisterSummaryService::deviceLabel(7, null, null));
+    }
 }
