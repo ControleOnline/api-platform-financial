@@ -168,6 +168,19 @@ class InvoiceService
         }
     }
 
+    public function isCanceledStatus(mixed $status): bool
+    {
+        if (!$status instanceof Status) {
+            return false;
+        }
+
+        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
+        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
+
+        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
+            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
+    }
+
     /**
      * @return Invoice[]
      */
@@ -372,7 +385,8 @@ class InvoiceService
         if ($paidValue > 0 && $paidValue >= $financialOrder->getPrice()) {
             $visitedOrderIds = [];
             $convertedSaleOrders = [];
-            $this->markOrderTreeAsPaid($financialOrder, $visitedOrderIds, $convertedSaleOrders);
+            $this->markOrderTreeAsPaid($financialOrder, $visitedOrderIds, $convertedSaleOrders,
+                TabConsumptionPriceCalculator::supports($financialOrder));
             $this->manager->flush();
 
             foreach ($convertedSaleOrders as $convertedSaleOrder) {
@@ -384,22 +398,31 @@ class InvoiceService
     private function markOrderTreeAsPaid(
         Order $order,
         array &$visitedOrderIds = [],
-        array &$convertedSaleOrders = []
+        array &$convertedSaleOrders = [],
+        bool $tabSettlement = false
     ): void
     {
+        // Only this settlement path excludes unsent/canceled children. Standalone cart payment still promotes.
+        if ($tabSettlement && (
+            in_array(strtolower(trim((string) $order->getStatus()?->getRealStatus())), ['canceled', 'cancelled'], true)
+            || !in_array(strtolower(trim((string) $order->getOrderType())), ['tab', 'sale'], true)
+        )) return;
         if (!$order->getId() || isset($visitedOrderIds[$order->getId()])) {
             return;
         }
 
         $visitedOrderIds[$order->getId()] = true;
-        if ($this->orderService->convertDraftOrderToSale($order)) {
-            $convertedSaleOrders[$order->getId()] = $order;
-        }
+        $keepClosed = $tabSettlement && strtolower(trim((string) $order->getStatus()?->getRealStatus())) === 'closed';
+        if (!$keepClosed) {
+            if ($this->orderService->convertDraftOrderToSale($order)) {
+                $convertedSaleOrders[$order->getId()] = $order;
+            }
 
-        // Payment alone only closes the order when no delivery or production work is still pending.
-        $order->setStatus($this->orderService->resolvePostPaymentStatus($order));
-        $this->manager->persist($order);
-        $this->orderProductQueueService->syncByOrderStatus($order);
+            // Preserve fulfillment rules and already-closed history while visiting eligible descendants.
+            $order->setStatus($this->orderService->resolvePostPaymentStatus($order));
+            $this->manager->persist($order);
+            $this->orderProductQueueService->syncByOrderStatus($order);
+        }
 
         $linkedOrders = $this->manager->getRepository(Order::class)->findBy([
             'mainOrderId' => $order->getId(),
@@ -410,7 +433,7 @@ class InvoiceService
                 continue;
             }
 
-            $this->markOrderTreeAsPaid($linkedOrder, $visitedOrderIds, $convertedSaleOrders);
+            $this->markOrderTreeAsPaid($linkedOrder, $visitedOrderIds, $convertedSaleOrders, $tabSettlement);
         }
     }
 
@@ -464,17 +487,6 @@ class InvoiceService
      *
      * @return array{updated: int, skipped: int, errors: int}
      */
-    private function isCanceledStatus(mixed $status): bool
-    {
-        if (!$status instanceof Status) {
-            return false;
-        }
 
-        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
-        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
-
-        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
-            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
-    }
 
 }

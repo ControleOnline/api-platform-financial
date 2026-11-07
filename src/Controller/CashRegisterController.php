@@ -22,28 +22,9 @@ class CashRegisterController extends AbstractController
     public function __construct(
         private EntityManagerInterface $manager,
         private CashRegisterService $cashRegister,
-        private HydratorService $hydratorService,
-        private CashRegisterSummaryService $summaryService
+        private HydratorService $hydratorService
     ) {}
 
-
-    #[Route('/cash-register/summary', name: 'cash_register_summary', methods: ['GET'])]
-    #[Security("is_granted('ROLE_HUMAN')")]
-    public function getCashRegisterSummary(Request $request): JsonResponse
-    {
-        try {
-            $data = $this->summaryService->getSummary(
-                (int) $request->query->get('provider', 0),
-                (string) $request->query->get('period', 'today'),
-                $request->query->get('from'),
-                $request->query->get('to'),
-                $request->query->get('device')
-            );
-            return new JsonResponse($data);
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
-            return new JsonResponse(['error' => $e->getMessage()], $e->getStatusCode());
-        }
-    }
 
     #[Route('/cash-register/notify', name: 'notify-cash_register', methods: ['POST'])]
     #[Security("is_granted('ROLE_HUMAN')")]
@@ -160,9 +141,9 @@ class CashRegisterController extends AbstractController
     public function getMonthlyStatements(Request $request): Response
     {
         try {
-            $year = $request->get('year', null);
-            $month = $request->get('month', null);
-            $people = $request->get('people', null);
+            $year = $request->query->get('year');
+            $month = $request->query->get('month');
+            $people = $request->query->get('people');
             $result = $this->manager->getRepository(Invoice::class)->getMonthlyDRE($this->manager->getRepository(People::class)->find($people), $year, $month);
 
             return new JsonResponse($this->hydratorService->result($result));

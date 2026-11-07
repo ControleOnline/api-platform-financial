@@ -55,7 +55,7 @@ class OrderSingleInvoiceCancellationListener
         $previousStatus = $changeSet['status'][0] ?? null;
         $nextStatus = $changeSet['status'][1] ?? null;
 
-        return !$this->isCanceledStatus($previousStatus) && $this->isCanceledStatus($nextStatus);
+        return !$this->invoiceService->isCanceledStatus($previousStatus) && $this->invoiceService->isCanceledStatus($nextStatus);
     }
 
     private function resolveCanceledInvoiceStatus(EntityManagerInterface $entityManager): ?Status
@@ -76,16 +76,4 @@ class OrderSingleInvoiceCancellationListener
         return null;
     }
 
-    private function isCanceledStatus(mixed $status): bool
-    {
-        if (!$status instanceof Status) {
-            return false;
-        }
-
-        $normalizedStatus = strtolower(trim((string) $status->getStatus()));
-        $normalizedRealStatus = strtolower(trim((string) $status->getRealStatus()));
-
-        return in_array($normalizedStatus, ['canceled', 'cancelled'], true)
-            || in_array($normalizedRealStatus, ['canceled', 'cancelled'], true);
-    }
 }
