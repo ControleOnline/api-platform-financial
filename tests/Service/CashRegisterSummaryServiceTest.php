@@ -53,7 +53,8 @@ class CashRegisterSummaryServiceTest extends TestCase
             ['payment_type_id' => 1, 'payment_type' => 'Pix', 'inflow' => '100.50', 'withdrawal' => '0', 'quantity' => '3'],
             ['payment_type_id' => 2, 'payment_type' => 'Dinheiro', 'inflow' => '50', 'withdrawal' => '20', 'quantity' => '2'],
         ];
-        $r = CashRegisterSummaryService::format($rows, new \DateTimeImmutable('2026-11-06'), new \DateTimeImmutable('2026-11-07'), false);
+        $r = CashRegisterSummaryService::format($rows, new \DateTimeImmutable('2026-11-06'), new \DateTimeImmutable('2026-11-07'), false, 6);
+        self::assertSame(6, $r['userId']);
         self::assertSame('user', $r['scope']);
         self::assertSame('2026-11-06', $r['to']);
         self::assertSame(30.0, $r['payments'][1]['balance']);

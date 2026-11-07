@@ -124,10 +124,10 @@ class CashRegisterSummaryService
 
         $rows = $this->entityManager->getConnection()->fetchAllAssociative($sql, $params);
 
-        return self::format($rows, $start, $end, $fullAccess);
+        return self::format($rows, $start, $end, $fullAccess, $fullAccess ? null : (int) ($params['user'] ?? 0));
     }
 
-    public static function format(array $rows, \DateTimeImmutable $start, \DateTimeImmutable $end, bool $fullAccess): array
+    public static function format(array $rows, \DateTimeImmutable $start, \DateTimeImmutable $end, bool $fullAccess, ?int $userId = null): array
     {
         $groups = [];
         $total = ['inflow' => 0.0, 'withdrawal' => 0.0, 'balance' => 0.0, 'quantity' => 0];
@@ -159,6 +159,7 @@ class CashRegisterSummaryService
             'from' => $start->format('Y-m-d'),
             'to' => $end->modify('-1 day')->format('Y-m-d'),
             'scope' => $fullAccess ? 'company' : 'user',
+            'userId' => $fullAccess ? null : $userId,
             'payments' => $groups,
             'total' => $total,
         ];
