@@ -22,9 +22,28 @@ class CashRegisterController extends AbstractController
     public function __construct(
         private EntityManagerInterface $manager,
         private CashRegisterService $cashRegister,
-        private HydratorService $hydratorService
+        private HydratorService $hydratorService,
+        private CashRegisterSummaryService $summaryService
     ) {}
 
+
+    #[Route('/cash-register/summary', name: 'cash_register_summary', methods: ['GET'])]
+    #[Security("is_granted('ROLE_HUMAN')")]
+    public function getCashRegisterSummary(Request $request): JsonResponse
+    {
+        try {
+            $data = $this->summaryService->getSummary(
+                (int) $request->query->get('provider', 0),
+                (string) $request->query->get('period', 'today'),
+                $request->query->get('from'),
+                $request->query->get('to'),
+                $request->query->get('device')
+            );
+            return new JsonResponse($data);
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            return new JsonResponse(['error' => $e->getMessage()], $e->getStatusCode());
+        }
+    }
 
     #[Route('/cash-register/notify', name: 'notify-cash_register', methods: ['POST'])]
     #[Security("is_granted('ROLE_HUMAN')")]
