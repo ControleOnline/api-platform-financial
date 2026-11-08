@@ -133,8 +133,62 @@ class CashRegisterSummaryService
             $params
         );
 
+        $crossRows = $connection->fetchAllAssociative(
+            "SELECT pt.id AS payment_type_id, COALESCE(pt.payment_type, '-') AS payment_type,
+                    d.id AS device_id, d.device AS device, d.alias AS alias, $sums
+               $from LEFT JOIN payment_type pt ON pt.id = i.payment_type_id
+               LEFT JOIN device d ON d.id = i.device_id
+               $where GROUP BY pt.id, pt.payment_type, d.id, d.device, d.alias ORDER BY inflow DESC",
+            $params
+        );
+
         $result = self::format($rows, $start, $end, $fullAccess, $fullAccess ? null : (int) ($params['user'] ?? 0));
         $result['devices'] = self::formatDevices($deviceRows);
+
+        return self::attachCross($result, $crossRows);
+    }
+
+    /**
+     * Nests the payment x device breakdown: each payment gets its `devices`
+     * and each device gets its `payments`, so the sub cards add up to the parent.
+     */
+    public static function attachCross(array $result, array $crossRows): array
+    {
+        $byPayment = [];
+        $byDevice = [];
+
+        foreach ($crossRows as $row) {
+            $inflow = round((float) $row['inflow'], 2);
+            $withdrawal = round((float) $row['withdrawal'], 2);
+            $quantity = (int) $row['quantity'];
+            $paymentTypeId = $row['payment_type_id'] !== null ? (int) $row['payment_type_id'] : null;
+            $deviceId = $row['device_id'] !== null ? (int) $row['device_id'] : null;
+            $amounts = [
+                'inflow' => $inflow,
+                'withdrawal' => $withdrawal,
+                'balance' => round($inflow - $withdrawal, 2),
+                'quantity' => $quantity,
+            ];
+
+            $byPayment[(string) $paymentTypeId][] = [
+                'deviceId' => $deviceId,
+                'device' => $row['device'] ?? null,
+                'label' => self::deviceLabel($deviceId, $row['alias'] ?? null, $row['device'] ?? null),
+            ] + $amounts;
+
+            $byDevice[(string) $deviceId][] = [
+                'paymentTypeId' => $paymentTypeId,
+                'paymentType' => $row['payment_type'],
+            ] + $amounts;
+        }
+
+        foreach ($result['payments'] as $index => $payment) {
+            $result['payments'][$index]['devices'] = $byPayment[(string) $payment['paymentTypeId']] ?? [];
+        }
+
+        foreach ($result['devices'] as $index => $device) {
+            $result['devices'][$index]['payments'] = $byDevice[(string) $device['deviceId']] ?? [];
+        }
 
         return $result;
     }
