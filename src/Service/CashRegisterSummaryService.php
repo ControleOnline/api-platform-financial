@@ -97,34 +97,140 @@ class CashRegisterSummaryService
             'end' => $end->format('Y-m-d H:i:s'),
         ];
 
-        $sql = "SELECT pt.id AS payment_type_id,
-                       COALESCE(pt.payment_type, '-') AS payment_type,
-                       SUM(CASE WHEN i.source_wallet_id IS NULL THEN i.price ELSE 0 END) AS inflow,
-                       SUM(CASE WHEN i.source_wallet_id IS NOT NULL THEN i.price ELSE 0 END) AS withdrawal,
-                       COUNT(i.id) AS quantity
-                  FROM invoice i
-                  JOIN status s ON s.id = i.status_id AND s.real_status = 'closed'
-                  LEFT JOIN payment_type pt ON pt.id = i.payment_type_id
-                 WHERE i.receiver_id = :company
+        $where = " WHERE i.receiver_id = :company
                    AND i.invoice_type IN ('invoice', 'payment')
                    AND i.invoice_date >= :start
                    AND i.invoice_date < :end";
 
         if ($device) {
-            $sql .= ' AND i.device_id IN (SELECT d.id FROM device d WHERE d.device = :device)';
+            $where .= ' AND i.device_id IN (SELECT dv.id FROM device dv WHERE dv.device = :device)';
             $params['device'] = $device;
         }
 
         if (!$fullAccess) {
-            $sql .= ' AND i.user_id = :user';
+            $where .= ' AND i.user_id = :user';
             $params['user'] = $user && method_exists($user, 'getId') ? $user->getId() : 0;
         }
 
-        $sql .= ' GROUP BY pt.id, pt.payment_type ORDER BY inflow DESC';
+        $sums = "SUM(CASE WHEN i.source_wallet_id IS NULL THEN i.price ELSE 0 END) AS inflow,
+                 SUM(CASE WHEN i.source_wallet_id IS NOT NULL THEN i.price ELSE 0 END) AS withdrawal,
+                 COUNT(i.id) AS quantity";
+        $from = " FROM invoice i JOIN status s ON s.id = i.status_id AND s.real_status = 'closed'";
 
-        $rows = $this->entityManager->getConnection()->fetchAllAssociative($sql, $params);
+        $connection = $this->entityManager->getConnection();
 
-        return self::format($rows, $start, $end, $fullAccess, $fullAccess ? null : (int) ($params['user'] ?? 0));
+        $rows = $connection->fetchAllAssociative(
+            "SELECT pt.id AS payment_type_id, COALESCE(pt.payment_type, '-') AS payment_type, $sums
+               $from LEFT JOIN payment_type pt ON pt.id = i.payment_type_id
+               $where GROUP BY pt.id, pt.payment_type ORDER BY inflow DESC",
+            $params
+        );
+
+        $deviceRows = $connection->fetchAllAssociative(
+            "SELECT d.id AS device_id, d.device AS device, d.alias AS alias, $sums
+               $from LEFT JOIN device d ON d.id = i.device_id
+               $where GROUP BY d.id, d.device, d.alias ORDER BY inflow DESC",
+            $params
+        );
+
+        $crossRows = $connection->fetchAllAssociative(
+            "SELECT pt.id AS payment_type_id, COALESCE(pt.payment_type, '-') AS payment_type,
+                    d.id AS device_id, d.device AS device, d.alias AS alias, $sums
+               $from LEFT JOIN payment_type pt ON pt.id = i.payment_type_id
+               LEFT JOIN device d ON d.id = i.device_id
+               $where GROUP BY pt.id, pt.payment_type, d.id, d.device, d.alias ORDER BY inflow DESC",
+            $params
+        );
+
+        $result = self::format($rows, $start, $end, $fullAccess, $fullAccess ? null : (int) ($params['user'] ?? 0));
+        $result['devices'] = self::formatDevices($deviceRows);
+
+        return self::attachCross($result, $crossRows);
+    }
+
+    /**
+     * Nests the payment x device breakdown: each payment gets its `devices`
+     * and each device gets its `payments`, so the sub cards add up to the parent.
+     */
+    public static function attachCross(array $result, array $crossRows): array
+    {
+        $byPayment = [];
+        $byDevice = [];
+
+        foreach ($crossRows as $row) {
+            $inflow = round((float) $row['inflow'], 2);
+            $withdrawal = round((float) $row['withdrawal'], 2);
+            $quantity = (int) $row['quantity'];
+            $paymentTypeId = $row['payment_type_id'] !== null ? (int) $row['payment_type_id'] : null;
+            $deviceId = $row['device_id'] !== null ? (int) $row['device_id'] : null;
+            $amounts = [
+                'inflow' => $inflow,
+                'withdrawal' => $withdrawal,
+                'balance' => round($inflow - $withdrawal, 2),
+                'quantity' => $quantity,
+            ];
+
+            $byPayment[(string) $paymentTypeId][] = [
+                'deviceId' => $deviceId,
+                'device' => $row['device'] ?? null,
+                'label' => self::deviceLabel($deviceId, $row['alias'] ?? null, $row['device'] ?? null),
+            ] + $amounts;
+
+            $byDevice[(string) $deviceId][] = [
+                'paymentTypeId' => $paymentTypeId,
+                'paymentType' => $row['payment_type'],
+            ] + $amounts;
+        }
+
+        foreach ($result['payments'] as $index => $payment) {
+            $result['payments'][$index]['devices'] = $byPayment[(string) $payment['paymentTypeId']] ?? [];
+        }
+
+        foreach ($result['devices'] as $index => $device) {
+            $result['devices'][$index]['payments'] = $byDevice[(string) $device['deviceId']] ?? [];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Groups by device. Invoices without device are kept in a "no device" row
+     * (deviceId null) so the sum matches the payment type block.
+     */
+    public static function formatDevices(array $rows): array
+    {
+        $devices = [];
+
+        foreach ($rows as $row) {
+            $inflow = round((float) $row['inflow'], 2);
+            $withdrawal = round((float) $row['withdrawal'], 2);
+            $deviceId = $row['device_id'] !== null ? (int) $row['device_id'] : null;
+
+            $devices[] = [
+                'deviceId' => $deviceId,
+                'device' => $row['device'] ?? null,
+                'label' => self::deviceLabel($deviceId, $row['alias'] ?? null, $row['device'] ?? null),
+                'inflow' => $inflow,
+                'withdrawal' => $withdrawal,
+                'balance' => round($inflow - $withdrawal, 2),
+                'quantity' => (int) $row['quantity'],
+            ];
+        }
+
+        return $devices;
+    }
+
+    /** Friendly name: alias plus the identifier tail, since many devices share the default alias. */
+    public static function deviceLabel(?int $deviceId, ?string $alias, ?string $device): ?string
+    {
+        if ($deviceId === null) {
+            return null;
+        }
+
+        $alias = trim((string) $alias);
+        $tail = $device !== null && $device !== '' ? substr($device, -6) : (string) $deviceId;
+
+        return $alias !== '' ? sprintf('%s (%s)', $alias, $tail) : $tail;
     }
 
     public static function format(array $rows, \DateTimeImmutable $start, \DateTimeImmutable $end, bool $fullAccess, ?int $userId = null): array
