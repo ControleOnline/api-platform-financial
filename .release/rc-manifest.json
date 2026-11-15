@@ -1,14 +1,14 @@
 {
-  "version": "1.0.7",
+  "version": "1.0.9",
   "rc": 1,
-  "branch": "rc/1.0.7-rc.1",
+  "branch": "rc/1.0.9-rc.1",
   "baseMaster": "db11f31556edd13250cc1cd610203deaf87d80ae",
+  "baseTag": "v1.0.8",
   "tasks": [
-    133
+    35
   ],
-  "taskRepository": "ControleOnline/ui-common",
+  "frozen": true,
   "repositories": {
-    "ControleOnline/api-platform-financial": "a6ea6c97ba09831d0d419cef01c820f44cb7dffc"
-  },
-  "frozen": true
+    "ControleOnline/api-platform-financial": "17f9d22a0fe94e060b3e2cb66c983e2b10a113ae"
+  }
 }
