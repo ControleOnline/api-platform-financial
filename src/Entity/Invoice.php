@@ -222,6 +222,7 @@ class Invoice
     private $receiver;
 
     #[ApiFilter(filterClass: SearchFilter::class, properties: ['invoice_date' => 'exact'])]
+    #[ApiFilter(filterClass: DateFilter::class, properties: ['invoiceDate'])]
     #[ORM\Column(name: 'invoice_date', type: 'datetime', nullable: false, columnDefinition: 'DATETIME')]
     #[Groups(['invoice:read', 'invoice_list:read', 'invoice_details:read', 'logistic:read', 'invoice:write', 'order_invoice:write', 'order_invoice_invoice:read'])]
     private $invoice_date;
