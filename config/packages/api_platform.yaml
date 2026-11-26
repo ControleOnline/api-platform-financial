@@ -5,4 +5,4 @@ api_platform:
                 "%kernel.project_dir%/vendor/controleonline/financial/src/Entity",
                 "%kernel.project_dir%/vendor/controleonline/financial/src/Resource",
             ]
-    
+
